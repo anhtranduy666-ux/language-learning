@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import type { Achievement, UserProgress } from '../types'
 import { todayIso } from '../lib/date'
@@ -35,19 +35,33 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
   const [newAchievements, setNewAchievements] = useState<Achievement[]>([])
   const today = todayIso()
 
+  // Giữ bản mới nhất ngoài state để hàm cập nhật của React luôn thuần tuý.
+  const latest = useRef(progress)
+
   useEffect(() => {
     saveProgress(progress)
   }, [progress])
 
-  /** Áp dụng một phép biến đổi thuần và gom lại những thành tích vừa mở. */
+  /**
+   * Áp dụng một phép biến đổi thuần và gom lại những thành tích vừa mở.
+   *
+   * Việc so sánh thành tích cố tình nằm ngoài hàm cập nhật của `setProgress`:
+   * React có thể gọi hàm đó nhiều lần cho cùng một thao tác, và trước đây điều
+   * này làm thành tích bị xếp hàng trùng lặp.
+   */
   const apply = useCallback((transform: (current: UserProgress) => UserProgress) => {
-    setProgress((current) => {
-      const next = transform(current)
-      const unlocked = newlyUnlocked(current, next)
-      if (unlocked.length > 0) {
-        setNewAchievements((pending) => [...pending, ...unlocked])
-      }
-      return next
+    const current = latest.current
+    const next = transform(current)
+    latest.current = next
+    setProgress(next)
+
+    const unlocked = newlyUnlocked(current, next)
+    if (unlocked.length === 0) return
+
+    setNewAchievements((pending) => {
+      const seen = new Set(pending.map((achievement) => achievement.id))
+      const fresh = unlocked.filter((achievement) => !seen.has(achievement.id))
+      return fresh.length > 0 ? [...pending, ...fresh] : pending
     })
   }, [])
 
@@ -65,7 +79,8 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
       resetEverything: () => {
         clearProgress()
         setNewAchievements([])
-        setProgress(createProgress())
+        latest.current = createProgress()
+        setProgress(latest.current)
       },
     }),
     [apply, newAchievements, progress, today],

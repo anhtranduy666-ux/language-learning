@@ -243,9 +243,16 @@ describe('Trọn vẹn một buổi học — tiêu chí nghiệm thu của Vers
     expect(screen.getByText(`${EXERCISES.length}/${EXERCISES.length} câu đúng`)).toBeInTheDocument()
     expect(screen.getByText(/đã đạt mục tiêu/)).toBeInTheDocument()
 
-    // Thành tích đầu tiên được mở khoá.
+    // Thành tích đầu tiên được mở khoá, và chỉ được liệt kê đúng một lần.
     const achievements = screen.getByRole('heading', { name: 'Thành tích mới' }).parentElement!
     expect(within(achievements).getByText('First Lesson')).toBeInTheDocument()
+    expect(within(achievements).getAllByRole('listitem')).toHaveLength(
+      new Set(
+        within(achievements)
+          .getAllByRole('listitem')
+          .map((item) => item.textContent),
+      ).size,
+    )
 
     // Người học được mời đi tiếp sang bài kế tiếp.
     expect(screen.getByRole('button', { name: 'Học bài tiếp theo' })).toBeInTheDocument()
