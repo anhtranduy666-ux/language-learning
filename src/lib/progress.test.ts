@@ -4,6 +4,7 @@ import {
   awardXp,
   completeLesson,
   createProgress,
+  isOnboarded,
   recordCorrectAnswer,
   recordWordReview,
   setDailyGoal,
@@ -24,6 +25,24 @@ describe('createProgress', () => {
 
   it('nhận tên tuỳ chỉnh', () => {
     expect(createProgress('Duy').name).toBe('Duy')
+  })
+
+  it('mặc định chưa có tên, tức là chưa qua màn chào', () => {
+    expect(createProgress().name).toBe('')
+  })
+})
+
+describe('isOnboarded', () => {
+  it('false khi chưa khai tên', () => {
+    expect(isOnboarded(createProgress())).toBe(false)
+  })
+
+  it('false khi tên chỉ có khoảng trắng', () => {
+    expect(isOnboarded({ ...createProgress(), name: '   ' })).toBe(false)
+  })
+
+  it('true sau khi đã khai tên', () => {
+    expect(isOnboarded(createProgress('Duy'))).toBe(true)
   })
 })
 

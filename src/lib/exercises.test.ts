@@ -8,6 +8,7 @@ import {
   gradeChoice,
   gradeMatching,
   isChoiceExercise,
+  seedFromText,
   shuffle,
 } from './exercises'
 
@@ -32,6 +33,24 @@ describe('createRng', () => {
       const value = rng()
       expect(value).toBeGreaterThanOrEqual(0)
       expect(value).toBeLessThan(1)
+    }
+  })
+})
+
+describe('seedFromText', () => {
+  it('cùng chuỗi cho cùng seed', () => {
+    expect(seedFromText('u1l1')).toBe(seedFromText('u1l1'))
+  })
+
+  it('chuỗi khác cho seed khác', () => {
+    expect(seedFromText('u1l1')).not.toBe(seedFromText('u1l2'))
+  })
+
+  it('luôn là số nguyên không âm', () => {
+    for (const id of ['', 'u1l1', 'một chuỗi tiếng Việt dài']) {
+      const seed = seedFromText(id)
+      expect(Number.isInteger(seed)).toBe(true)
+      expect(seed).toBeGreaterThanOrEqual(0)
     }
   })
 })

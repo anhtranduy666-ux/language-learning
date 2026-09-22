@@ -1,8 +1,8 @@
 import type { UserProgress } from '../types'
 import { DEFAULT_DAILY_GOAL, XP_REWARDS, evaluateAchievements, nextStreak } from './gamification'
 
-/** Tiến độ khởi điểm của một người học mới. */
-export function createProgress(name = 'Bạn'): UserProgress {
+/** Tiến độ khởi điểm của một người học mới. Tên rỗng nghĩa là chưa qua màn chào. */
+export function createProgress(name = ''): UserProgress {
   return {
     name,
     xp: 0,
@@ -108,4 +108,9 @@ export function setDailyGoal(progress: UserProgress, goal: number): UserProgress
 export function setName(progress: UserProgress, name: string): UserProgress {
   const trimmed = name.trim()
   return { ...progress, name: trimmed === '' ? progress.name : trimmed }
+}
+
+/** Người học đã qua màn chào và khai tên chưa. */
+export function isOnboarded(progress: UserProgress): boolean {
+  return progress.name.trim() !== ''
 }

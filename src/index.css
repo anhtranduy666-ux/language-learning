@@ -1,0 +1,65 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-brand-50: #fff5f4;
+  --color-brand-100: #ffe4e1;
+  --color-brand-200: #ffc9c3;
+  --color-brand-300: #ffa49b;
+  --color-brand-400: #f9756a;
+  --color-brand-500: #e2483d;
+  --color-brand-600: #c4342a;
+  --color-brand-700: #9e2822;
+  --color-gold-400: #f5b83d;
+  --color-gold-500: #e09c1c;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-slate-50 text-slate-900 antialiased;
+  }
+
+  /* Chữ Hán cần font có bộ chữ Trung để không bị hiển thị thành ô vuông. */
+  .font-hanzi {
+    font-family: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', 'Hiragino Sans GB', sans-serif;
+  }
+
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-brand-500;
+  }
+}
+
+@layer components {
+  /* Hiệu ứng lật flashcard. Phần tử cha cần perspective. */
+  .flip-scene {
+    perspective: 1200px;
+  }
+
+  .flip-card {
+    transform-style: preserve-3d;
+    transition: transform 500ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .flip-card[data-flipped='true'] {
+    transform: rotateY(180deg);
+  }
+
+  .flip-face {
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
+
+  .flip-face-back {
+    transform: rotateY(180deg);
+  }
+}
+
+/* Người dùng bật "giảm chuyển động" thì bỏ hiệu ứng lật. */
+@media (prefers-reduced-motion: reduce) {
+  .flip-card {
+    transition: none;
+  }
+}

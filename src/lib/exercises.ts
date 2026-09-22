@@ -15,6 +15,19 @@ export function createRng(seed: number): () => number {
   }
 }
 
+/**
+ * Biến một chuỗi thành seed số (FNV-1a).
+ * Nhờ vậy mỗi lesson luôn sinh ra đúng một bộ câu hỏi, lần học lại vẫn như cũ.
+ */
+export function seedFromText(text: string): number {
+  let hash = 2166136261
+  for (let i = 0; i < text.length; i += 1) {
+    hash ^= text.charCodeAt(i)
+    hash = Math.imul(hash, 16777619)
+  }
+  return hash >>> 0
+}
+
 /** Trộn mảng, không làm thay đổi mảng gốc (Fisher–Yates). */
 export function shuffle<T>(items: readonly T[], rng: () => number): T[] {
   const result = [...items]
