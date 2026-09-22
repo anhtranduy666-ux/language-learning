@@ -53,6 +53,10 @@ Máy nào không có cả hai thì nút chuyển sang màu xám, bấm vào sẽ
 cài giọng tiếng Trung thay vì im lặng. Riêng bài tập nghe sẽ hiện pinyin thay
 thế để người học vẫn đi hết được bài.
 
+Hướng đi tiếp theo đã chốt: sinh audio bằng dịch vụ TTS qua Supabase Edge
+Function và cache vào Supabase Storage — xem
+[docs/audio-tts.md](docs/audio-tts.md).
+
 Lưu ý: Windows **không** cài sẵn giọng tiếng Trung. Muốn nghe được bằng giọng hệ
 điều hành thì vào Cài đặt → Thời gian và ngôn ngữ → Giọng nói → Thêm giọng nói →
 Chinese (Simplified). Cách chắc ăn hơn cho người dùng cuối là thu sẵn file audio,
