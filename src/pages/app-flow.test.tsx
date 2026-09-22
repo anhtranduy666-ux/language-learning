@@ -17,6 +17,9 @@ const LESSON_WORDS = wordsOfLesson(LESSON_ID)
 /** Bộ câu hỏi mà màn hình bài tập sẽ sinh ra — dựng lại y hệt để biết đáp án đúng. */
 const EXERCISES = buildExercises(LESSON_WORDS, WORDS, createRng(seedFromText(LESSON_ID)))
 
+/** Vị trí câu nghe đầu tiên — phần audio của Version 2 được kiểm ở đây. */
+const LISTENING_INDEX = EXERCISES.findIndex((exercise) => exercise.kind === 'listening')
+
 /** Đọc con số trên một thẻ chỉ số của màn hình Tiến độ. */
 function metric(label: string): string {
   const card = screen.getByRole('group', { name: label })
@@ -33,7 +36,12 @@ async function reviewAllFlashcards(user: UserEvent, known = true) {
 
 /** Làm hết bài tập, luôn chọn đáp án đúng. */
 async function answerAllExercises(user: UserEvent) {
-  for (const exercise of EXERCISES) {
+  await answerExercises(user, EXERCISES)
+}
+
+/** Làm một dãy bài tập cho trước, luôn chọn đáp án đúng. */
+async function answerExercises(user: UserEvent, list: typeof EXERCISES) {
+  for (const exercise of list) {
     if (isChoiceExercise(exercise)) {
       const correct = exercise.choices.find((c) => c.id === exercise.correctChoiceId)!
       await user.click(screen.getByRole('button', { name: correct.label }))
@@ -217,6 +225,31 @@ describe('Bài tập', () => {
     await user.click(screen.getByRole('button', { name: 'Tiếp tục' }))
 
     expect(screen.getByText(new RegExp(`2/${EXERCISES.length}`))).toBeInTheDocument()
+  })
+
+  it('bộ bài tập có ít nhất một câu nghe', () => {
+    expect(LISTENING_INDEX).toBeGreaterThanOrEqual(0)
+  })
+
+  it('bài nghe có nút phát âm', async () => {
+    const { user } = renderApp(`/lesson/${LESSON_ID}/exercise`, ONBOARDED)
+
+    await answerExercises(user, EXERCISES.slice(0, LISTENING_INDEX))
+
+    expect(
+      screen.getByRole('button', { name: 'Nghe phát âm từ trong câu hỏi' }),
+    ).toBeInTheDocument()
+  })
+
+  it('máy không phát được âm thì bài nghe hiện pinyin thay thế', async () => {
+    // jsdom không có Web Speech API, đúng bằng tình huống máy thiếu giọng tiếng Trung.
+    const { user } = renderApp(`/lesson/${LESSON_ID}/exercise`, ONBOARDED)
+
+    await answerExercises(user, EXERCISES.slice(0, LISTENING_INDEX))
+
+    const listening = EXERCISES[LISTENING_INDEX]
+    if (!isChoiceExercise(listening)) throw new Error('Câu này phải là dạng nghe')
+    expect(screen.getByText(WORDS.find((w) => w.id === listening.wordId)!.pinyin)).toBeInTheDocument()
   })
 })
 

@@ -28,7 +28,7 @@ export function Flashcard({ word, flipped, onFlip }: FlashcardProps) {
           <p className="font-hanzi text-7xl font-semibold text-slate-900 sm:text-8xl">
             {word.hanzi}
           </p>
-          <AudioButton text={word.hanzi} label={word.hanzi} size="md" />
+          <AudioButton text={word.hanzi} wordId={word.id} label={word.hanzi} size="md" />
           <p className="text-sm text-slate-400">Chạm để xem nghĩa</p>
         </div>
 

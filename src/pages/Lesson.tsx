@@ -34,7 +34,7 @@ export function Lesson() {
                   <p className="text-brand-600">{word.pinyin}</p>
                   <p className="font-medium text-slate-800">{word.meaning}</p>
                 </div>
-                <AudioButton text={word.hanzi} label={word.hanzi} size="sm" />
+                <AudioButton text={word.hanzi} wordId={word.id} label={word.hanzi} size="sm" />
               </div>
 
               <div className="mt-3 rounded-xl bg-slate-50 px-3 py-2">

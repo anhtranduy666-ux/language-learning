@@ -32,13 +32,31 @@ Yêu cầu Node.js 20 trở lên.
 - **Bài tập**: đủ 4 dạng của Version 2 — trắc nghiệm, ghép nối, nghe, chọn pinyin.
 - **Gamification**: XP, level, daily goal, streak và 9 thành tích.
 - **Lưu trữ**: tiến độ nằm trong `localStorage`, tự khôi phục khi mở lại.
+- **Phát âm**: nút loa ở màn hình từ vựng, flashcard và bài nghe. Xem mục [Âm thanh](#âm-thanh).
 
 ## Chưa có
 
 - Authentication và Supabase (Phase 2–3). Hiện chỉ hỏi tên và lưu ở máy.
-- File audio thu sẵn. Phát âm đang dùng Web Speech API của trình duyệt; khi có audio thật chỉ cần sửa `src/lib/speech.ts`.
+- File audio thu sẵn — xem mục [Âm thanh](#âm-thanh) bên dưới.
 - Spaced repetition cho flashcard. Bản này mới có hai mức "Chưa nhớ" / "Đã nhớ".
 - Toàn bộ phần AI ở Phase 8.
+
+## Âm thanh
+
+Nút phát âm thử hai nguồn, theo thứ tự:
+
+1. **File thu sẵn** trong `src/assets/audio/`. Đặt tên file bằng `id` của từ
+   (`nihao.mp3` cho `你好`) là chạy, không cần khai báo thêm ở đâu.
+2. **Giọng tiếng Trung của hệ điều hành** qua Web Speech API.
+
+Máy nào không có cả hai thì nút chuyển sang màu xám, bấm vào sẽ hướng dẫn cách
+cài giọng tiếng Trung thay vì im lặng. Riêng bài tập nghe sẽ hiện pinyin thay
+thế để người học vẫn đi hết được bài.
+
+Lưu ý: Windows **không** cài sẵn giọng tiếng Trung. Muốn nghe được bằng giọng hệ
+điều hành thì vào Cài đặt → Thời gian và ngôn ngữ → Giọng nói → Thêm giọng nói →
+Chinese (Simplified). Cách chắc ăn hơn cho người dùng cuối là thu sẵn file audio,
+vì khi đó âm thanh không phụ thuộc vào máy của họ.
 
 ## Cấu trúc mã nguồn
 
@@ -52,6 +70,8 @@ src/
 │   ├── progress.ts       Các phép biến đổi tiến độ
 │   ├── exercises.ts      Sinh và chấm bài tập
 │   ├── course.ts         Điều hướng trong khoá học
+│   ├── speech.ts         Phát âm: file thu sẵn hoặc giọng hệ điều hành
+│   ├── audioFiles.ts     Quét file audio trong src/assets/audio
 │   └── storage.ts        Đọc/ghi localStorage
 ├── data/hsk1.ts     Nội dung khoá học
 └── types/           Kiểu dữ liệu dùng chung
@@ -61,7 +81,7 @@ Quy tắc: mọi luật chơi nằm trong `src/lib` dưới dạng hàm thuần,
 
 ## Kiểm thử
 
-174 test, chia làm ba tầng:
+208 test, chia làm ba tầng:
 
 - **Logic** (`src/lib/*.test.ts`) — XP, level, streak, thành tích, sinh và chấm bài tập, đọc/ghi dữ liệu hỏng.
 - **Dữ liệu** (`src/data/hsk1.test.ts`) — mọi từ đều có đủ trường, không trùng id, không từ nào lạc khỏi bài học.

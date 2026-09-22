@@ -5,6 +5,7 @@ import { FocusHeader } from '../components/FocusHeader'
 import { Button } from '../components/ui/Button'
 import { ALL_LESSONS, WORDS, WORD_BY_ID, wordsOfLesson } from '../data/hsk1'
 import { useProgress } from '../context/ProgressContext'
+import { useAudioStatus } from '../hooks/useAudioStatus'
 import { cn } from '../lib/cn'
 import {
   KIND_LABEL,
@@ -22,6 +23,7 @@ export function ExercisePage() {
   const { lessonId = '' } = useParams()
   const navigate = useNavigate()
   const { answerCorrect, finishLesson } = useProgress()
+  const audioStatus = useAudioStatus()
 
   const lesson = ALL_LESSONS.find((item) => item.id === lessonId)
   const exercises = useMemo(
@@ -114,12 +116,23 @@ export function ExercisePage() {
         {isChoice ? (
           <>
             {exercise.kind === 'listening' ? (
-              <div className="mt-6 flex justify-center">
+              <div className="mt-6 flex flex-col items-center gap-3">
                 <AudioButton
                   text={WORD_BY_ID[exercise.wordId]?.hanzi ?? ''}
+                  wordId={exercise.wordId}
                   label="từ trong câu hỏi"
                   size="lg"
                 />
+                {/* Không có âm thì bài nghe sẽ không thể làm được, nên hiện pinyin
+                    thay thế để người học vẫn đi hết bài. */}
+                {audioStatus !== 'ready' ? (
+                  <p className="max-w-xs text-center text-sm text-slate-500">
+                    Máy chưa phát âm được nên bài nghe hiện pinyin thay thế:{' '}
+                    <span className="font-medium text-slate-700">
+                      {WORD_BY_ID[exercise.wordId]?.pinyin}
+                    </span>
+                  </p>
+                ) : null}
               </div>
             ) : (
               <p className="font-hanzi mt-6 text-center text-6xl font-semibold text-slate-900">
