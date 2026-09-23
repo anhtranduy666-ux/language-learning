@@ -2,7 +2,7 @@
 
 Ứng dụng học tiếng Trung cho người mới bắt đầu, xây theo [product_design.md](product_design.md).
 
-**Bản chạy thật: https://anhtranduy666-ux.github.io/language-learning/**
+**Bản chạy thật: https://duahnproducts.github.io/language-learning/**
 
 Bản hiện tại: toàn bộ vòng học cốt lõi của Version 2 đã chạy được với dữ liệu
 HSK 1 lưu ngay trong mã nguồn (**Phase 1 — UI**), kèm chế độ sáng/tối và phần
