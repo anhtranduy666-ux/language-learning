@@ -1,4 +1,5 @@
 import { StatBar } from '../components/StatBar'
+import { WordMap } from '../components/WordMap'
 import { ProgressBar } from '../components/ui/ProgressBar'
 import { useProgress } from '../context/ProgressContext'
 import { TOTAL_LESSONS, courseCompletion } from '../lib/course'
@@ -19,6 +20,9 @@ export function ProgressPage() {
         <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">Tiến độ</h1>
         <StatBar />
       </header>
+
+      {/* Bản đồ 60 từ — thứ đầu tiên người học muốn thấy khi mở màn hình này. */}
+      <WordMap />
 
       {/* Level */}
       <section className="surface p-5">

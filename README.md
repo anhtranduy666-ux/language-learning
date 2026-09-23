@@ -49,6 +49,10 @@ chạy thẳng file TypeScript.
   đêm — và cảnh nở dần theo XP hôm nay, nên nhìn nền là biết đã học tới đâu.
   Vẽ hoàn toàn bằng CSS và SVG nên không làm nặng thêm bản offline. Chọn Đầy
   đủ / Tĩnh / Tắt ở màn hình Cá nhân. Xem [docs/scene.md](docs/scene.md).
+- **Bản đồ 60 từ**: màn hình Tiến độ có một bản đồ chia 5 unit — mỗi từ đã nhớ
+  là một ngôi sao trong chòm (chế độ tối) hoặc một bông hoa trong luống (chế độ
+  sáng). Học xong một unit là cả chòm sáng hẳn. Xem
+  [docs/word-map.md](docs/word-map.md).
 - **Phát âm**: 60 file audio thu sẵn cho toàn bộ từ vựng, chạy được trên mọi
   máy kể cả khi không cài giọng tiếng Trung. Xem mục [Âm thanh](#âm-thanh).
 - **Cài được lên điện thoại**: thêm vào màn hình chính iPhone hoặc Android,
@@ -134,8 +138,10 @@ iOS nằm ở [docs/pwa.md](docs/pwa.md).
 src/
 ├── components/      Component dùng lại: Flashcard, BottomNav, AudioButton, ui/
 ├── pages/           Mỗi màn hình một file
+├── components/scene/  Nền động: khung, khu vườn, bầu trời sao
 ├── context/
 │   ├── ProgressContext.tsx  Tiến độ người học
+│   ├── SceneContext.tsx     Nền động: đầy đủ / tĩnh / tắt
 │   └── ThemeContext.tsx     Chế độ sáng/tối
 ├── lib/             Logic thuần, không phụ thuộc React
 │   ├── gamification.ts   XP, level, streak, thành tích
@@ -147,7 +153,10 @@ src/
 │   ├── remoteAudio.ts    Gọi CDN rồi mới tới Edge Function, có hạn giờ
 │   ├── audioFiles.ts     Quét file audio trong src/assets/audio
 │   ├── theme.ts          Đọc/ghi lựa chọn giao diện, gắn vào thẻ html
+│   ├── scene.ts          Mốc nở của nền động, mức chuyển động
+│   ├── wordMap.ts        Toạ độ 60 từ trên bản đồ chòm sao / luống hoa
 │   └── storage.ts        Đọc/ghi localStorage
+├── styles/          CSS của nền động và bản đồ từ
 ├── services/supabase.ts  Biến môi trường Supabase
 ├── data/hsk1.ts     Nội dung khoá học
 └── types/           Kiểu dữ liệu dùng chung
@@ -159,7 +168,7 @@ supabase/
     └── index.ts     Vỏ Deno: nối dây với Storage, PostgREST và Azure
 
 scripts/prewarm-audio.ts   Sinh sẵn toàn bộ audio HSK 1
-docs/                      Phương án kỹ thuật cho audio và chế độ sáng/tối
+docs/                      Phương án kỹ thuật cho từng tính năng
 ```
 
 Quy tắc: mọi luật chơi nằm trong `src/lib` dưới dạng hàm thuần, React chỉ hiển thị. Nhờ vậy phần logic được kiểm thử trực tiếp, không cần dựng DOM.
@@ -169,9 +178,9 @@ nên chạy được trong `npm test`, không phải cài Deno chỉ để chạ
 
 ## Kiểm thử
 
-321 test, chia làm ba tầng:
+397 test, chia làm ba tầng:
 
-- **Logic** (`src/lib/*.test.ts`, `supabase/functions/speak/handler.test.ts`) — XP, level, streak, thành tích, sinh và chấm bài tập, chế độ sáng/tối, khoá cache audio, đọc/ghi dữ liệu hỏng.
+- **Logic** (`src/lib/*.test.ts`, `supabase/functions/speak/handler.test.ts`) — XP, level, streak, thành tích, sinh và chấm bài tập, chế độ sáng/tối, nền động, bản đồ 60 từ, khoá cache audio, đọc/ghi dữ liệu hỏng.
 - **Dữ liệu** (`src/data/hsk1.test.ts`) — mọi từ đều có đủ trường, không trùng id, không từ nào lạc khỏi bài học.
 - **Giao diện** (`src/components/*.test.tsx`, `src/pages/app-flow.test.tsx`) — dựng app thật trong bộ nhớ và đi trọn một buổi học, đúng tiêu chí nghiệm thu của Version 2.
 

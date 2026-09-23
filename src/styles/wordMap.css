@@ -1,0 +1,93 @@
+/**
+ * Bản đồ 60 từ — phần vẽ.
+ *
+ * Cùng một bộ toạ độ cho hai chế độ: ban đêm là chòm sao nối bằng đường mờ,
+ * ban ngày là luống hoa trên nền cỏ. Logic ở `src/lib/wordMap.ts`.
+ */
+
+.wordmap {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* `text-anchor` cố ý đặt bằng thuộc tính trên từng thẻ `<text>` chứ không ở
+   đây: nhãn sát rìa phải neo khác nhãn ở giữa, mà CSS thì đè mất thuộc tính. */
+.wordmap-label {
+  font-size: 12px;
+}
+
+/* ------------------------------------------------------- tối: chòm sao -- */
+
+.wordmap-line {
+  fill: none;
+  stroke: rgba(140, 155, 210, 0.16);
+  stroke-width: 1;
+}
+
+.wordmap-line--lit {
+  stroke: rgba(203, 198, 255, 0.5);
+  stroke-width: 1.1;
+}
+
+.wordmap-star {
+  fill: rgba(140, 155, 210, 0.32);
+}
+
+.wordmap-star--lit {
+  fill: #ffffff;
+}
+
+/* Quầng sáng đặt trên nhóm sao đã nhớ, không phải trên từng ngôi. */
+.wordmap-lit {
+  filter: drop-shadow(0 0 5px rgba(198, 208, 255, 0.95));
+  animation: wordmap-pulse 5s ease-in-out infinite alternate;
+}
+
+.wordmap-label {
+  fill: rgba(232, 238, 255, 0.82);
+}
+
+/* ------------------------------------------------------ sáng: luống hoa -- */
+
+.wordmap-bed {
+  fill: rgba(124, 193, 131, 0.16);
+}
+
+.wordmap-bed--lit {
+  fill: rgba(124, 193, 131, 0.3);
+}
+
+.wordmap-bud {
+  fill: rgba(90, 120, 95, 0.28);
+}
+
+.wordmap-label--day {
+  fill: #2c4535;
+  font-weight: 600;
+}
+
+/* ---------------------------------------------------------- chuyển động -- */
+
+@keyframes wordmap-pulse {
+  from {
+    opacity: 0.82;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/*
+ * Nhịp thở của chòm sao nghe theo đúng lựa chọn nền động: đã tắt nền thì
+ * không có lý do gì để một góc màn hình vẫn nhấp nháy.
+ */
+[data-scene='off'] .wordmap-lit {
+  animation: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wordmap-lit {
+    animation: none;
+  }
+}

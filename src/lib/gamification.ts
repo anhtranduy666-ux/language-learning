@@ -71,9 +71,14 @@ export function effectiveStreak(progress: UserProgress, today: string): number {
   return 0
 }
 
-/** Số từ đã học — tính những từ người dùng đã bấm "Đã nhớ" ít nhất một lần. */
+/** Một từ được coi là "đã nhớ" khi người học từng bấm "Đã nhớ" ít nhất một lần. */
+export function isWordLearned(progress: UserProgress, wordId: string): boolean {
+  return (progress.words[wordId]?.known ?? 0) > 0
+}
+
+/** Số từ đã học. Đi qua `isWordLearned` để chỉ có đúng một định nghĩa "đã nhớ". */
 export function learnedWordCount(progress: UserProgress): number {
-  return Object.values(progress.words).filter((word) => word.known > 0).length
+  return Object.keys(progress.words).filter((wordId) => isWordLearned(progress, wordId)).length
 }
 
 /** Danh sách thành tích có thể mở khoá. */

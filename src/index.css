@@ -1,5 +1,6 @@
 @import 'tailwindcss';
 @import './styles/scene.css';
+@import './styles/wordMap.css';
 
 /* Chế độ tối do người học chọn, không bám cứng vào `prefers-color-scheme`.
    Thuộc tính này được đặt trên thẻ `html` — xem `src/lib/theme.ts`. */

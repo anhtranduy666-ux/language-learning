@@ -204,8 +204,7 @@ Ghi lại vì cả ba đều im lặng — không lỗi, chỉ là nhìn sai.
 
 ## 11. Không nằm trong phạm vi
 
-- Màn hình Tiến độ dạng chòm sao — mỗi từ đã nhớ là một ngôi sao, 60 từ HSK 1
-  thành năm chòm. Đây là bước tiếp theo đáng làm nhất.
+- ~~Màn hình Tiến độ dạng chòm sao~~ — đã làm, xem [docs/word-map.md](word-map.md).
 - Màn hình chào (`Landing`) vẫn giữ nền gradient thương hiệu riêng.
 - Cảnh theo mùa hoặc theo khoá học khác ngoài HSK 1.
 - Tự hạ mức khi pin yếu: `navigator.getBattery()` không có trên Safari, mà
