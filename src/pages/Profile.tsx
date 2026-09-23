@@ -1,8 +1,10 @@
 import { useState } from 'react'
 import { Button } from '../components/ui/Button'
 import { useProgress } from '../context/ProgressContext'
+import { useTheme } from '../context/ThemeContext'
 import { cn } from '../lib/cn'
 import { levelFromXp } from '../lib/gamification'
+import type { ThemeChoice } from '../lib/theme'
 
 const GOAL_OPTIONS = [
   { value: 30, label: 'Nhẹ nhàng', hint: '30 XP · khoảng 3 phút' },
@@ -10,9 +12,16 @@ const GOAL_OPTIONS = [
   { value: 100, label: 'Nghiêm túc', hint: '100 XP · khoảng 10 phút' },
 ]
 
-/** Màn hình Profile: tên hiển thị, mục tiêu hằng ngày và tuỳ chọn xoá dữ liệu. */
+const THEME_OPTIONS: Array<{ value: ThemeChoice; label: string; icon: string }> = [
+  { value: 'light', label: 'Sáng', icon: '☀️' },
+  { value: 'dark', label: 'Tối', icon: '🌙' },
+  { value: 'system', label: 'Theo máy', icon: '🌓' },
+]
+
+/** Màn hình Profile: tên hiển thị, mục tiêu hằng ngày, giao diện và tuỳ chọn xoá dữ liệu. */
 export function Profile() {
   const { progress, updateName, updateDailyGoal, resetEverything } = useProgress()
+  const { choice, setChoice } = useTheme()
   const [name, setName] = useState(progress.name)
   const [saved, setSaved] = useState(false)
   const [confirmingReset, setConfirmingReset] = useState(false)
@@ -104,6 +113,40 @@ export function Profile() {
             )
           })}
         </ul>
+      </section>
+
+      {/* Giao diện */}
+      <section className="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-100">
+        <h2 id="theme-label" className="font-semibold text-slate-900">
+          Giao diện
+        </h2>
+        <p className="mt-1 text-sm text-slate-500">
+          Học buổi tối thì chế độ tối đỡ chói mắt hơn.
+        </p>
+        <div role="group" aria-labelledby="theme-label" className="mt-4 grid grid-cols-3 gap-2">
+          {THEME_OPTIONS.map((option) => {
+            const active = choice === option.value
+            return (
+              <button
+                key={option.value}
+                type="button"
+                onClick={() => setChoice(option.value)}
+                aria-pressed={active}
+                className={cn(
+                  'rounded-2xl border-2 p-3 text-center transition',
+                  active ? 'border-brand-500 bg-brand-50' : 'border-slate-200 hover:bg-slate-50',
+                )}
+              >
+                <span aria-hidden="true" className="block text-xl">
+                  {option.icon}
+                </span>
+                <span className="mt-1 block text-sm font-semibold text-slate-900">
+                  {option.label}
+                </span>
+              </button>
+            )
+          })}
+        </div>
       </section>
 
       {/* Dữ liệu */}

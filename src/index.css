@@ -1,5 +1,9 @@
 @import 'tailwindcss';
 
+/* Chế độ tối do người học chọn, không bám cứng vào `prefers-color-scheme`.
+   Thuộc tính này được đặt trên thẻ `html` — xem `src/lib/theme.ts`. */
+@custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
+
 @theme {
   --color-brand-50: #fff5f4;
   --color-brand-100: #ffe4e1;
@@ -20,6 +24,7 @@
 
   body {
     @apply bg-slate-50 text-slate-900 antialiased;
+    @apply dark:bg-slate-950 dark:text-slate-100;
   }
 
   /* Chữ Hán cần font có bộ chữ Trung để không bị hiển thị thành ô vuông. */

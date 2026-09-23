@@ -1,6 +1,6 @@
-import { screen, within } from '@testing-library/react'
+import { cleanup, screen, within } from '@testing-library/react'
 import type { UserEvent } from '@testing-library/user-event'
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it } from 'vitest'
 import { WORDS, wordsOfLesson } from '../data/hsk1'
 import {
   buildExercises,
@@ -337,5 +337,49 @@ describe('Cá nhân', () => {
     await user.click(screen.getByRole('button', { name: 'Xoá hết' }))
 
     expect(screen.getByRole('heading', { name: /Học tiếng Trung từ con số 0/ })).toBeInTheDocument()
+  })
+})
+
+describe('Chế độ sáng/tối', () => {
+  const theme = () => document.documentElement.getAttribute('data-theme')
+
+  afterEach(() => {
+    document.documentElement.removeAttribute('data-theme')
+    document.documentElement.style.colorScheme = ''
+  })
+
+  it('đổi giao diện ngay khi chọn ở màn hình Cá nhân', async () => {
+    const { user } = renderApp('/profile', ONBOARDED)
+
+    await user.click(screen.getByRole('button', { name: /Tối/ }))
+
+    expect(theme()).toBe('dark')
+    expect(screen.getByRole('button', { name: /Tối/ })).toHaveAttribute('aria-pressed', 'true')
+  })
+
+  it('giữ nguyên chế độ đã chọn ở lần mở sau', async () => {
+    const first = renderApp('/profile', ONBOARDED)
+    await first.user.click(screen.getByRole('button', { name: /Tối/ }))
+
+    // Dựng lại từ đầu như một lần mở app mới: gỡ luôn thuộc tính trên thẻ html
+    // để phép kiểm dưới đây chỉ đạt khi lựa chọn thật sự được đọc lại từ máy.
+    cleanup()
+    document.documentElement.removeAttribute('data-theme')
+
+    renderApp('/profile', ONBOARDED)
+
+    expect(theme()).toBe('dark')
+    expect(screen.getByRole('button', { name: /Tối/ })).toHaveAttribute('aria-pressed', 'true')
+  })
+
+  it('xoá tiến độ học không đụng tới chế độ hiển thị', async () => {
+    const { user } = renderApp('/profile', { ...ONBOARDED, xp: 420 })
+
+    await user.click(screen.getByRole('button', { name: /Tối/ }))
+    await user.click(screen.getByRole('button', { name: 'Xoá tiến độ học' }))
+    await user.click(screen.getByRole('button', { name: 'Xoá hết' }))
+
+    expect(screen.getByRole('heading', { name: /Học tiếng Trung từ con số 0/ })).toBeInTheDocument()
+    expect(theme()).toBe('dark')
   })
 })

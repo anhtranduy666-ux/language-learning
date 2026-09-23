@@ -5,6 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="description" content="Học tiếng Trung từ con số 0 — từ vựng, pinyin, phát âm, flashcard và bài tập HSK 1." />
     <title>Chinese Learning App</title>
+    <script>
+      // Đặt chế độ sáng/tối trước khi trang vẽ lần đầu, để không nháy trắng.
+      // Bản đầy đủ và test nằm ở src/lib/theme.ts — sửa thì sửa cả hai.
+      try {
+        var choice = localStorage.getItem('chinese-learning-app:theme:v1') || 'system'
+        var dark =
+          choice === 'dark' ||
+          (choice !== 'light' && matchMedia('(prefers-color-scheme: dark)').matches)
+        document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light')
+        document.documentElement.style.colorScheme = dark ? 'dark' : 'light'
+      } catch (e) {
+        // Trình duyệt chặn localStorage hoặc không có matchMedia: cứ để mặc định sáng.
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>
