@@ -4,6 +4,20 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="description" content="Học tiếng Trung từ con số 0 — từ vựng, pinyin, phát âm, flashcard và bài tập HSK 1." />
+
+    <!-- Cài lên màn hình chính điện thoại — xem docs/pwa.md.
+         iOS KHÔNG đọc icon khai trong manifest, phải có riêng apple-touch-icon,
+         nếu không màn hình chính hiện một ảnh chụp trang web bị thu nhỏ. -->
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Học tiếng Trung" />
+
+    <!-- Khai hai lần để thanh trạng thái khớp chế độ sáng/tối, xem docs/theme.md. -->
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f8fafc" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#020617" />
+
     <title>Chinese Learning App</title>
     <script>
       // Đặt chế độ sáng/tối trước khi trang vẽ lần đầu, để không nháy trắng.

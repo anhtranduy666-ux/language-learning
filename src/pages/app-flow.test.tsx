@@ -393,3 +393,42 @@ describe('Chế độ sáng/tối', () => {
     expect(theme()).toBe('dark')
   })
 })
+
+describe('Mời cài lên màn hình chính', () => {
+  const IPHONE_SAFARI =
+    'Mozilla/5.0 (iPhone; CPU iPhone OS 17_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4 Mobile/15E148 Safari/604.1'
+
+  /** Giả lập máy đang mở app. */
+  function usePlatform(userAgent: string, standalone = false) {
+    vi.stubGlobal('navigator', { userAgent, maxTouchPoints: 5, standalone })
+    vi.stubGlobal('matchMedia', () => ({ matches: false, addEventListener() {}, removeEventListener() {} }))
+  }
+
+  afterEach(() => {
+    vi.unstubAllGlobals()
+  })
+
+  it('chỉ đường cho người dùng iPhone, vì Safari không tự mời cài', () => {
+    usePlatform(IPHONE_SAFARI)
+    renderApp('/profile', ONBOARDED)
+
+    expect(screen.getByRole('heading', { name: 'Cài vào màn hình chính' })).toBeInTheDocument()
+    expect(screen.getByText(/Thêm vào MH chính/)).toBeInTheDocument()
+  })
+
+  it('thôi nhắc khi app đã được cài', () => {
+    usePlatform(IPHONE_SAFARI, true)
+    renderApp('/profile', ONBOARDED)
+
+    expect(screen.queryByRole('heading', { name: 'Cài vào màn hình chính' })).not.toBeInTheDocument()
+  })
+
+  it('không làm phiền người dùng máy tính', () => {
+    usePlatform(
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0 Safari/537.36',
+    )
+    renderApp('/profile', ONBOARDED)
+
+    expect(screen.queryByRole('heading', { name: 'Cài vào màn hình chính' })).not.toBeInTheDocument()
+  })
+})

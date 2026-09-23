@@ -27,6 +27,8 @@ npm run dev
 | `npm run test:watch` | Chạy test ở chế độ theo dõi |
 | `npm run typecheck` | Kiểm tra kiểu TypeScript |
 | `npm run build` | Build bản production vào `dist/` |
+| `npm run generate-audio` | Sinh file phát âm cho từ mới |
+| `npm run generate-icons` | Vẽ lại icon của app |
 | `npm run prewarm-audio -- --local --dry-run` | Liệt kê audio sẽ sinh, không chạm mạng |
 | `npm run prewarm-audio -- --local` | Sinh 60 file mp3 vào `src/assets/audio/` |
 | `npm run prewarm-audio` | Sinh audio lên Supabase Storage (cần thêm Supabase) |
@@ -45,6 +47,9 @@ chạy thẳng file TypeScript.
   định bám theo hệ điều hành. Xem [docs/theme.md](docs/theme.md).
 - **Phát âm**: 60 file audio thu sẵn cho toàn bộ từ vựng, chạy được trên mọi
   máy kể cả khi không cài giọng tiếng Trung. Xem mục [Âm thanh](#âm-thanh).
+- **Cài được lên điện thoại**: thêm vào màn hình chính iPhone hoặc Android,
+  chạy toàn màn hình và **dùng được khi mất mạng**, kể cả phần nghe phát âm.
+  Xem [docs/pwa.md](docs/pwa.md).
 
 ## Chưa có
 
@@ -100,6 +105,25 @@ hạn mức để vượt, và giá vẫn bằng không khi khoá học lớn l�
 Muốn bật đường Supabase về sau thì xem [docs/audio-setup.md](docs/audio-setup.md).
 Lúc đó nhớ xoá `src/assets/audio/`, vì nguồn 1 được ưu tiên hơn nguồn 2.
 
+## Cài lên điện thoại
+
+App chạy được như một app thật trên màn hình chính, không cần App Store và
+không cần tài khoản Apple.
+
+**iPhone** — mở site bằng **Safari** (Chrome trên iOS không cài được), bấm nút
+Chia sẻ ở thanh dưới, kéo xuống chọn **Thêm vào MH chính**. Màn hình Cá nhân
+cũng hiện sẵn hướng dẫn này khi phát hiện bạn đang dùng Safari trên iPhone.
+
+**Android** — Chrome tự hiện lời mời cài, hoặc vào menu ba chấm chọn **Cài đặt
+ứng dụng**.
+
+Cài xong thì bật chế độ máy bay vẫn học được trọn vẹn: toàn bộ bài học, bài tập
+và 60 file phát âm đều nằm trong máy.
+
+Vì sao không làm app native để lên App Store: cần tài khoản Apple Developer
+99 USD/năm kèm thẻ tín dụng. Chi tiết và những gì PWA **không** làm được trên
+iOS nằm ở [docs/pwa.md](docs/pwa.md).
+
 ## Cấu trúc mã nguồn
 
 ```
@@ -141,7 +165,7 @@ nên chạy được trong `npm test`, không phải cài Deno chỉ để chạ
 
 ## Kiểm thử
 
-297 test, chia làm ba tầng:
+321 test, chia làm ba tầng:
 
 - **Logic** (`src/lib/*.test.ts`, `supabase/functions/speak/handler.test.ts`) — XP, level, streak, thành tích, sinh và chấm bài tập, chế độ sáng/tối, khoá cache audio, đọc/ghi dữ liệu hỏng.
 - **Dữ liệu** (`src/data/hsk1.test.ts`) — mọi từ đều có đủ trường, không trùng id, không từ nào lạc khỏi bài học.

@@ -5,6 +5,7 @@ import { useTheme } from '../context/ThemeContext'
 import { cn } from '../lib/cn'
 import { levelFromXp } from '../lib/gamification'
 import type { ThemeChoice } from '../lib/theme'
+import { currentPlatform, shouldOfferInstall } from '../lib/install'
 
 const GOAL_OPTIONS = [
   { value: 30, label: 'Nhẹ nhàng', hint: '30 XP · khoảng 3 phút' },
@@ -26,6 +27,9 @@ export function Profile() {
   const [saved, setSaved] = useState(false)
   const [confirmingReset, setConfirmingReset] = useState(false)
 
+  // Máy và trình duyệt không đổi giữa chừng, nên hỏi đúng một lần lúc dựng.
+  const [offerInstall] = useState(() => shouldOfferInstall(currentPlatform()))
+
   const level = levelFromXp(progress.xp)
 
   return (
@@ -46,6 +50,25 @@ export function Profile() {
           </p>
         </div>
       </section>
+
+      {/* Hướng dẫn cài lên màn hình chính.
+          Safari không tự mời cài như Chrome trên Android, nên app phải tự nhắc
+          — nhưng nhắc ở đây chứ không chắn ngang lúc đang học. */}
+      {offerInstall && (
+        <section className="rounded-3xl bg-brand-50 p-5 ring-1 ring-brand-100 dark:bg-brand-500/15 dark:ring-brand-500/25">
+          <h2 className="font-semibold text-brand-700 dark:text-brand-300">
+            Cài vào màn hình chính
+          </h2>
+          <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
+            Mở được như một app thật, chạy toàn màn hình và dùng được cả khi không có mạng.
+          </p>
+          <ol className="mt-3 space-y-1.5 text-sm text-slate-700 dark:text-slate-300">
+            <li>1. Bấm nút Chia sẻ ở thanh dưới Safari</li>
+            <li>2. Kéo xuống chọn “Thêm vào MH chính”</li>
+            <li>3. Bấm “Thêm” ở góc trên bên phải</li>
+          </ol>
+        </section>
+      )}
 
       {/* Tên hiển thị */}
       <section className="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-100 dark:bg-slate-900 dark:ring-slate-800">
