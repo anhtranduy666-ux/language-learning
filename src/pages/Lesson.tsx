@@ -14,9 +14,12 @@ export function Lesson() {
 
   // Nạp sẵn audio của cả bài ngay khi mở trang. Mỗi bài chỉ khoảng sáu từ nên
   // thường tải xong trước lúc người học đọc hết danh sách và bấm loa.
+  //
+  // Phụ thuộc theo `lessonId` chứ không theo `words`: `wordsOfLesson` trả về
+  // mảng mới mỗi lần render, nên để `words` ở đây là nạp lại sau mỗi render.
   useEffect(() => {
-    prefetchAudio(words.map((word) => word.hanzi))
-  }, [words])
+    prefetchAudio(wordsOfLesson(lessonId).map((word) => word.hanzi))
+  }, [lessonId])
 
   if (!lesson) return <Navigate to="/learn" replace />
 

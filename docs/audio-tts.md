@@ -1,6 +1,7 @@
 # Phương án kỹ thuật — Audio phát âm qua Supabase
 
-> Trạng thái: **đề xuất, chưa triển khai**
+> Trạng thái: **M1 và M2 đã code xong** (2026-09-23), chờ tài khoản Supabase
+> và khoá Azure để chạy thật. M3 và M4 chưa làm.
 > Ngày: 2026-09-22
 > Liên quan: [product_design.md](../product_design.md) Phase 2 & Phase 5, `src/lib/speech.ts`
 
@@ -206,7 +207,7 @@ File mới:
 ```
 src/lib/audioCacheKey.ts    sha256 + dựng URL công khai (thuần, test được)
 src/lib/remoteAudio.ts      gọi CDN rồi mới tới Edge Function, có timeout
-src/services/supabase.ts    khởi tạo client, đọc biến môi trường
+src/services/supabase.ts    đọc biến môi trường, dựng URL Edge Function
 ```
 
 Biến môi trường client (`.env.local`, kèm `.env.example` trong repo):
@@ -306,7 +307,12 @@ tiếp, không dựng DOM.
 | Nguồn từ xa | `src/lib/remoteAudio.test.ts` | Mock `fetch`: CDN hit; CDN 404 dẫn tới gọi function; function 403/502 trả null; quá timeout trả null. Thiếu biến môi trường thì tắt hẳn, không gọi mạng. |
 | Chuỗi fallback | `src/lib/speech.test.ts` *(cập nhật)* | Có remote thì không đụng Web Speech; remote hỏng thì vẫn đọc bằng giọng hệ điều hành; không có cả hai thì trả `no-chinese-voice`. |
 | Giao diện | `src/components/AudioButton.test.tsx` *(cập nhật)* | Trạng thái chờ tải; lỗi mạng hiện lời nhắc chứ không kẹt ở "đang đọc". |
-| Edge Function | `supabase/functions/speak/index.test.ts` | `deno test` với provider giả: đầu vào sai trả 400; ngoài whitelist trả 403; đã cache thì không gọi provider; provider lỗi trả 502. |
+| Edge Function | `supabase/functions/speak/handler.test.ts` | Provider giả: đầu vào sai trả 400; ngoài whitelist trả 403; đã cache thì không gọi provider; provider lỗi trả 502. |
+
+Edge Function được tách làm đôi so với bản phác ở mục 5: luật nằm trong
+`handler.ts` — TypeScript thuần, phụ thuộc bơm vào từ ngoài — còn `index.ts`
+chỉ nối dây với Storage, PostgREST và Azure. Nhờ vậy phần luật chạy thẳng trong
+`npm test` của repo, không phải cài Deno chỉ để chạy một bộ test.
 
 Điểm dễ hỏng nhất là **client và server băm ra hai hash khác nhau** — lúc đó mọi
 request đều miss, hoá đơn TTS tăng mà không ai thấy gì bất thường. Chốt bằng một

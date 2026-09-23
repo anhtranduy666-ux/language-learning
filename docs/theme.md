@@ -1,6 +1,6 @@
 # Phương án kỹ thuật — Chế độ sáng/tối
 
-> Trạng thái: **đề xuất**
+> Trạng thái: **đã triển khai** (2026-09-23)
 > Ngày: 2026-09-23
 > Liên quan: [product_design.md](../product_design.md) mục 2 (Settings) và mục 11 (UI/UX)
 
@@ -105,9 +105,11 @@ bộ trước lần vẽ đầu tiên.
     var dark =
       choice === 'dark' ||
       (choice !== 'light' && matchMedia('(prefers-color-scheme: dark)').matches)
-    document.documentElement.dataset.theme = dark ? 'dark' : 'light'
+    document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light')
     document.documentElement.style.colorScheme = dark ? 'dark' : 'light'
-  } catch (e) {}
+  } catch (e) {
+    // Trình duyệt chặn localStorage hoặc không có matchMedia: cứ để mặc định sáng.
+  }
 </script>
 ```
 
