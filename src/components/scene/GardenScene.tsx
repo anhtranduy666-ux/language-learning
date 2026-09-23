@@ -1,26 +1,65 @@
 /**
  * Khu vườn ban ngày.
  *
- * Đồi cỏ và cây hoa đào vẽ bằng SVG, hoa cỏ bằng gradient lặp, ong bướm là
- * năm phần tử nhỏ bay qua bay lại. Vị trí, tốc độ và luật hiện/ẩn theo tiến độ
- * nằm hết trong `src/styles/scene.css` — ở đây chỉ có hình.
+ * Đồi cỏ, bụi cây và cây hoa đào vẽ bằng SVG, hoa cỏ bằng gradient lặp, chim
+ * và ong bướm là những phần tử nhỏ bay qua bay lại. Vị trí, tốc độ và luật
+ * hiện/ẩn theo tiến độ nằm hết trong `src/styles/scene.css` — ở đây chỉ có hình.
+ *
+ * Bụi cây, cây xa và chim nằm ngoài `.scene-band` nên trải hết bề ngang: trên
+ * màn hình rộng, nếu mọi thứ đều bó trong cột nội dung thì hai bên trống trơn.
  */
 export function GardenScene() {
   return (
     <>
       <div className="scene-sky" />
-      <div className="scene-sun" />
-      <div className="scene-cloud scene-cloud--1" />
-      <div className="scene-cloud scene-cloud--2" />
+      <div className="scene-sun">
+        <div className="scene-sun-disc" />
+      </div>
 
-      <svg className="scene-hills" viewBox="0 0 390 340" preserveAspectRatio="none">
-        <path d="M0 126C70 98 140 120 210 96 280 72 332 102 390 84V340H0Z" fill="#b9d8e2" />
-        <path d="M0 158C62 126 112 146 172 122 232 98 302 134 390 108V340H0Z" fill="#9ccfae" opacity=".95" />
-        <path d="M0 204C72 176 122 194 192 174 262 154 330 184 390 166V340H0Z" fill="#7cc183" />
-        <path d="M0 258C80 234 152 252 232 238 302 226 352 244 390 234V340H0Z" fill="#5dad61" />
+      <div className="scene-cloud scene-cloud--1">
+        <span />
+        <span />
+        <span />
+      </div>
+      <div className="scene-cloud scene-cloud--2">
+        <span />
+        <span />
+        <span />
+      </div>
+      <div className="scene-cloud scene-cloud--3">
+        <span />
+        <span />
+        <span />
+      </div>
+
+      <Bird index={1} />
+      <Bird index={2} />
+      <Bird index={3} />
+
+      {/* Sáu lớp đồi. Lớp bị kéo giãn theo bề ngang màn hình nên chỉ chứa những
+          nét trừu tượng — cây cối vẽ trong đây sẽ bẹt ra trên màn hình rộng. */}
+      <svg className="scene-hills" viewBox="0 0 390 360" preserveAspectRatio="none">
+        <path d="M0 96C64 70 126 92 196 70 266 48 320 76 390 58V360H0Z" fill="#cbe3ea" />
+        <path d="M0 132C70 104 140 126 210 102 280 78 332 108 390 90V360H0Z" fill="#b0d7dd" />
+        <path d="M0 168C62 136 112 156 172 132 232 108 302 144 390 118V360H0Z" fill="#a4d3b2" />
+        <path d="M0 212C72 184 122 202 192 182 262 162 330 192 390 174V360H0Z" fill="#84c78a" />
+        <path d="M0 262C80 238 152 256 232 242 302 230 352 248 390 238V360H0Z" fill="#63b167" />
+        <path d="M0 312C74 296 140 308 214 300 288 292 340 302 390 296V360H0Z" fill="#4e9e55" />
       </svg>
 
-      <div className="scene-flowers" />
+      <Shrub index={1} />
+      <Shrub index={2} />
+      <Shrub index={3} />
+      <Shrub index={4} />
+
+      <FarTree index={1} />
+      <FarTree index={2} />
+      <FarTree index={3} />
+      <FarTree index={4} />
+      <FarTree index={5} />
+
+      <div className="scene-flowers scene-flowers--1" />
+      <div className="scene-flowers scene-flowers--2" />
 
       <div className="scene-band">
         {/* Thân cây cố ý ngắn: trên điện thoại, cột nội dung chiếm gần hết bề
@@ -67,15 +106,17 @@ export function GardenScene() {
         <div className="scene-petal scene-petal--2" />
         <div className="scene-petal scene-petal--3" />
         <div className="scene-petal scene-petal--4" />
+        <div className="scene-petal scene-petal--5" />
+        <div className="scene-petal scene-petal--6" />
 
         <Flyer path="a" bob="a">
-          <Butterfly size={24} wing="#ff9ec4" wingLight="#ffc7de" body="#5a3b52" />
+          <Butterfly size={24} wing="#ff8fb8" wingLight="#ffc7de" body="#5a3b52" />
         </Flyer>
         <Flyer path="b" bob="b">
-          <Butterfly size={20} wing="#ffd591" wingLight="#ffe9c2" body="#6b4a2a" />
+          <Butterfly size={20} wing="#ffcb70" wingLight="#ffe9c2" body="#6b4a2a" />
         </Flyer>
         <Flyer path="c" bob="c">
-          <Butterfly size={17} wing="#c9b6f5" wingLight="#e6dbff" body="#4b3b6b" />
+          <Butterfly size={17} wing="#bda4f2" wingLight="#e6dbff" body="#4b3b6b" />
         </Flyer>
         <Flyer path="d" bob="d" facing>
           <Bee size={20} />
@@ -146,6 +187,47 @@ function Bee({ size }: { size: number }) {
       <g className="scene-wing">
         <ellipse cx="14" cy="5" rx="4.6" ry="2.4" fill="rgba(255,255,255,.85)" />
       </g>
+    </svg>
+  )
+}
+
+/** Một con chim ở xa: chỉ là hai nét cánh, nhưng đập cánh nên nhìn ra là chim. */
+function Bird({ index }: { index: 1 | 2 | 3 }) {
+  return (
+    <div className={`scene-bird scene-bird--${index}`}>
+      <svg viewBox="0 0 24 12" width="20" height="10">
+        <path
+          className="scene-wingbeat"
+          d="M2 8c3.4 0 4.6-5 6.6-5s3.2 5 6.6 5"
+          fill="none"
+          stroke="rgba(58,80,70,.5)"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+        />
+      </svg>
+    </div>
+  )
+}
+
+/** Bụi cây thấp ven chân đồi. */
+function Shrub({ index }: { index: 1 | 2 | 3 | 4 }) {
+  return (
+    <svg className={`scene-shrub scene-shrub--${index}`} viewBox="0 0 100 50">
+      <ellipse cx="30" cy="38" rx="26" ry="18" fill="#3f8c48" />
+      <ellipse cx="62" cy="34" rx="22" ry="20" fill="#4b9c53" />
+      <ellipse cx="82" cy="40" rx="17" ry="13" fill="#3f8c48" />
+    </svg>
+  )
+}
+
+/** Cây ở xa: chỉ một tán tròn và một thân mảnh, đủ để có chiều sâu. */
+function FarTree({ index }: { index: 1 | 2 | 3 | 4 | 5 }) {
+  return (
+    <svg className={`scene-fartree scene-fartree--${index}`} viewBox="0 0 40 64">
+      <path d="M20 64V40" stroke="#6d5140" strokeWidth="3.4" strokeLinecap="round" />
+      <circle cx="20" cy="26" r="15" fill="#4f9d58" />
+      <circle cx="10" cy="34" r="10" fill="#5aa962" />
+      <circle cx="30" cy="33" r="9" fill="#5aa962" />
     </svg>
   )
 }

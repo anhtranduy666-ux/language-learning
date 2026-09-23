@@ -45,8 +45,9 @@ chạy thẳng file TypeScript.
 - **Lưu trữ**: tiến độ nằm trong `localStorage`, tự khôi phục khi mở lại.
 - **Giao diện sáng/tối**: chọn Sáng, Tối hoặc Theo máy ở màn hình Cá nhân. Mặc
   định bám theo hệ điều hành. Xem [docs/theme.md](docs/theme.md).
-- **Nền động**: khu vườn có ong bướm ban ngày, bầu trời sao và mưa sao băng ban
-  đêm — và cảnh nở dần theo XP hôm nay, nên nhìn nền là biết đã học tới đâu.
+- **Nền động**: khu vườn có chim, ong và bướm ban ngày; dải ngân hà, núi soi
+  bóng hồ và mưa sao băng ban đêm — và cảnh nở dần theo XP hôm nay, nên nhìn
+  nền là biết đã học tới đâu.
   Vẽ hoàn toàn bằng CSS và SVG nên không làm nặng thêm bản offline. Chọn Đầy
   đủ / Tĩnh / Tắt ở màn hình Cá nhân. Xem [docs/scene.md](docs/scene.md).
 - **Bản đồ 60 từ**: màn hình Tiến độ có một bản đồ chia 5 unit — mỗi từ đã nhớ
@@ -178,7 +179,7 @@ nên chạy được trong `npm test`, không phải cài Deno chỉ để chạ
 
 ## Kiểm thử
 
-397 test, chia làm ba tầng:
+403 test, chia làm ba tầng:
 
 - **Logic** (`src/lib/*.test.ts`, `supabase/functions/speak/handler.test.ts`) — XP, level, streak, thành tích, sinh và chấm bài tập, chế độ sáng/tối, nền động, bản đồ 60 từ, khoá cache audio, đọc/ghi dữ liệu hỏng.
 - **Dữ liệu** (`src/data/hsk1.test.ts`) — mọi từ đều có đủ trường, không trùng id, không từ nào lạc khỏi bài học.

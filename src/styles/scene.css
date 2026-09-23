@@ -2,9 +2,9 @@
  * Nền động — phần vẽ.
  *
  * Bốn lớp, xếp từ xa tới gần và dùng chung cấu trúc cho cả hai chế độ:
- *   1. Trời    — gradient phủ kín, cộng một quầng sáng.
- *   2. Cảnh    — SVG: đồi cỏ và cây hoa đào, hoặc dãy núi soi bóng mặt hồ.
- *   3. Hạt sống — ong bướm bay qua bay lại, hoặc mưa sao băng.
+ *   1. Trời    — gradient phủ kín, cộng mặt trời hoặc dải ngân hà.
+ *   2. Cảnh    — SVG: đồi cỏ, bụi cây và cây hoa đào, hoặc dãy núi soi bóng hồ.
+ *   3. Hạt sống — chim, ong bướm, cánh hoa, hoặc mưa sao băng.
  *   4. Màn đọc — một lớp phủ mỏng để chữ ở nửa trên luôn đọc được.
  *
  * Không có tấm ảnh nào: tất cả là gradient, SVG và CSS, nên service worker
@@ -24,11 +24,20 @@
   z-index: 0;
   overflow: hidden;
   pointer-events: none;
+
+  /* Chiều cao của địa hình khai báo một chỗ, để bụi cây và cây cối bám đúng
+     đường chân đồi mà không phải chép lại cùng một `clamp()` ở năm nơi. */
+  --hills-h: clamp(230px, 44vh, 460px);
+  --mountains-b: clamp(80px, 15vh, 150px);
+  --mountains-h: clamp(90px, 16vh, 150px);
+  --lake-h: clamp(80px, 15vh, 150px);
 }
 
 /*
- * Cây cối và ong bướm bám theo cột nội dung thay vì trải hết bề ngang: trên
- * màn hình rộng, một con bướm bay ở tận mép phải chỉ làm người đọc liếc theo.
+ * Cây hoa đào và ong bướm bám theo cột nội dung thay vì trải hết bề ngang:
+ * trên màn hình rộng, một con bướm bay ở tận mép phải chỉ làm người đọc liếc
+ * theo. Bụi cây, chim và núi thì trải hết bề ngang, để màn hình rộng không
+ * trống hai bên.
  */
 .scene-band {
   position: absolute;
@@ -47,93 +56,197 @@
 }
 
 .scene[data-sky='day'] .scene-sky {
-  background: linear-gradient(#a3dbf2 0%, #c6e9ee 28%, #e2f3e0 60%, #f1f7db 100%);
+  background: linear-gradient(#8fd3ef 0%, #b8e5ef 26%, #daf0e6 54%, #ecf6dd 78%, #f6f7d4 100%);
 }
 
-/* Chưa học gì thì trời còn sương sớm: cùng một bố cục, chỉ nhạt màu đi. */
+/* Chưa học gì thì trời còn sương sớm: cùng một bố cục, chỉ nhạt và lạnh hơn. */
 .scene[data-sky='day'][data-stage='dawn'] .scene-sky {
-  background: linear-gradient(#cfe0ea 0%, #dde7e4 34%, #e9eede 66%, #f2eee0 100%);
+  background: linear-gradient(#bcd6e6 0%, #d2e2e4 30%, #e2ebe0 60%, #eeeedd 82%, #f4efdc 100%);
 }
 
 .scene[data-sky='night'] .scene-sky {
-  background: linear-gradient(#04060f 0%, #0a1030 44%, #101a3e 72%, #0b1129 100%);
+  background: linear-gradient(#03050d 0%, #070c24 30%, #0c1234 58%, #101a3e 80%, #0a1028 100%);
 }
 
+/* Quầng nắng. Đĩa mặt trời nằm trong quầng nên hai lớp luôn đi cùng nhau. */
 .scene-sun {
   position: absolute;
-  top: -90px;
-  right: -80px;
-  width: 340px;
-  height: 340px;
+  top: -120px;
+  right: -110px;
+  width: 420px;
+  height: 420px;
   border-radius: 50%;
   background: radial-gradient(
     circle,
-    rgba(255, 250, 226, 0.95) 0%,
-    rgba(255, 242, 196, 0.5) 45%,
-    rgba(255, 242, 196, 0) 72%
+    rgba(255, 252, 236, 0.98) 0%,
+    rgba(255, 246, 206, 0.6) 32%,
+    rgba(255, 238, 186, 0.22) 55%,
+    rgba(255, 238, 186, 0) 74%
   );
 }
 
-.scene[data-stage='dawn'] .scene-sun {
-  opacity: 0.4;
+.scene-sun-disc {
+  position: absolute;
+  top: 46px;
+  right: 46px;
+  width: 78px;
+  height: 78px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fffdf2 0%, #fff3c4 58%, rgba(255, 243, 196, 0) 72%);
 }
 
-/* Trôi qua trôi lại chứ không chạy hết màn rồi nhảy về chỗ cũ: một cú nhảy
-   như thế, dù 90 giây mới có một lần, vẫn đập vào mắt. */
+.scene[data-stage='dawn'] .scene-sun {
+  opacity: 0.55;
+}
+
+/*
+ * Mây gồm ba khối tròn chồng nhau rồi làm mờ, chứ không phải một viên thuốc
+ * con nhộng: một hình bầu dục đơn ở cỡ lớn nhìn ra hình viên thuốc thật.
+ * Trôi qua trôi lại chứ không chạy hết màn rồi nhảy về chỗ cũ — một cú nhảy
+ * như thế, dù 90 giây mới có một lần, vẫn đập vào mắt.
+ */
 .scene-cloud {
   position: absolute;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.78);
-  filter: blur(11px);
+  filter: blur(9px);
   animation: scene-drift ease-in-out infinite alternate;
 }
 
+.scene-cloud span {
+  position: absolute;
+  bottom: 0;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.88);
+}
+
+.scene-cloud span:nth-child(1) {
+  left: 0;
+  width: 56%;
+  height: 58%;
+}
+
+.scene-cloud span:nth-child(2) {
+  left: 24%;
+  width: 54%;
+  height: 100%;
+}
+
+.scene-cloud span:nth-child(3) {
+  left: 54%;
+  width: 46%;
+  height: 64%;
+}
+
 .scene-cloud--1 {
-  top: 11%;
-  left: 8%;
-  width: 120px;
-  height: 26px;
+  top: 9%;
+  left: 6%;
+  width: 150px;
+  height: 46px;
   animation-duration: 90s;
 }
 
 .scene-cloud--2 {
-  top: 18%;
-  left: 48%;
-  width: 86px;
-  height: 20px;
+  top: 16%;
+  left: 44%;
+  width: 110px;
+  height: 34px;
+  opacity: 0.85;
   animation-duration: 124s;
   animation-delay: -30s;
 }
 
-/* Dải ngân hà. Một mảng gradient xoay chéo rồi làm mờ — rẻ hơn ảnh, và đổi
-   được độ sáng theo tiến độ mà không phải đổi tài nguyên. */
+.scene-cloud--3 {
+  top: 5%;
+  left: 74%;
+  width: 190px;
+  height: 52px;
+  opacity: 0.7;
+  animation-duration: 150s;
+  animation-delay: -70s;
+}
+
+/* ------------------------------------------------------- dải ngân hà -- */
+
+/*
+ * Dải ngân hà dựng theo ảnh chụp thật: một dải sáng rộng chạy chéo, có lõi
+ * sáng hơn hẳn ở giữa, có vệt bụi tối cắt dọc thân dải, và dày đặc sao li ti
+ * bên trong. Một gradient đơn thì ra một vệt khói tím — phải bốn lớp chồng lên
+ * nhau mới ra được chiều sâu đó.
+ */
 .scene-milky {
   position: absolute;
-  top: -16%;
-  left: -34%;
-  width: 170%;
-  height: 78%;
-  transform: rotate(-26deg);
-  filter: blur(15px);
+  top: -28%;
+  left: -40%;
+  width: 180%;
+  height: 104%;
+  transform: rotate(-32deg);
+}
+
+.scene-milky > div {
+  position: absolute;
+  inset: 0;
+}
+
+/* 1. Quầng rộng: phần mờ nhất, trải ra hai bên thân dải. */
+.scene-milky-haze {
+  filter: blur(16px);
   background:
-    radial-gradient(58% 34% at 50% 50%, rgba(171, 163, 255, 0.34), rgba(171, 163, 255, 0) 72%),
-    radial-gradient(34% 24% at 31% 58%, rgba(226, 72, 61, 0.2), rgba(226, 72, 61, 0) 74%),
-    radial-gradient(40% 24% at 70% 43%, rgba(116, 196, 255, 0.22), rgba(116, 196, 255, 0) 74%),
-    radial-gradient(22% 16% at 58% 62%, rgba(255, 214, 150, 0.16), rgba(255, 214, 150, 0) 76%);
+    radial-gradient(44% 21% at 50% 50%, rgba(158, 160, 240, 0.44), rgba(158, 160, 240, 0) 76%),
+    radial-gradient(28% 15% at 24% 60%, rgba(232, 126, 104, 0.22), rgba(232, 126, 104, 0) 74%),
+    radial-gradient(32% 16% at 76% 42%, rgba(108, 186, 255, 0.26), rgba(108, 186, 255, 0) 74%);
 }
 
-.scene[data-stage='dawn'] .scene-milky {
-  opacity: 0.26;
-}
-
-.scene[data-stage='rising'] .scene-milky {
-  opacity: 0.62;
+/* 2. Lõi: hẹp hơn, sáng hơn, ngả vàng — chỗ dày sao nhất của dải. */
+.scene-milky-core {
+  filter: blur(8px);
+  background:
+    radial-gradient(24% 8% at 44% 50%, rgba(255, 242, 218, 0.5), rgba(255, 242, 218, 0) 72%),
+    radial-gradient(33% 11% at 50% 50%, rgba(212, 204, 255, 0.52), rgba(212, 204, 255, 0) 74%),
+    radial-gradient(14% 6% at 66% 47%, rgba(255, 255, 255, 0.34), rgba(255, 255, 255, 0) 72%);
 }
 
 /*
- * Sao vẽ bằng radial-gradient lặp lại: hàng trăm ngôi sao mà không thêm một
- * phần tử DOM nào. Ba lớp chồng lên nhau, khác kích thước ô nên mắt không bắt
- * được quy luật lặp.
+ * 3. Sao li ti trong lòng dải. Ô lặp nhỏ nên dày hơn hẳn sao nền, và được
+ * `mask` bóp lại đúng trong thân dải để ngoài dải trời vẫn thưa sao.
+ */
+.scene-milky-grain {
+  background-image:
+    radial-gradient(1.4px 1.4px at 10px 14px, rgba(255, 255, 255, 0.98), transparent),
+    radial-gradient(1.1px 1.1px at 36px 6px, rgba(226, 232, 255, 0.95), transparent),
+    radial-gradient(1.5px 1.5px at 22px 40px, rgba(255, 255, 255, 0.95), transparent),
+    radial-gradient(1px 1px at 52px 28px, rgba(255, 238, 214, 0.9), transparent),
+    radial-gradient(1.3px 1.3px at 64px 52px, rgba(255, 255, 255, 0.9), transparent),
+    radial-gradient(1.1px 1.1px at 6px 58px, rgba(206, 220, 255, 0.9), transparent),
+    radial-gradient(0.9px 0.9px at 44px 62px, rgba(255, 255, 255, 0.8), transparent),
+    radial-gradient(1.2px 1.2px at 70px 16px, rgba(232, 238, 255, 0.85), transparent);
+  background-size: 74px 68px;
+  -webkit-mask-image: radial-gradient(50% 20% at 50% 50%, #000 0%, rgba(0, 0, 0, 0.72) 54%, transparent 80%);
+  mask-image: radial-gradient(50% 20% at 50% 50%, #000 0%, rgba(0, 0, 0, 0.72) 54%, transparent 80%);
+}
+
+/* 4. Vệt bụi tối cắt dọc thân dải — thứ làm nó ra hình dải ngân hà thật. */
+.scene-milky-dust {
+  filter: blur(6px);
+  background:
+    radial-gradient(28% 4% at 36% 53%, rgba(4, 6, 18, 0.9), rgba(4, 6, 18, 0) 72%),
+    radial-gradient(20% 3.4% at 64% 47%, rgba(4, 6, 18, 0.82), rgba(4, 6, 18, 0) 72%),
+    radial-gradient(15% 3% at 16% 56%, rgba(4, 6, 18, 0.7), rgba(4, 6, 18, 0) 72%),
+    radial-gradient(12% 2.6% at 84% 44%, rgba(4, 6, 18, 0.6), rgba(4, 6, 18, 0) 72%);
+}
+
+.scene[data-stage='dawn'] .scene-milky {
+  opacity: 0.4;
+}
+
+.scene[data-stage='rising'] .scene-milky {
+  opacity: 0.72;
+}
+
+/* ------------------------------------------------------------------ sao -- */
+
+/*
+ * Sao nền vẽ bằng radial-gradient lặp lại: hàng trăm ngôi sao mà không thêm
+ * một phần tử DOM nào. Bốn lớp chồng lên nhau, khác kích thước ô nên mắt không
+ * bắt được quy luật lặp.
  */
 .scene-stars {
   position: absolute;
@@ -153,27 +266,95 @@
 
 .scene-stars--2 {
   background-image:
-    radial-gradient(1.1px 1.1px at 14px 72px, rgba(255, 255, 255, 0.8), transparent),
-    radial-gradient(1px 1px at 96px 26px, rgba(188, 208, 255, 0.8), transparent),
-    radial-gradient(1.2px 1.2px at 152px 132px, rgba(255, 255, 255, 0.8), transparent),
-    radial-gradient(1px 1px at 62px 104px, rgba(230, 236, 255, 0.8), transparent);
+    radial-gradient(1.1px 1.1px at 14px 72px, rgba(255, 255, 255, 0.85), transparent),
+    radial-gradient(1px 1px at 96px 26px, rgba(188, 208, 255, 0.85), transparent),
+    radial-gradient(1.2px 1.2px at 152px 132px, rgba(255, 255, 255, 0.85), transparent),
+    radial-gradient(1px 1px at 62px 104px, rgba(230, 236, 255, 0.85), transparent);
   background-size: 163px 149px;
   animation: scene-twinkle 6.8s ease-in-out infinite alternate-reverse;
 }
 
 .scene-stars--3 {
   background-image:
-    radial-gradient(0.9px 0.9px at 40px 30px, rgba(255, 255, 255, 0.5), transparent),
-    radial-gradient(0.9px 0.9px at 110px 90px, rgba(214, 228, 255, 0.45), transparent);
+    radial-gradient(0.9px 0.9px at 40px 30px, rgba(255, 255, 255, 0.6), transparent),
+    radial-gradient(0.9px 0.9px at 110px 90px, rgba(214, 228, 255, 0.55), transparent),
+    radial-gradient(0.8px 0.8px at 74px 58px, rgba(255, 236, 216, 0.5), transparent);
   background-size: 121px 113px;
 }
 
+.scene-stars--4 {
+  background-image:
+    radial-gradient(0.7px 0.7px at 18px 26px, rgba(255, 255, 255, 0.42), transparent),
+    radial-gradient(0.7px 0.7px at 58px 66px, rgba(210, 224, 255, 0.4), transparent),
+    radial-gradient(0.6px 0.6px at 36px 92px, rgba(255, 255, 255, 0.36), transparent);
+  background-size: 77px 71px;
+}
+
 .scene[data-stage='dawn'] .scene-stars {
-  opacity: 0.34;
+  opacity: 0.42;
 }
 
 .scene[data-stage='rising'] .scene-stars {
-  opacity: 0.74;
+  opacity: 0.76;
+}
+
+/*
+ * Vài ngôi sáng nhất có tia nhiễu xạ hình chữ thập, đúng như ảnh chụp phơi
+ * sáng lâu. Chỉ sáu ngôi — nhiều hơn là ra hình lấp lánh đồ trang trí.
+ */
+.scene-bigstar {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow:
+    0 0 6px 2px rgba(214, 228, 255, 0.9),
+    0 0 16px 6px rgba(140, 170, 255, 0.3);
+  animation: scene-bigstar 6s ease-in-out infinite alternate;
+}
+
+.scene-bigstar::before,
+.scene-bigstar::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.scene-bigstar::before {
+  width: 30px;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0));
+}
+
+.scene-bigstar::after {
+  width: 1px;
+  height: 30px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0));
+}
+
+.scene-bigstar--1 { top: 12%; left: 16%; animation-duration: 5.2s; }
+.scene-bigstar--2 { top: 7%; left: 62%; animation-duration: 7.4s; animation-delay: -2s; }
+.scene-bigstar--3 { top: 24%; left: 84%; animation-duration: 6.1s; animation-delay: -4s; }
+.scene-bigstar--4 { top: 34%; left: 34%; animation-duration: 8.3s; animation-delay: -1s; }
+.scene-bigstar--5 { top: 19%; left: 47%; animation-duration: 5.7s; animation-delay: -3s; }
+.scene-bigstar--6 { top: 41%; left: 72%; animation-duration: 9s; animation-delay: -5s; }
+
+/* Ánh đèn thành phố hắt lên sau rặng núi — chi tiết làm bức ảnh gốc có chiều sâu. */
+.scene-horizon {
+  position: absolute;
+  right: 0;
+  bottom: var(--mountains-b);
+  left: 0;
+  height: clamp(120px, 22vh, 220px);
+  background: radial-gradient(
+    68% 100% at 50% 100%,
+    rgba(255, 168, 106, 0.26),
+    rgba(255, 138, 96, 0.09) 44%,
+    rgba(255, 138, 96, 0) 74%
+  );
 }
 
 /* ------------------------------------------------------------------ cảnh -- */
@@ -188,39 +369,78 @@
 }
 
 .scene-hills {
-  height: clamp(220px, 42vh, 420px);
+  height: var(--hills-h);
 }
 
-/* Rặng núi hạ xuống đúng dải cỏ giữa thẻ cuối và thanh điều hướng, giống chỗ
-   đứng của cây hoa đào ở chế độ sáng — chỗ duy nhất không bị thẻ che. */
 .scene-mountains {
-  bottom: clamp(80px, 15vh, 150px);
-  height: clamp(80px, 14vh, 130px);
+  bottom: var(--mountains-b);
+  height: var(--mountains-h);
 }
+
+/*
+ * Bụi cây và cây xa trải hết bề ngang, bám theo đường chân đồi bằng `--hills-h`.
+ * Chúng là SVG rời chứ không vẽ thẳng vào lớp đồi, vì lớp đồi bị kéo giãn theo
+ * bề ngang màn hình — cây vẽ trong đó sẽ bẹt ra trên màn hình rộng.
+ */
+.scene-shrub {
+  position: absolute;
+  bottom: calc(var(--hills-h) * 0.3);
+}
+
+.scene-shrub--1 { left: 2%; width: 88px; height: 44px; }
+.scene-shrub--2 { left: 21%; width: 62px; height: 32px; bottom: calc(var(--hills-h) * 0.26); }
+.scene-shrub--3 { left: 63%; width: 104px; height: 50px; }
+.scene-shrub--4 { left: 84%; width: 74px; height: 38px; bottom: calc(var(--hills-h) * 0.27); }
+
+.scene-fartree {
+  position: absolute;
+  bottom: calc(var(--hills-h) * 0.5);
+  opacity: 0.85;
+}
+
+.scene-fartree--1 { left: 8%; width: 34px; height: 54px; }
+.scene-fartree--2 { left: 14%; width: 26px; height: 42px; bottom: calc(var(--hills-h) * 0.52); }
+.scene-fartree--3 { left: 72%; width: 38px; height: 60px; }
+.scene-fartree--4 { left: 79%; width: 28px; height: 46px; bottom: calc(var(--hills-h) * 0.52); }
+.scene-fartree--5 { left: 46%; width: 24px; height: 40px; bottom: calc(var(--hills-h) * 0.56); }
 
 .scene-flowers {
   position: absolute;
   right: 0;
   bottom: 0;
   left: 0;
-  height: clamp(130px, 25vh, 230px);
+  background-repeat: repeat;
+}
+
+.scene-flowers--1 {
+  height: clamp(140px, 27vh, 250px);
   background-image:
-    radial-gradient(2.6px 2.6px at 18px 40px, #ff85b3, transparent),
-    radial-gradient(2.2px 2.2px at 74px 96px, #fff3a6, transparent),
-    radial-gradient(2.4px 2.4px at 112px 22px, #ffffff, transparent),
-    radial-gradient(2.2px 2.2px at 42px 132px, #ffb8d4, transparent),
-    radial-gradient(2.6px 2.6px at 138px 150px, #fff3a6, transparent),
-    radial-gradient(2px 2px at 96px 64px, #ffffff, transparent);
-  background-size: 165px 180px;
-  opacity: 0.95;
+    radial-gradient(2.8px 2.8px at 18px 40px, #ff6fa6, transparent),
+    radial-gradient(2.4px 2.4px at 74px 96px, #ffef8a, transparent),
+    radial-gradient(2.6px 2.6px at 112px 22px, #ffffff, transparent),
+    radial-gradient(2.4px 2.4px at 42px 132px, #ffa8cb, transparent),
+    radial-gradient(2.8px 2.8px at 138px 150px, #ffef8a, transparent),
+    radial-gradient(2.2px 2.2px at 96px 64px, #ffffff, transparent),
+    radial-gradient(2.4px 2.4px at 156px 78px, #d7a2ff, transparent);
+  background-size: 172px 178px;
+}
+
+.scene-flowers--2 {
+  height: clamp(100px, 19vh, 180px);
+  background-image:
+    radial-gradient(2.2px 2.2px at 28px 34px, #ffffff, transparent),
+    radial-gradient(2.4px 2.4px at 88px 70px, #ff8fb8, transparent),
+    radial-gradient(2px 2px at 56px 96px, #fff3a6, transparent);
+  background-size: 113px 121px;
+  opacity: 0.85;
 }
 
 .scene[data-stage='dawn'] .scene-flowers {
-  opacity: 0.16;
+  opacity: 0.22;
 }
 
 .scene[data-stage='rising'] .scene-flowers {
-  opacity: 0.55;
+  opacity: 0.62;
 }
 
 /* Mặt hồ: chính dãy núi lật ngược, làm mờ và phủ tối dần xuống đáy. */
@@ -229,7 +449,7 @@
   right: 0;
   bottom: 0;
   left: 0;
-  height: clamp(80px, 15vh, 150px);
+  height: var(--lake-h);
   overflow: hidden;
 }
 
@@ -238,46 +458,46 @@
   top: 0;
   right: 0;
   left: 0;
-  height: clamp(70px, 13vh, 120px);
+  height: calc(var(--lake-h) * 0.82);
   transform: scaleY(-1);
-  opacity: 0.3;
+  opacity: 0.32;
   filter: blur(1.4px);
+}
+
+/* Ngân hà và sao hắt xuống mặt nước: mờ hơn, nhoè hơn, nhưng phải có — thiếu
+   nó thì mặt hồ chỉ là một mảng tối. */
+.scene-lake-glow {
+  position: absolute;
+  inset: 0;
+  filter: blur(9px);
+  opacity: 0.5;
+  background:
+    radial-gradient(40% 46% at 44% 0%, rgba(158, 160, 240, 0.5), rgba(158, 160, 240, 0) 74%),
+    radial-gradient(22% 30% at 68% 0%, rgba(108, 186, 255, 0.3), rgba(108, 186, 255, 0) 74%),
+    radial-gradient(30% 34% at 50% 6%, rgba(255, 190, 130, 0.22), rgba(255, 190, 130, 0) 74%);
 }
 
 .scene-lake-fade {
   position: absolute;
   inset: 0;
-  background: linear-gradient(rgba(8, 12, 32, 0.1) 0%, rgba(6, 9, 24, 0.75) 58%, #05070f 100%);
+  background: linear-gradient(rgba(8, 12, 32, 0.08) 0%, rgba(6, 9, 24, 0.72) 56%, #05070f 100%);
 }
 
 .scene-ripple {
   position: absolute;
   height: 1px;
-  background: rgba(190, 205, 255, 0.14);
+  background: rgba(190, 205, 255, 0.16);
 }
 
-.scene-ripple--1 {
-  top: 24%;
-  left: 8%;
-  width: 40%;
-}
-
-.scene-ripple--2 {
-  top: 42%;
-  left: 38%;
-  width: 54%;
-}
-
-.scene-ripple--3 {
-  top: 62%;
-  left: 16%;
-  width: 44%;
-}
+.scene-ripple--1 { top: 20%; left: 6%; width: 42%; }
+.scene-ripple--2 { top: 38%; left: 36%; width: 56%; }
+.scene-ripple--3 { top: 56%; left: 14%; width: 46%; }
+.scene-ripple--4 { top: 72%; left: 48%; width: 38%; background: rgba(190, 205, 255, 0.1); }
 
 /*
- * Cây mọc từ mép dưới lên. Cột nội dung chiếm gần hết bề ngang điện thoại,
- * nên tán hoa phải rơi vào dải cỏ giữa thẻ cuối và thanh điều hướng — chỗ
- * duy nhất không bị thẻ che.
+ * Cây hoa đào mọc từ mép dưới lên. Cột nội dung chiếm gần hết bề ngang điện
+ * thoại, nên tán hoa phải rơi vào dải cỏ giữa thẻ cuối và thanh điều hướng —
+ * chỗ duy nhất không bị thẻ che.
  */
 .scene-tree {
   position: absolute;
@@ -309,11 +529,7 @@
 }
 
 .scene[data-stage='dawn'] .scene-canopy {
-  opacity: 0.5;
-}
-
-.scene[data-stage='rising'] .scene-canopy {
-  opacity: 0.82;
+  opacity: 0.78;
 }
 
 /* ------------------------------------------------------------- hạt sống -- */
@@ -324,15 +540,31 @@
  * động lồng vào nhau thành đường bay cong và không lặp lại trong hàng phút.
  * Quãng đường tính bằng `%` của dải nội dung, để điện thoại hẹp hay màn hình
  * rộng đều ra cùng một đường bay.
+ *
+ * Vườn không bao giờ vắng hẳn: kể cả khi chưa học gì hôm nay vẫn có một con
+ * bướm và một con ong. Bản trước tắt sạch ở mốc `dawn`, nghĩa là người mở app
+ * lần đầu — đúng lúc cần gây ấn tượng nhất — không thấy gì chuyển động cả.
  */
 .scene-fly {
   position: absolute;
   right: 0;
   left: 0;
-  display: none;
   animation-timing-function: ease-in-out;
   animation-iteration-count: infinite;
   animation-direction: alternate;
+}
+
+.scene-fly--b,
+.scene-fly--c,
+.scene-fly--e {
+  display: none;
+}
+
+.scene[data-stage='rising'] .scene-fly--b,
+.scene[data-stage='bloom'] .scene-fly--b,
+.scene[data-stage='bloom'] .scene-fly--c,
+.scene[data-stage='bloom'] .scene-fly--e {
+  display: block;
 }
 
 /*
@@ -355,8 +587,8 @@
  * Không dùng `alternate` được ở đây: lượt về chạy ngược qua đúng hàm thời
  * gian của lượt đi, nên giá trị nào ở lượt đi thì lượt về cũng ra y như thế —
  * con ong sẽ bay giật lùi cả nửa chặng. Thay vào đó, chu kỳ lật dài gấp đôi
- * chu kỳ sweep (một vòng đi–về), nửa đầu quay một hướng, nửa sau quay hướng
- * kia. `animation-delay` phải giữ y hệt của sweep để hai bên cùng pha.
+ * chu kỳ sweep (một vòng đi–về), nửa đầu quay một hướng nửa sau hướng kia.
+ * `animation-delay` phải giữ y hệt của sweep để hai bên cùng pha.
  */
 .scene-face {
   animation-timing-function: linear;
@@ -422,32 +654,35 @@
   animation-delay: -5s;
 }
 
-.scene-bob--a {
-  animation-duration: 3.2s;
+.scene-bob--a { animation-duration: 3.2s; }
+.scene-bob--b { animation-duration: 4.1s; }
+.scene-bob--c { animation-duration: 5.2s; }
+.scene-bob--d { animation-duration: 1.5s; }
+.scene-bob--e { animation-duration: 1.2s; }
+
+/* Chim bay ngang trời, trải hết bề ngang màn hình chứ không bó trong cột nội
+   dung: đây là thứ lấp khoảng trống hai bên trên màn hình rộng. */
+.scene-bird {
+  position: absolute;
+  right: 0;
+  left: 0;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
 }
 
-.scene-bob--b {
-  animation-duration: 4.1s;
+.scene-bird--1 { top: 13%; animation-name: scene-bird-a; animation-duration: 58s; }
+.scene-bird--2 { top: 19%; animation-name: scene-bird-b; animation-duration: 74s; animation-delay: -20s; }
+.scene-bird--3 { top: 9%; animation-name: scene-bird-c; animation-duration: 92s; animation-delay: -50s; }
+
+.scene-wingbeat {
+  transform-box: fill-box;
+  transform-origin: 50% 40%;
+  animation: scene-wingbeat 0.62s ease-in-out infinite alternate;
 }
 
-.scene-bob--c {
-  animation-duration: 5.2s;
-}
-
-.scene-bob--d {
-  animation-duration: 1.5s;
-}
-
-.scene-bob--e {
-  animation-duration: 1.2s;
-}
-
-/* Sương sớm thì vườn còn vắng; nắng lên có một bướm một ong; nở hết thì đủ cả. */
-.scene[data-stage='rising'] .scene-fly--a,
-.scene[data-stage='rising'] .scene-fly--d,
-.scene[data-stage='bloom'] .scene-fly {
-  display: block;
-}
+.scene-bird--2 .scene-wingbeat { animation-duration: 0.74s; }
+.scene-bird--3 .scene-wingbeat { animation-duration: 0.55s; }
 
 .scene-petal {
   position: absolute;
@@ -461,31 +696,12 @@
   animation: scene-fall linear infinite;
 }
 
-.scene-petal--1 {
-  left: 12%;
-  animation-duration: 17s;
-  animation-delay: -3s;
-}
-
-.scene-petal--2 {
-  left: 38%;
-  background: #fbc9db;
-  animation-duration: 22s;
-  animation-delay: -11s;
-}
-
-.scene-petal--3 {
-  left: 61%;
-  animation-duration: 19s;
-  animation-delay: -7s;
-}
-
-.scene-petal--4 {
-  left: 84%;
-  background: #fdd7e4;
-  animation-duration: 25s;
-  animation-delay: -16s;
-}
+.scene-petal--1 { left: 12%; animation-duration: 17s; animation-delay: -3s; }
+.scene-petal--2 { left: 38%; background: #fbc9db; animation-duration: 22s; animation-delay: -11s; }
+.scene-petal--3 { left: 61%; animation-duration: 19s; animation-delay: -7s; }
+.scene-petal--4 { left: 84%; background: #fdd7e4; animation-duration: 25s; animation-delay: -16s; }
+.scene-petal--5 { left: 26%; background: #ffc2dc; animation-duration: 21s; animation-delay: -14s; }
+.scene-petal--6 { left: 72%; animation-duration: 24s; animation-delay: -5s; }
 
 .scene[data-stage='bloom'] .scene-petal {
   display: block;
@@ -493,8 +709,8 @@
 
 /*
  * Mưa sao băng. Mỗi vệt chỉ sáng khoảng một phần năm chu kỳ rồi tắt, và các
- * chu kỳ lệch hẳn nhau (7s → 22s), nên trung bình lúc nào cũng có chừng một
- * vệt đang rơi mà không bao giờ thành nhịp đều.
+ * chu kỳ lệch hẳn nhau, nên trung bình lúc nào cũng có một hai vệt đang rơi mà
+ * không bao giờ thành nhịp đều. Vệt số 1 luôn có, kể cả lúc chưa học gì.
  */
 .scene-meteor {
   position: absolute;
@@ -529,25 +745,26 @@
 /* Góc xoay của vệt phải khớp với hướng bay, nếu không đuôi sẽ lệch khỏi quỹ đạo. */
 .scene-meteor--1 .scene-meteor-streak,
 .scene-meteor--2 .scene-meteor-streak,
-.scene-meteor--5 .scene-meteor-streak {
+.scene-meteor--5 .scene-meteor-streak,
+.scene-meteor--7 .scene-meteor-streak {
   transform: rotate(138deg);
 }
 
 .scene-meteor--3 .scene-meteor-streak,
-.scene-meteor--4 .scene-meteor-streak {
+.scene-meteor--4 .scene-meteor-streak,
+.scene-meteor--6 .scene-meteor-streak {
   transform: rotate(128deg);
 }
 
 .scene-meteor--1 {
   top: -4%;
   left: 64%;
+  display: block;
   animation-name: scene-meteor-a;
-  animation-duration: 7s;
+  animation-duration: 6.5s;
 }
 
-.scene-meteor--1 .scene-meteor-streak {
-  width: 148px;
-}
+.scene-meteor--1 .scene-meteor-streak { width: 148px; }
 
 /* Quả lớn ánh cam — phần thưởng cho streak, nên mặc định không có. */
 .scene-meteor--2 {
@@ -568,7 +785,7 @@
   top: 14%;
   left: 78%;
   animation-name: scene-meteor-b;
-  animation-duration: 9.5s;
+  animation-duration: 9s;
   animation-delay: -6s;
 }
 
@@ -581,19 +798,17 @@
   top: 24%;
   left: 50%;
   animation-name: scene-meteor-b;
-  animation-duration: 16s;
+  animation-duration: 15s;
   animation-delay: -11s;
 }
 
-.scene-meteor--4 .scene-meteor-streak {
-  width: 124px;
-}
+.scene-meteor--4 .scene-meteor-streak { width: 124px; }
 
 .scene-meteor--5 {
   top: 34%;
   left: 86%;
   animation-name: scene-meteor-a;
-  animation-duration: 22s;
+  animation-duration: 21s;
   animation-delay: -17s;
 }
 
@@ -603,12 +818,37 @@
   background: linear-gradient(90deg, rgba(255, 255, 255, 0), rgba(196, 214, 255, 0.26) 60%, rgba(255, 255, 255, 0.7) 100%);
 }
 
-.scene[data-stage='rising'] .scene-meteor--1,
+.scene-meteor--6 {
+  top: 6%;
+  left: 18%;
+  animation-name: scene-meteor-b;
+  animation-duration: 12.5s;
+  animation-delay: -8s;
+}
+
+.scene-meteor--6 .scene-meteor-streak { width: 116px; }
+
+.scene-meteor--7 {
+  top: 30%;
+  left: 12%;
+  animation-name: scene-meteor-a;
+  animation-duration: 18s;
+  animation-delay: -3s;
+}
+
+.scene-meteor--7 .scene-meteor-streak {
+  width: 92px;
+  height: 1.8px;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0), rgba(214, 226, 255, 0.28) 60%, rgba(255, 255, 255, 0.78) 100%);
+}
+
 .scene[data-stage='rising'] .scene-meteor--3,
-.scene[data-stage='bloom'] .scene-meteor--1,
+.scene[data-stage='rising'] .scene-meteor--6,
 .scene[data-stage='bloom'] .scene-meteor--3,
 .scene[data-stage='bloom'] .scene-meteor--4,
-.scene[data-stage='bloom'] .scene-meteor--5 {
+.scene[data-stage='bloom'] .scene-meteor--5,
+.scene[data-stage='bloom'] .scene-meteor--6,
+.scene[data-stage='bloom'] .scene-meteor--7 {
   display: block;
 }
 
@@ -622,27 +862,29 @@
 
 .scene[data-sky='day'] .scene-veil {
   background: linear-gradient(
-    rgba(255, 255, 255, 0.3) 0%,
-    rgba(255, 255, 255, 0.06) 24%,
+    rgba(255, 255, 255, 0.34) 0%,
+    rgba(255, 255, 255, 0.08) 24%,
     rgba(255, 255, 255, 0) 46%
   );
 }
 
 .scene[data-sky='night'] .scene-veil {
-  background: linear-gradient(rgba(4, 6, 15, 0.4) 0%, rgba(4, 6, 15, 0.08) 30%, rgba(4, 6, 15, 0) 55%);
+  background: linear-gradient(rgba(4, 6, 15, 0.44) 0%, rgba(4, 6, 15, 0.1) 30%, rgba(4, 6, 15, 0) 55%);
 }
 
 /*
- * Màn hình học: một màn hình — một mục tiêu. Cảnh lùi hẳn về sau, tắt ong
- * bướm và sao băng, làm mờ và phủ tối để không có gì nhúc nhích cạnh câu hỏi.
+ * Màn hình học: một màn hình — một mục tiêu. Cảnh lùi hẳn về sau, tắt chim,
+ * ong bướm và sao băng, làm mờ và phủ tối để không có gì nhúc nhích cạnh câu hỏi.
  */
 .scene[data-variant='focus'] {
   filter: blur(2.6px) saturate(0.75);
 }
 
 .scene[data-variant='focus'] .scene-fly,
+.scene[data-variant='focus'] .scene-bird,
 .scene[data-variant='focus'] .scene-petal,
-.scene[data-variant='focus'] .scene-meteor {
+.scene[data-variant='focus'] .scene-meteor,
+.scene[data-variant='focus'] .scene-bigstar {
   display: none;
 }
 
@@ -674,9 +916,27 @@
   display: none;
 }
 
+/*
+ * Trừ một vệt: một ngôi sao băng đứng yên giữa trời là hình vẽ quen thuộc, và
+ * thiếu nó thì bầu trời ở chế độ Tĩnh trông như bị tắt mất thứ gì đó.
+ */
+.scene[data-motion='still'] .scene-meteor--1 {
+  display: block;
+  opacity: 1;
+  transform: translate(-30vmin, 27vmin);
+}
+
 .scene[data-motion='still'] .scene-fly {
   transform: translateX(var(--scene-rest-x));
 }
+
+.scene[data-motion='still'] .scene-bird {
+  transform: translateX(var(--scene-rest-x));
+}
+
+.scene-bird--1 { --scene-rest-x: 22%; }
+.scene-bird--2 { --scene-rest-x: 64%; }
+.scene-bird--3 { --scene-rest-x: 40%; }
 
 /* Người học chuyển sang app khác: dừng hẳn, không đốt pin sau lưng. */
 .scene[data-paused='true'] * {
@@ -697,9 +957,16 @@
     display: none;
   }
 
+  .scene .scene-meteor--1 {
+    display: block;
+    opacity: 1;
+    transform: translate(-30vmin, 27vmin);
+  }
+
   /* Không có dòng này thì cả đàn dồn về `translateX(0)`, tức là chồng lên nhau
      ở mép trái — đúng lúc người dùng vừa xin đừng làm gì loè loẹt. */
-  .scene .scene-fly {
+  .scene .scene-fly,
+  .scene .scene-bird {
     transform: translateX(var(--scene-rest-x));
   }
 }
@@ -707,164 +974,107 @@
 /* ------------------------------------------------------------ keyframes -- */
 
 @keyframes scene-drift {
-  from {
-    transform: translateX(-30px);
-  }
-  to {
-    transform: translateX(84px);
-  }
+  from { transform: translateX(-30px); }
+  to { transform: translateX(84px); }
 }
 
 @keyframes scene-sweep-a {
-  from {
-    transform: translateX(4%);
-  }
-  to {
-    transform: translateX(74%);
-  }
+  from { transform: translateX(4%); }
+  to { transform: translateX(74%); }
 }
 
 @keyframes scene-sweep-b {
-  from {
-    transform: translateX(66%);
-  }
-  to {
-    transform: translateX(8%);
-  }
+  from { transform: translateX(66%); }
+  to { transform: translateX(8%); }
 }
 
 @keyframes scene-sweep-c {
-  from {
-    transform: translateX(20%);
-  }
-  to {
-    transform: translateX(84%);
-  }
+  from { transform: translateX(20%); }
+  to { transform: translateX(84%); }
 }
 
 @keyframes scene-sweep-d {
-  from {
-    transform: translateX(56%);
-  }
-  to {
-    transform: translateX(6%);
-  }
+  from { transform: translateX(56%); }
+  to { transform: translateX(6%); }
 }
 
 @keyframes scene-sweep-e {
-  from {
-    transform: translateX(12%);
-  }
-  to {
-    transform: translateX(78%);
-  }
+  from { transform: translateX(12%); }
+  to { transform: translateX(78%); }
+}
+
+@keyframes scene-bird-a {
+  from { transform: translateX(2%); }
+  to { transform: translateX(86%); }
+}
+
+@keyframes scene-bird-b {
+  from { transform: translateX(78%); }
+  to { transform: translateX(10%); }
+}
+
+@keyframes scene-bird-c {
+  from { transform: translateX(16%); }
+  to { transform: translateX(92%); }
 }
 
 @keyframes scene-bob {
-  from {
-    transform: translateY(8px);
-  }
-  to {
-    transform: translateY(-26px);
-  }
+  from { transform: translateY(8px); }
+  to { transform: translateY(-26px); }
 }
 
 @keyframes scene-face-left-first {
-  0%,
-  49.99% {
-    transform: scaleX(1);
-  }
-  50%,
-  100% {
-    transform: scaleX(-1);
-  }
+  0%, 49.99% { transform: scaleX(1); }
+  50%, 100% { transform: scaleX(-1); }
 }
 
 @keyframes scene-face-right-first {
-  0%,
-  49.99% {
-    transform: scaleX(-1);
-  }
-  50%,
-  100% {
-    transform: scaleX(1);
-  }
+  0%, 49.99% { transform: scaleX(-1); }
+  50%, 100% { transform: scaleX(1); }
 }
 
 @keyframes scene-flap {
-  from {
-    transform: scaleX(1);
-  }
-  to {
-    transform: scaleX(0.42);
-  }
+  from { transform: scaleX(1); }
+  to { transform: scaleX(0.42); }
+}
+
+@keyframes scene-wingbeat {
+  from { transform: scaleY(1); }
+  to { transform: scaleY(0.35); }
 }
 
 @keyframes scene-fall {
-  from {
-    transform: translate3d(0, 0, 0) rotate(0deg);
-  }
-  to {
-    transform: translate3d(70px, 110vh, 0) rotate(520deg);
-  }
+  from { transform: translate3d(0, 0, 0) rotate(0deg); }
+  to { transform: translate3d(70px, 110vh, 0) rotate(520deg); }
 }
 
 @keyframes scene-sway {
-  from {
-    transform: rotate(-1.1deg);
-  }
-  to {
-    transform: rotate(1.1deg);
-  }
+  from { transform: rotate(-1.1deg); }
+  to { transform: rotate(1.1deg); }
 }
 
 @keyframes scene-twinkle {
-  from {
-    opacity: 0.55;
-  }
-  to {
-    opacity: 1;
-  }
+  from { opacity: 0.55; }
+  to { opacity: 1; }
+}
+
+@keyframes scene-bigstar {
+  from { opacity: 0.55; transform: scale(0.85); }
+  to { opacity: 1; transform: scale(1); }
 }
 
 @keyframes scene-meteor-a {
-  0% {
-    opacity: 0;
-    transform: translate(0, 0);
-  }
-  2% {
-    opacity: 1;
-  }
-  14% {
-    opacity: 1;
-  }
-  19% {
-    opacity: 0;
-    transform: translate(-80vmin, 71vmin);
-  }
-  100% {
-    opacity: 0;
-    transform: translate(-80vmin, 71vmin);
-  }
+  0% { opacity: 0; transform: translate(0, 0); }
+  2% { opacity: 1; }
+  14% { opacity: 1; }
+  19% { opacity: 0; transform: translate(-80vmin, 71vmin); }
+  100% { opacity: 0; transform: translate(-80vmin, 71vmin); }
 }
 
 @keyframes scene-meteor-b {
-  0% {
-    opacity: 0;
-    transform: translate(0, 0);
-  }
-  2% {
-    opacity: 1;
-  }
-  13% {
-    opacity: 1;
-  }
-  18% {
-    opacity: 0;
-    transform: translate(-63vmin, 80vmin);
-  }
-  100% {
-    opacity: 0;
-    transform: translate(-63vmin, 80vmin);
-  }
+  0% { opacity: 0; transform: translate(0, 0); }
+  2% { opacity: 1; }
+  13% { opacity: 1; }
+  18% { opacity: 0; transform: translate(-63vmin, 80vmin); }
+  100% { opacity: 0; transform: translate(-63vmin, 80vmin); }
 }

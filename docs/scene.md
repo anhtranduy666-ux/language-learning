@@ -35,13 +35,18 @@ Và **cảnh nở theo tiến độ trong ngày**, đọc thẳng từ `UserProg
 
 | Mốc | Sáng | Tối |
 | --- | --- | --- |
-| `dawn` — chưa có XP nào hôm nay | Sương sớm, đồi xám, hoa chưa nở, vườn vắng | Trời vừa tối, lác đác vài sao |
-| `rising` — đang học dở | Nắng lên, hoa nở lác đác, một bướm một ong | Sao dày thêm, ngân hà hiện mờ, vài vệt thiên thạch |
-| `bloom` — đạt mục tiêu ngày | Cả vườn nở, ba bướm hai ong, cánh hoa rơi | Ngân hà sáng hẳn, mưa sao băng |
+| `dawn` — chưa có XP nào hôm nay | Sương sớm, đồi xám, hoa chưa nở — nhưng vẫn có chim, một bướm và một ong | Trời vừa tối, sao thưa, ngân hà mờ, một vệt thiên thạch |
+| `rising` — đang học dở | Nắng lên, hoa nở lác đác, thêm một bướm nữa | Sao dày thêm, ngân hà rõ dần, ba vệt thiên thạch |
+| `bloom` — đạt mục tiêu ngày | Cả vườn nở, ba bướm hai ong, cánh hoa rơi | Ngân hà sáng hẳn, mưa sao băng sáu vệt |
 | Streak ≥ 7 ngày | Thêm một cây hoa đào | Thêm một thiên thạch lớn ánh cam |
 
 Không thêm một huy hiệu, một con số hay một câu chúc mừng nào. Cảnh chính là
 phần thưởng, và nó luôn ở đó chứ không hiện ra một lần rồi thôi.
+
+**Cảnh không bao giờ vắng tanh.** Bản đầu tắt sạch ong bướm và sao băng ở mốc
+`dawn`; kết quả là người mới mở app — đúng lúc cần gây ấn tượng nhất — không
+thấy gì chuyển động cả, và tưởng tính năng bị hỏng. Mốc `dawn` giờ chỉ làm cảnh
+*nhạt đi*, không tắt thứ gì. `src/test/scene-css.test.ts` chốt lại điều đó.
 
 ### Các phương án đã cân nhắc và loại
 
@@ -59,14 +64,26 @@ Xếp từ xa tới gần, cùng cấu trúc cho cả hai chế độ — chỉ 
 
 | Lớp | Là gì | Chi phí |
 | --- | --- | --- |
-| 1 · Trời | Một `linear-gradient` phủ kín, cộng quầng mặt trời hoặc dải ngân hà | 1–2 phần tử |
-| 2 · Cảnh | SVG: đồi cỏ và cây hoa đào, hoặc dãy núi và mặt hồ | ~4 KB vector |
-| 3 · Hạt sống | Ong bướm, cánh hoa, thiên thạch | tối đa 10 phần tử |
+| 1 · Trời | Gradient phủ kín, cộng mặt trời và mây, hoặc dải ngân hà bốn lớp | 6–10 phần tử |
+| 2 · Cảnh | SVG: sáu lớp đồi, bụi cây, cây xa, cây hoa đào — hoặc ba lớp núi và mặt hồ | ~8 KB vector |
+| 3 · Hạt sống | Chim, ong bướm, cánh hoa, thiên thạch | tối đa 17 phần tử |
 | 4 · Màn đọc | Lớp phủ mỏng ở nửa trên, cộng lớp phủ tối của màn hình học | 2 phần tử |
 
-Sao nền là **`radial-gradient` lặp lại** trên ba lớp có kích thước ô khác nhau:
+Sao nền là **`radial-gradient` lặp lại** trên bốn lớp có kích thước ô khác nhau:
 hàng trăm ngôi sao mà không thêm một phần tử DOM nào, và mắt không bắt được
-quy luật lặp.
+quy luật lặp. Sáu ngôi sáng nhất là phần tử riêng, có tia nhiễu xạ hình chữ
+thập như ảnh phơi sáng lâu.
+
+**Dải ngân hà dựng theo ảnh chụp thật**, chồng bốn lớp trong một khung xoay
+chéo: quầng rộng mờ, lõi sáng ngả vàng, một lớp sao li ti được `mask` bóp lại
+đúng trong thân dải, và vệt bụi tối cắt dọc. Thiếu lớp bụi tối thì nó chỉ là
+một vệt khói tím — chính chỗ tối mới làm ra hình dải ngân hà.
+
+**Bụi cây, cây xa và chim trải hết bề ngang màn hình**, trong khi cây hoa đào
+và ong bướm bó trong cột nội dung. Lý do: trên màn hình rộng, nếu mọi thứ đều
+bó vào giữa thì hai bên trống trơn; còn một con bướm bay ở tận mép phải thì chỉ
+làm người đọc liếc theo. Chúng là SVG rời chứ không vẽ vào lớp đồi, vì lớp đồi
+bị kéo giãn theo bề ngang — cây vẽ trong đó sẽ bẹt ra.
 
 Mọi animation chỉ đụng tới `transform` và `opacity`, nên trình duyệt xử lý
 thẳng trên compositor, không tính lại layout và không vẽ lại.
@@ -117,6 +134,10 @@ người, điện thoại cũ để Tĩnh còn laptop để Đầy đủ.
 | Hệ điều hành xin `prefers-reduced-motion` | Về mức Tĩnh, **không** đụng tới lựa chọn đang lưu. |
 | Người học chuyển sang app khác | `animation-play-state: paused` qua `visibilitychange`. |
 | Người học chọn Tắt | Tắt hẳn, kể cả khi hệ điều hành không yêu cầu gì. |
+
+Chế độ Tĩnh giữ lại **một** vệt sao băng đứng yên giữa trời. Một ngôi sao băng
+bất động là hình vẽ quen thuộc, còn thiếu hẳn thì bầu trời trông như bị tắt mất
+thứ gì đó — mà người bật "giảm chuyển động" cũng rơi vào chế độ này.
 
 Lựa chọn "Tắt" thắng tuyệt đối, còn `prefers-reduced-motion` chỉ hạ xuống
 Tĩnh: bỏ hẳn cảnh đi là lấy mất thông tin tiến độ, còn để nó nhúc nhích là làm
@@ -184,6 +205,7 @@ Ghi lại vì cả ba đều im lặng — không lỗi, chỉ là nhìn sai.
 
 | Phạm vi | File | Nội dung |
 | --- | --- | --- |
+| Luật CSS | `src/test/scene-css.test.ts` | Cảnh không bao giờ vắng tanh: mốc `dawn` chỉ làm nhạt chứ không tắt thứ gì; chỉ màn hình học và chế độ Tắt mới được giấu hạt sống; chế độ Tĩnh vẫn giữ một vệt sao băng. |
 | Logic thuần | `src/lib/scene.test.ts` | Bốn tổ hợp của `resolveSceneMotion`; `sceneStage` cho cả `NaN`, số âm và mục tiêu bằng 0; mốc streak; giá trị lưu hỏng rơi về `full`; `localStorage` ném lỗi vẫn không vỡ; `applyScene` đặt đúng thuộc tính; `matchMedia` và `visibilitychange`. |
 | Context | `src/context/SceneContext.test.tsx` | Mặc định đầy đủ; hệ điều hành xin giảm chuyển động thì về Tĩnh mà vẫn hiện; chọn Tắt rồi thì hệ điều hành nói gì cũng vẫn tắt; nhớ lựa chọn cho lần mở sau. |
 | Giao diện | `src/components/scene/SceneBackground.test.tsx` | Sáng ra vườn, tối ra bầu trời; ba mốc nở theo XP; streak đứt thì thôi thưởng; vào màn hình học thì `data-variant="focus"`; chọn Tắt thì không dựng gì. |
