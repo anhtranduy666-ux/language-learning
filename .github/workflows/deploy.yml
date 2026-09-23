@@ -1,0 +1,74 @@
+# Build và đưa app lên GitHub Pages sau mỗi lần đẩy code lên `main`.
+#
+# Test và typecheck chạy trước bước build: hỏng thì không deploy, đúng quy định
+# trong CLAUDE.md là mọi bài test phải đạt trước khi giao.
+
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Chỉ chạy một lượt deploy tại một thời điểm.
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - run: npm ci
+
+      - name: Kiểm tra kiểu
+        run: npm run typecheck
+
+      - name: Chạy test
+        run: npm test
+
+      - name: Build
+        env:
+          # Pages phục vụ site ở /<tên repo>/, không phải ở gốc.
+          VITE_BASE_PATH: /language-learning/
+          # Chưa khai hai secret này thì phần audio từ xa tự tắt, app lùi về
+          # giọng đọc của hệ điều hành. Xem docs/audio-tts.md.
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+        run: npm run build
+
+      # Pages không có luật rewrite. App dùng đường dẫn thật (/progress,
+      # /lesson/u1l1) nên mở thẳng link hoặc bấm F5 sẽ rơi vào 404.html —
+      # để 404.html chính là app thì router tự hiển thị đúng màn hình.
+      - name: Dựng fallback cho SPA
+        run: cp dist/index.html dist/404.html
+
+      - uses: actions/configure-pages@v5
+        with:
+          enablement: true
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

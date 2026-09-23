@@ -9,7 +9,9 @@ if (!container) throw new Error('Không tìm thấy phần tử #root trong inde
 
 createRoot(container).render(
   <StrictMode>
-    <BrowserRouter>
+    {/* `basename` bám theo `base` của Vite, để bản deploy dưới đường dẫn con
+        (GitHub Pages) và bản deploy ở gốc (Vercel) dùng chung một mã nguồn. */}
+    <BrowserRouter basename={import.meta.env.BASE_URL}>
       <App />
     </BrowserRouter>
   </StrictMode>,
