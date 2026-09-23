@@ -1,0 +1,10 @@
+# Cấu hình Supabase CLI. Xem docs/audio-tts.md.
+
+project_id = "chinese-learning-app"
+
+[functions.speak]
+# Chưa bật xác thực: Phase 3 mới có đăng nhập thật, mà nút phát âm phải chạy
+# được ngay từ bây giờ. Lớp chống lạm dụng hiện tại là whitelist theo hash
+# trong bảng `speakable_texts` — người lạ không sinh được nội dung mới, kể cả
+# khi biết endpoint. Bật lại ở mốc M3, sau khi có đăng nhập.
+verify_jwt = false
