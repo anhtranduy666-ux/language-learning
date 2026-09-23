@@ -37,7 +37,7 @@ export function Lesson() {
           {words.map((word) => (
             <li
               key={word.id}
-              className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-100 dark:bg-slate-900 dark:ring-slate-800"
+              className="surface rounded-2xl p-4"
             >
               <div className="flex items-center gap-4">
                 <p className="font-hanzi text-3xl font-semibold text-slate-900 dark:text-slate-100">{word.hanzi}</p>

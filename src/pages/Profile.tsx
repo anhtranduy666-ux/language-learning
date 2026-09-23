@@ -1,9 +1,11 @@
 import { useState } from 'react'
 import { Button } from '../components/ui/Button'
 import { useProgress } from '../context/ProgressContext'
+import { useScene } from '../context/SceneContext'
 import { useTheme } from '../context/ThemeContext'
 import { cn } from '../lib/cn'
 import { levelFromXp } from '../lib/gamification'
+import type { SceneChoice } from '../lib/scene'
 import type { ThemeChoice } from '../lib/theme'
 import { currentPlatform, shouldOfferInstall } from '../lib/install'
 
@@ -19,10 +21,17 @@ const THEME_OPTIONS: Array<{ value: ThemeChoice; label: string; icon: string }> 
   { value: 'system', label: 'Theo máy', icon: '🌓' },
 ]
 
+const SCENE_OPTIONS: Array<{ value: SceneChoice; label: string; icon: string }> = [
+  { value: 'full', label: 'Đầy đủ', icon: '🦋' },
+  { value: 'still', label: 'Tĩnh', icon: '🏞️' },
+  { value: 'off', label: 'Tắt', icon: '🚫' },
+]
+
 /** Màn hình Profile: tên hiển thị, mục tiêu hằng ngày, giao diện và tuỳ chọn xoá dữ liệu. */
 export function Profile() {
   const { progress, updateName, updateDailyGoal, resetEverything } = useProgress()
   const { choice, setChoice } = useTheme()
+  const { choice: sceneChoice, setChoice: setSceneChoice } = useScene()
   const [name, setName] = useState(progress.name)
   const [saved, setSaved] = useState(false)
   const [confirmingReset, setConfirmingReset] = useState(false)
@@ -36,7 +45,7 @@ export function Profile() {
     <div className="space-y-6">
       <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">Cá nhân</h1>
 
-      <section className="flex items-center gap-4 rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-100 dark:bg-slate-900 dark:ring-slate-800">
+      <section className="surface flex items-center gap-4 p-5">
         <span
           aria-hidden="true"
           className="flex h-16 w-16 items-center justify-center rounded-full bg-brand-50 text-2xl font-bold text-brand-600 dark:bg-brand-500/15 dark:text-brand-300"
@@ -71,7 +80,7 @@ export function Profile() {
       )}
 
       {/* Tên hiển thị */}
-      <section className="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-100 dark:bg-slate-900 dark:ring-slate-800">
+      <section className="surface p-5">
         <label htmlFor="profile-name" className="block font-semibold text-slate-900 dark:text-slate-100">
           Tên hiển thị
         </label>
@@ -103,7 +112,7 @@ export function Profile() {
       </section>
 
       {/* Mục tiêu hằng ngày */}
-      <section className="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-100 dark:bg-slate-900 dark:ring-slate-800">
+      <section className="surface p-5">
         <h2 className="font-semibold text-slate-900 dark:text-slate-100">Mục tiêu mỗi ngày</h2>
         <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
           Đạt mục tiêu là giữ được streak. Chọn mức bạn theo nổi mỗi ngày.
@@ -141,7 +150,7 @@ export function Profile() {
       </section>
 
       {/* Giao diện */}
-      <section className="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-100 dark:bg-slate-900 dark:ring-slate-800">
+      <section className="surface p-5">
         <h2 id="theme-label" className="font-semibold text-slate-900 dark:text-slate-100">
           Giao diện
         </h2>
@@ -174,10 +183,47 @@ export function Profile() {
             )
           })}
         </div>
+
+        {/* Nền động.
+            Ba mức chứ không phải công tắc bật/tắt: máy yếu thì cảnh vẫn nên ở
+            lại, chỉ là đứng yên. Hệ điều hành bật "giảm chuyển động" thì app
+            tự về mức Tĩnh mà không đụng tới lựa chọn đang lưu ở đây. */}
+        <h3 id="scene-label" className="mt-6 font-semibold text-slate-900 dark:text-slate-100">
+          Nền động
+        </h3>
+        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+          Khu vườn ban ngày, bầu trời sao ban đêm — nở dần theo tiến độ hôm nay.
+        </p>
+        <div role="group" aria-labelledby="scene-label" className="mt-4 grid grid-cols-3 gap-2">
+          {SCENE_OPTIONS.map((option) => {
+            const active = sceneChoice === option.value
+            return (
+              <button
+                key={option.value}
+                type="button"
+                onClick={() => setSceneChoice(option.value)}
+                aria-pressed={active}
+                className={cn(
+                  'rounded-2xl border-2 p-3 text-center transition',
+                  active
+                    ? 'border-brand-500 bg-brand-50 dark:bg-brand-500/15'
+                    : 'border-slate-200 hover:bg-slate-50 dark:border-slate-700 dark:hover:bg-slate-800',
+                )}
+              >
+                <span aria-hidden="true" className="block text-xl">
+                  {option.icon}
+                </span>
+                <span className="mt-1 block text-sm font-semibold text-slate-900 dark:text-slate-100">
+                  {option.label}
+                </span>
+              </button>
+            )
+          })}
+        </div>
       </section>
 
       {/* Dữ liệu */}
-      <section className="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-100 dark:bg-slate-900 dark:ring-slate-800">
+      <section className="surface p-5">
         <h2 className="font-semibold text-slate-900 dark:text-slate-100">Dữ liệu học</h2>
         <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
           Toàn bộ tiến độ đang được lưu trên máy bạn. Xoá đi là không lấy lại được.

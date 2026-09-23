@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+@import './styles/scene.css';
 
 /* Chế độ tối do người học chọn, không bám cứng vào `prefers-color-scheme`.
    Thuộc tính này được đặt trên thẻ `html` — xem `src/lib/theme.ts`. */
@@ -38,6 +39,35 @@
 }
 
 @layer components {
+  /**
+   * Mặt thẻ dùng chung cho mọi màn hình.
+   *
+   * Nền động bật thì thẻ chuyển sang kính mờ để khung cảnh nhìn xuyên qua
+   * được — nhưng vẫn đủ đục để chữ giữ đúng tỉ lệ tương phản, nên không bao
+   * giờ phải đặt chữ thẳng lên cảnh. Nền động tắt thì thẻ trở lại màu đặc,
+   * đúng như giao diện cũ.
+   */
+  .surface {
+    @apply rounded-3xl bg-white shadow-sm ring-1 ring-slate-100;
+    @apply dark:bg-slate-900 dark:ring-slate-800;
+  }
+
+  [data-scene='on'] .surface {
+    @apply bg-white/70 ring-white/70 backdrop-blur-xl;
+    @apply dark:bg-slate-900/60 dark:ring-slate-100/10;
+  }
+
+  /* Thanh điều hướng: mỏng hơn thẻ vì nó nằm đè lên phần cảnh đẹp nhất. */
+  .surface-nav {
+    @apply border-t border-slate-200 bg-white/95 backdrop-blur;
+    @apply dark:border-slate-800 dark:bg-slate-900/95;
+  }
+
+  [data-scene='on'] .surface-nav {
+    @apply border-white/60 bg-white/60 backdrop-blur-xl;
+    @apply dark:border-slate-100/10 dark:bg-slate-950/55;
+  }
+
   /* Hiệu ứng lật flashcard. Phần tử cha cần perspective. */
   .flip-scene {
     perspective: 1200px;

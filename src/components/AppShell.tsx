@@ -2,10 +2,13 @@ import { Navigate, Outlet } from 'react-router-dom'
 import { useProgress } from '../context/ProgressContext'
 import { isOnboarded } from '../lib/progress'
 import { BottomNav } from './BottomNav'
+import { SceneBackground } from './scene/SceneBackground'
 
 /**
  * Khung chung cho các màn hình có thanh điều hướng.
  * Người chưa khai tên sẽ bị đưa về màn hình chào.
+ *
+ * Nền động nằm dưới cùng; nội dung phải có `relative z-10` để nổi lên trên nó.
  */
 export function AppShell() {
   const { progress } = useProgress()
@@ -14,7 +17,8 @@ export function AppShell() {
 
   return (
     <div className="min-h-dvh bg-slate-50 dark:bg-slate-950">
-      <main className="mx-auto w-full max-w-lg px-4 pt-6 pb-24">
+      <SceneBackground />
+      <main className="relative z-10 mx-auto w-full max-w-lg px-4 pt-6 pb-24">
         <Outlet />
       </main>
       <BottomNav />
@@ -25,6 +29,8 @@ export function AppShell() {
 /**
  * Khung cho luồng học trong một bài: không có thanh điều hướng,
  * đúng nguyên tắc "một màn hình — một mục tiêu".
+ *
+ * Nền động cũng theo nguyên tắc đó: ở đây nó lắng hẳn xuống.
  */
 export function FocusShell() {
   const { progress } = useProgress()
@@ -33,7 +39,8 @@ export function FocusShell() {
 
   return (
     <div className="min-h-dvh bg-slate-50 dark:bg-slate-950">
-      <main className="mx-auto flex min-h-dvh w-full max-w-lg flex-col px-4 py-5">
+      <SceneBackground variant="focus" />
+      <main className="relative z-10 mx-auto flex min-h-dvh w-full max-w-lg flex-col px-4 py-5">
         <Outlet />
       </main>
     </div>

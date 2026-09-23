@@ -394,6 +394,49 @@ describe('Chế độ sáng/tối', () => {
   })
 })
 
+describe('Nền động', () => {
+  const scene = () => document.querySelector('.scene')
+
+  afterEach(() => {
+    document.documentElement.removeAttribute('data-scene')
+  })
+
+  it('tắt được từ màn hình Cá nhân', async () => {
+    const { user } = renderApp('/profile', ONBOARDED)
+    expect(scene()).not.toBeNull()
+
+    await user.click(screen.getByRole('button', { name: /Tắt/ }))
+
+    expect(scene()).toBeNull()
+    expect(screen.getByRole('button', { name: /Tắt/ })).toHaveAttribute('aria-pressed', 'true')
+  })
+
+  it('giữ nguyên lựa chọn ở lần mở sau', async () => {
+    const first = renderApp('/profile', ONBOARDED)
+    await first.user.click(screen.getByRole('button', { name: /Tĩnh/ }))
+
+    // Dựng lại từ đầu như một lần mở app mới.
+    cleanup()
+    document.documentElement.removeAttribute('data-scene')
+
+    renderApp('/profile', ONBOARDED)
+
+    expect(scene()).toHaveAttribute('data-motion', 'still')
+    expect(screen.getByRole('button', { name: /Tĩnh/ })).toHaveAttribute('aria-pressed', 'true')
+  })
+
+  it('xoá tiến độ học không đụng tới lựa chọn nền', async () => {
+    const { user } = renderApp('/profile', { ...ONBOARDED, xp: 420 })
+
+    await user.click(screen.getByRole('button', { name: /Tắt/ }))
+    await user.click(screen.getByRole('button', { name: 'Xoá tiến độ học' }))
+    await user.click(screen.getByRole('button', { name: 'Xoá hết' }))
+
+    expect(screen.getByRole('heading', { name: /Học tiếng Trung từ con số 0/ })).toBeInTheDocument()
+    expect(document.documentElement.getAttribute('data-scene')).toBe('off')
+  })
+})
+
 describe('Mời cài lên màn hình chính', () => {
   const IPHONE_SAFARI =
     'Mozilla/5.0 (iPhone; CPU iPhone OS 17_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4 Mobile/15E148 Safari/604.1'

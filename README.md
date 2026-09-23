@@ -45,6 +45,10 @@ chạy thẳng file TypeScript.
 - **Lưu trữ**: tiến độ nằm trong `localStorage`, tự khôi phục khi mở lại.
 - **Giao diện sáng/tối**: chọn Sáng, Tối hoặc Theo máy ở màn hình Cá nhân. Mặc
   định bám theo hệ điều hành. Xem [docs/theme.md](docs/theme.md).
+- **Nền động**: khu vườn có ong bướm ban ngày, bầu trời sao và mưa sao băng ban
+  đêm — và cảnh nở dần theo XP hôm nay, nên nhìn nền là biết đã học tới đâu.
+  Vẽ hoàn toàn bằng CSS và SVG nên không làm nặng thêm bản offline. Chọn Đầy
+  đủ / Tĩnh / Tắt ở màn hình Cá nhân. Xem [docs/scene.md](docs/scene.md).
 - **Phát âm**: 60 file audio thu sẵn cho toàn bộ từ vựng, chạy được trên mọi
   máy kể cả khi không cài giọng tiếng Trung. Xem mục [Âm thanh](#âm-thanh).
 - **Cài được lên điện thoại**: thêm vào màn hình chính iPhone hoặc Android,

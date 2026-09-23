@@ -23,7 +23,7 @@ export function Learn() {
         <StatBar />
       </header>
 
-      <section className="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-100 dark:bg-slate-900 dark:ring-slate-800">
+      <section className="surface p-5">
         <div className="flex items-baseline justify-between">
           <h2 className="font-semibold text-slate-900 dark:text-slate-100">Tiến độ khoá học</h2>
           <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
@@ -50,8 +50,8 @@ export function Learn() {
                   <Link
                     to={`/lesson/${lesson.id}`}
                     className={cn(
-                      'flex items-center gap-3 rounded-2xl bg-white p-4 shadow-sm transition hover:bg-slate-50 dark:bg-slate-900 dark:hover:bg-slate-800',
-                      isNext ? 'ring-2 ring-brand-400' : 'ring-1 ring-slate-100 dark:ring-slate-800',
+                      'surface flex items-center gap-3 rounded-2xl p-4 transition hover:shadow-md active:scale-[.99]',
+                      isNext && 'ring-2 ring-brand-400',
                     )}
                   >
                     <span

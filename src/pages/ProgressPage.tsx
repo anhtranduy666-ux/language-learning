@@ -21,7 +21,7 @@ export function ProgressPage() {
       </header>
 
       {/* Level */}
-      <section className="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-100 dark:bg-slate-900 dark:ring-slate-800">
+      <section className="surface p-5">
         <div className="flex items-baseline justify-between">
           <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100">Level {level.level}</h2>
           <p className="text-sm text-slate-500 dark:text-slate-400">
@@ -47,7 +47,7 @@ export function ProgressPage() {
       </section>
 
       {/* Khoá học */}
-      <section className="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-100 dark:bg-slate-900 dark:ring-slate-800">
+      <section className="surface p-5">
         <div className="flex items-baseline justify-between">
           <h2 className="font-semibold text-slate-900 dark:text-slate-100">Khoá HSK 1</h2>
           <p className="text-sm text-slate-500 dark:text-slate-400">
@@ -63,7 +63,7 @@ export function ProgressPage() {
       </section>
 
       {/* Mục tiêu hôm nay */}
-      <section className="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-100 dark:bg-slate-900 dark:ring-slate-800">
+      <section className="surface p-5">
         <div className="flex items-baseline justify-between">
           <h2 className="font-semibold text-slate-900 dark:text-slate-100">Hôm nay</h2>
           <p className="text-sm text-slate-500 dark:text-slate-400">
@@ -129,7 +129,7 @@ function MetricCard({
     <div
       role="group"
       aria-label={label}
-      className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-100 dark:bg-slate-900 dark:ring-slate-800"
+      className="surface rounded-2xl p-4"
     >
       <p aria-hidden="true" className="text-2xl">
         {icon}

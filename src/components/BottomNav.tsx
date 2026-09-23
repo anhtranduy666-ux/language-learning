@@ -13,7 +13,7 @@ export function BottomNav() {
   return (
     <nav
       aria-label="Điều hướng chính"
-      className="fixed inset-x-0 bottom-0 z-20 border-t border-slate-200 bg-white/95 dark:border-slate-800 dark:bg-slate-900/95 pb-[env(safe-area-inset-bottom)] backdrop-blur"
+      className="surface-nav fixed inset-x-0 bottom-0 z-20 pb-[env(safe-area-inset-bottom)]"
     >
       <ul className="mx-auto flex max-w-lg">
         {ITEMS.map((item) => (

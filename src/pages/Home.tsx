@@ -30,7 +30,7 @@ export function Home() {
       </header>
 
       {/* Mục tiêu hôm nay */}
-      <section className="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-100 dark:bg-slate-900 dark:ring-slate-800">
+      <section className="surface p-5">
         <div className="flex items-baseline justify-between">
           <h2 className="font-semibold text-slate-900 dark:text-slate-100">Mục tiêu hôm nay</h2>
           <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
@@ -80,7 +80,7 @@ export function Home() {
 
       <Link
         to="/learn"
-        className="block rounded-3xl bg-white p-4 text-center font-semibold text-slate-700 shadow-sm ring-1 ring-slate-100 transition hover:bg-slate-50 dark:bg-slate-900 dark:text-slate-300 dark:ring-slate-800 dark:hover:bg-slate-800"
+        className="surface block p-4 text-center font-semibold text-slate-700 transition hover:shadow-md active:scale-[.99] dark:text-slate-300"
       >
         Xem toàn bộ khoá học →
       </Link>
@@ -98,7 +98,7 @@ function SummaryCard({
   label: string
 }) {
   return (
-    <div className="rounded-2xl bg-white p-3 text-center shadow-sm ring-1 ring-slate-100 dark:bg-slate-900 dark:ring-slate-800">
+    <div className="surface rounded-2xl p-3 text-center">
       <p aria-hidden="true" className="text-xl">
         {icon}
       </p>

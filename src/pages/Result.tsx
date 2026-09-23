@@ -53,7 +53,7 @@ export function Result() {
         </p>
       </div>
 
-      <div className="mt-8 rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-100 dark:bg-slate-900 dark:ring-slate-800">
+      <div className="mt-8 surface p-5">
         <div className="flex items-baseline justify-between">
           <span className="font-semibold text-slate-900 dark:text-slate-100">Kết quả bài tập</span>
           <span className="text-sm font-medium text-slate-500 dark:text-slate-400">
