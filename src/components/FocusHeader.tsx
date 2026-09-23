@@ -19,7 +19,7 @@ export function FocusHeader({ title, progress, backTo }: FocusHeaderProps) {
         type="button"
         onClick={() => (backTo ? navigate(backTo) : navigate(-1))}
         aria-label="Quay lại"
-        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-slate-500 transition hover:bg-slate-200"
+        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-slate-500 transition hover:bg-slate-200 dark:text-slate-400 dark:hover:bg-slate-800"
       >
         <span aria-hidden="true" className="text-xl leading-none">
           ✕
@@ -27,7 +27,7 @@ export function FocusHeader({ title, progress, backTo }: FocusHeaderProps) {
       </button>
 
       <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-semibold text-slate-700">{title}</p>
+        <p className="truncate text-sm font-semibold text-slate-700 dark:text-slate-300">{title}</p>
         {progress !== undefined && (
           <ProgressBar value={progress} label="Tiến độ bài học" className="mt-1.5 h-2" />
         )}

@@ -20,7 +20,7 @@ export function ProgressBar({ value, label, className, tone = 'brand' }: Progres
 
   return (
     <div
-      className={cn('h-3 w-full overflow-hidden rounded-full bg-slate-200', className)}
+      className={cn('h-3 w-full overflow-hidden rounded-full bg-slate-200 dark:bg-slate-800', className)}
       role="progressbar"
       aria-valuenow={clamped}
       aria-valuemin={0}

@@ -13,7 +13,7 @@ export function AppShell() {
   if (!isOnboarded(progress)) return <Navigate to="/welcome" replace />
 
   return (
-    <div className="min-h-dvh bg-slate-50">
+    <div className="min-h-dvh bg-slate-50 dark:bg-slate-950">
       <main className="mx-auto w-full max-w-lg px-4 pt-6 pb-24">
         <Outlet />
       </main>
@@ -32,7 +32,7 @@ export function FocusShell() {
   if (!isOnboarded(progress)) return <Navigate to="/welcome" replace />
 
   return (
-    <div className="min-h-dvh bg-slate-50">
+    <div className="min-h-dvh bg-slate-50 dark:bg-slate-950">
       <main className="mx-auto flex min-h-dvh w-full max-w-lg flex-col px-4 py-5">
         <Outlet />
       </main>

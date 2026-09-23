@@ -18,6 +18,40 @@ import {
 } from '../lib/exercises'
 import { XP_REWARDS } from '../lib/gamification'
 
+/**
+ * Màu của một ô theo trạng thái của nó.
+ *
+ * Mỗi trạng thái tự khai đủ nền cho cả hai chế độ. Để một nền chung ở lớp gốc
+ * rồi trông chờ `dark:` của trạng thái ghi đè là không ăn: Tailwind xếp CSS
+ * theo tên tiện ích chứ không theo thứ tự mình viết, nên `dark:bg-slate-900`
+ * của lớp gốc đè mất `dark:bg-emerald-500/15` của trạng thái.
+ */
+const CHOICE_STYLES = {
+  idle: 'border-slate-200 bg-white hover:border-slate-300 dark:border-slate-700 dark:bg-slate-900 dark:hover:border-slate-600',
+  selected: 'border-brand-500 bg-brand-50 dark:bg-brand-500/15',
+  right: 'border-emerald-500 bg-emerald-50 text-emerald-900 dark:bg-emerald-500/15 dark:text-emerald-200',
+  wrong: 'border-amber-500 bg-amber-50 dark:bg-amber-500/15',
+  dimmed: 'border-slate-200 bg-white opacity-60 dark:border-slate-700 dark:bg-slate-900',
+}
+
+const MATCH_STYLES = {
+  idle: 'border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900',
+  active: 'border-brand-500 bg-brand-50 dark:bg-brand-500/15',
+  paired: 'border-emerald-400 bg-emerald-50 dark:bg-emerald-500/15',
+  wrong: 'border-amber-500 bg-amber-50 dark:bg-amber-500/15',
+}
+
+/** Trạng thái của một lựa chọn trong bài trắc nghiệm / nghe / pinyin. */
+function choiceState(
+  checked: boolean,
+  selected: boolean,
+  isRight: boolean,
+): keyof typeof CHOICE_STYLES {
+  if (!checked) return selected ? 'selected' : 'idle'
+  if (isRight) return 'right'
+  return selected ? 'wrong' : 'dimmed'
+}
+
 /** Bước 3: làm bài tập. Bốn dạng của Version 2 đều xuất hiện ở đây. */
 export function ExercisePage() {
   const { lessonId = '' } = useParams()
@@ -111,7 +145,7 @@ export function ExercisePage() {
       />
 
       <div className="flex-1">
-        <h1 className="text-xl font-bold text-slate-900">{exercise.prompt}</h1>
+        <h1 className="text-xl font-bold text-slate-900 dark:text-slate-100">{exercise.prompt}</h1>
 
         {isChoice ? (
           <>
@@ -126,16 +160,16 @@ export function ExercisePage() {
                 {/* Không có âm thì bài nghe sẽ không thể làm được, nên hiện pinyin
                     thay thế để người học vẫn đi hết bài. */}
                 {audioStatus !== 'ready' ? (
-                  <p className="max-w-xs text-center text-sm text-slate-500">
+                  <p className="max-w-xs text-center text-sm text-slate-500 dark:text-slate-400">
                     Máy chưa phát âm được nên bài nghe hiện pinyin thay thế:{' '}
-                    <span className="font-medium text-slate-700">
+                    <span className="font-medium text-slate-700 dark:text-slate-200">
                       {WORD_BY_ID[exercise.wordId]?.pinyin}
                     </span>
                   </p>
                 ) : null}
               </div>
             ) : (
-              <p className="font-hanzi mt-6 text-center text-6xl font-semibold text-slate-900">
+              <p className="font-hanzi mt-6 text-center text-6xl font-semibold text-slate-900 dark:text-slate-100">
                 {WORD_BY_ID[exercise.wordId]?.hanzi}
               </p>
             )}
@@ -151,13 +185,9 @@ export function ExercisePage() {
                       disabled={checked}
                       onClick={() => setChoiceId(choice.id)}
                       className={cn(
-                        'w-full rounded-2xl border-2 bg-white p-4 text-left text-lg font-medium transition',
+                        'w-full rounded-2xl border-2 p-4 text-left text-lg font-medium transition',
                         exercise.kind === 'listening' && 'font-hanzi text-2xl',
-                        !checked && selected && 'border-brand-500 bg-brand-50',
-                        !checked && !selected && 'border-slate-200 hover:border-slate-300',
-                        checked && isRight && 'border-emerald-500 bg-emerald-50 text-emerald-900',
-                        checked && selected && !isRight && 'border-amber-500 bg-amber-50',
-                        checked && !selected && !isRight && 'border-slate-200 opacity-60',
+                        CHOICE_STYLES[choiceState(checked, selected, isRight)],
                       )}
                     >
                       {choice.label}
@@ -179,13 +209,16 @@ export function ExercisePage() {
                       disabled={checked}
                       onClick={() => tapLeft(item.id)}
                       className={cn(
-                        'font-hanzi w-full rounded-2xl border-2 bg-white p-4 text-2xl font-semibold transition',
-                        activeLeft === item.id && 'border-brand-500 bg-brand-50',
-                        pairedTo && 'border-emerald-400 bg-emerald-50',
-                        !pairedTo && activeLeft !== item.id && 'border-slate-200',
-                        checked &&
-                          matches[item.id] !== exercise.answerKey[item.id] &&
-                          'border-amber-500 bg-amber-50',
+                        'font-hanzi w-full rounded-2xl border-2 p-4 text-2xl font-semibold transition',
+                        // Chấm xong mà ghép sai thì phải ra màu sai, kể cả khi
+                        // ô đó đang có cặp — nên nhánh này đứng trước.
+                        checked && matches[item.id] !== exercise.answerKey[item.id]
+                          ? MATCH_STYLES.wrong
+                          : pairedTo
+                            ? MATCH_STYLES.paired
+                            : activeLeft === item.id
+                              ? MATCH_STYLES.active
+                              : MATCH_STYLES.idle,
                       )}
                     >
                       {item.label}
@@ -205,8 +238,8 @@ export function ExercisePage() {
                       disabled={checked || used}
                       onClick={() => tapRight(item.id)}
                       className={cn(
-                        'w-full rounded-2xl border-2 bg-white p-4 text-base font-medium transition',
-                        used ? 'border-emerald-400 bg-emerald-50 opacity-70' : 'border-slate-200',
+                        'w-full rounded-2xl border-2 p-4 text-base font-medium transition',
+                        used ? `${MATCH_STYLES.paired} opacity-70` : MATCH_STYLES.idle,
                       )}
                     >
                       {item.label}
@@ -223,9 +256,9 @@ export function ExercisePage() {
       <div
         className={cn(
           'sticky bottom-0 -mx-4 mt-6 px-4 pt-4 pb-[max(1rem,env(safe-area-inset-bottom))]',
-          !checked && 'bg-slate-50/95 backdrop-blur',
-          checked && isCorrect && 'bg-emerald-50',
-          checked && !isCorrect && 'bg-amber-50',
+          !checked && 'bg-slate-50/95 backdrop-blur dark:bg-slate-950/95',
+          checked && isCorrect && 'bg-emerald-50 dark:bg-emerald-500/15',
+          checked && !isCorrect && 'bg-amber-50 dark:bg-amber-500/15',
         )}
       >
         {checked && (
@@ -233,7 +266,7 @@ export function ExercisePage() {
             role="status"
             className={cn(
               'mb-3 font-semibold',
-              isCorrect ? 'text-emerald-700' : 'text-amber-700',
+              isCorrect ? 'text-emerald-700 dark:text-emerald-300' : 'text-amber-700 dark:text-amber-300',
             )}
           >
             {isCorrect ? (

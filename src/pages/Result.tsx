@@ -45,18 +45,18 @@ export function Result() {
         <p aria-hidden="true" className="text-6xl">
           {percent === 100 ? '🎉' : percent >= 60 ? '👏' : '💪'}
         </p>
-        <h1 className="mt-4 text-3xl font-bold text-slate-900">
+        <h1 className="mt-4 text-3xl font-bold text-slate-900 dark:text-slate-100">
           {percent === 100 ? 'Hoàn hảo!' : percent >= 60 ? 'Làm tốt lắm!' : 'Cứ từ từ thôi'}
         </h1>
-        <p className="mt-2 text-slate-600">
+        <p className="mt-2 text-slate-600 dark:text-slate-400">
           {lesson.unitTitle} · {lesson.title}
         </p>
       </div>
 
-      <div className="mt-8 rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-100">
+      <div className="mt-8 rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-100 dark:bg-slate-900 dark:ring-slate-800">
         <div className="flex items-baseline justify-between">
-          <span className="font-semibold text-slate-900">Kết quả bài tập</span>
-          <span className="text-sm font-medium text-slate-500">
+          <span className="font-semibold text-slate-900 dark:text-slate-100">Kết quả bài tập</span>
+          <span className="text-sm font-medium text-slate-500 dark:text-slate-400">
             {state.correct}/{state.total} câu đúng
           </span>
         </div>
@@ -75,14 +75,14 @@ export function Result() {
       </div>
 
       {goalMet && (
-        <p className="mt-4 rounded-2xl bg-emerald-50 p-4 text-center text-sm font-medium text-emerald-800">
+        <p className="mt-4 rounded-2xl bg-emerald-50 p-4 text-center text-sm font-medium text-emerald-800 dark:bg-emerald-500/15 dark:text-emerald-200">
           Bạn đã đạt mục tiêu {progress.dailyGoal} XP hôm nay. Hẹn gặp lại ngày mai!
         </p>
       )}
 
       {unlocked.length > 0 && (
-        <section className="mt-4 rounded-3xl bg-gold-400/15 p-5 ring-1 ring-gold-400/40">
-          <h2 className="font-semibold text-slate-900">Thành tích mới</h2>
+        <section className="mt-4 rounded-3xl bg-gold-400/15 p-5 ring-1 ring-gold-400/40 dark:bg-gold-400/10">
+          <h2 className="font-semibold text-slate-900 dark:text-slate-100">Thành tích mới</h2>
           <ul className="mt-3 space-y-2">
             {unlocked.map((achievement) => (
               <li key={achievement.id} className="flex items-center gap-3">
@@ -90,8 +90,8 @@ export function Result() {
                   {achievement.icon}
                 </span>
                 <span>
-                  <span className="block font-semibold text-slate-900">{achievement.title}</span>
-                  <span className="block text-sm text-slate-600">{achievement.description}</span>
+                  <span className="block font-semibold text-slate-900 dark:text-slate-100">{achievement.title}</span>
+                  <span className="block text-sm text-slate-600 dark:text-slate-400">{achievement.description}</span>
                 </span>
               </li>
             ))}
@@ -126,8 +126,8 @@ export function Result() {
 function Stat({ label, value }: { label: string; value: string | number }) {
   return (
     <div>
-      <dt className="text-xs text-slate-500">{label}</dt>
-      <dd className="text-lg font-bold text-slate-900">{value}</dd>
+      <dt className="text-xs text-slate-500 dark:text-slate-400">{label}</dt>
+      <dd className="text-lg font-bold text-slate-900 dark:text-slate-100">{value}</dd>
     </div>
   )
 }

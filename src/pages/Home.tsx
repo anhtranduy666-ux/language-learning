@@ -23,17 +23,17 @@ export function Home() {
     <div className="space-y-6">
       <header className="flex items-start justify-between gap-3">
         <div>
-          <p className="text-sm text-slate-500">Chào bạn,</p>
-          <h1 className="text-2xl font-bold text-slate-900">{progress.name}</h1>
+          <p className="text-sm text-slate-500 dark:text-slate-400">Chào bạn,</p>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">{progress.name}</h1>
         </div>
         <StatBar />
       </header>
 
       {/* Mục tiêu hôm nay */}
-      <section className="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-100">
+      <section className="rounded-3xl bg-white p-5 shadow-sm ring-1 ring-slate-100 dark:bg-slate-900 dark:ring-slate-800">
         <div className="flex items-baseline justify-between">
-          <h2 className="font-semibold text-slate-900">Mục tiêu hôm nay</h2>
-          <p className="text-sm font-medium text-slate-500">
+          <h2 className="font-semibold text-slate-900 dark:text-slate-100">Mục tiêu hôm nay</h2>
+          <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
             {progress.xpToday}/{progress.dailyGoal} XP
           </p>
         </div>
@@ -43,7 +43,7 @@ export function Home() {
           label="Tiến độ mục tiêu hôm nay"
           className="mt-3"
         />
-        <p className="mt-3 text-sm text-slate-600">
+        <p className="mt-3 text-sm text-slate-600 dark:text-slate-400">
           {goalMet
             ? streak > 0
               ? `Xong rồi! Streak của bạn đang là ${streak} ngày. 🔥`
@@ -53,7 +53,7 @@ export function Home() {
       </section>
 
       {/* Bước tiếp theo */}
-      <section className="rounded-3xl bg-brand-500 p-5 text-white shadow-sm">
+      <section className="rounded-3xl bg-brand-500 p-5 text-white shadow-sm dark:bg-brand-600">
         <p className="text-sm text-brand-100">
           {isReview ? 'Ôn lại' : `Bài ${lessonPosition(nextId)}/${TOTAL_LESSONS}`} ·{' '}
           {nextLesson.unitTitle}
@@ -61,7 +61,7 @@ export function Home() {
         <h2 className="mt-1 text-xl font-bold">{nextLesson.title}</h2>
         <p className="mt-1 text-brand-100">{nextLesson.description}</p>
         <Link to={`/lesson/${nextId}`} className="mt-4 block">
-          <Button variant="secondary" size="lg" fullWidth className="text-brand-700">
+          <Button variant="on-brand" size="lg" fullWidth>
             {isReview ? 'Ôn lại bài này' : 'Học tiếp'}
           </Button>
         </Link>
@@ -80,7 +80,7 @@ export function Home() {
 
       <Link
         to="/learn"
-        className="block rounded-3xl bg-white p-4 text-center font-semibold text-slate-700 shadow-sm ring-1 ring-slate-100 transition hover:bg-slate-50"
+        className="block rounded-3xl bg-white p-4 text-center font-semibold text-slate-700 shadow-sm ring-1 ring-slate-100 transition hover:bg-slate-50 dark:bg-slate-900 dark:text-slate-300 dark:ring-slate-800 dark:hover:bg-slate-800"
       >
         Xem toàn bộ khoá học →
       </Link>
@@ -98,12 +98,12 @@ function SummaryCard({
   label: string
 }) {
   return (
-    <div className="rounded-2xl bg-white p-3 text-center shadow-sm ring-1 ring-slate-100">
+    <div className="rounded-2xl bg-white p-3 text-center shadow-sm ring-1 ring-slate-100 dark:bg-slate-900 dark:ring-slate-800">
       <p aria-hidden="true" className="text-xl">
         {icon}
       </p>
-      <p className="mt-1 text-xl font-bold text-slate-900">{value}</p>
-      <p className="text-xs text-slate-500">{label}</p>
+      <p className="mt-1 text-xl font-bold text-slate-900 dark:text-slate-100">{value}</p>
+      <p className="text-xs text-slate-500 dark:text-slate-400">{label}</p>
     </div>
   )
 }

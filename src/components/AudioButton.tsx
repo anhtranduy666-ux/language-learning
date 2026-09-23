@@ -71,9 +71,9 @@ export function AudioButton({ text, wordId, label, size = 'md', className }: Aud
         className={cn(
           'inline-flex shrink-0 items-center justify-center rounded-full transition active:scale-95',
           available
-            ? 'bg-brand-50 text-brand-600 ring-1 ring-brand-100 hover:bg-brand-100'
-            : 'bg-slate-100 text-slate-400 ring-1 ring-slate-200 hover:bg-slate-200',
-          playing && 'animate-pulse bg-brand-100',
+            ? 'bg-brand-50 text-brand-600 ring-1 ring-brand-100 hover:bg-brand-100 dark:bg-brand-500/15 dark:text-brand-300 dark:ring-brand-500/25 dark:hover:bg-brand-500/25'
+            : 'bg-slate-100 text-slate-400 ring-1 ring-slate-200 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-500 dark:ring-slate-700 dark:hover:bg-slate-700',
+          playing && 'animate-pulse bg-brand-100 dark:bg-brand-500/30',
           SIZES[size],
           className,
         )}
@@ -84,7 +84,7 @@ export function AudioButton({ text, wordId, label, size = 'md', className }: Aud
       {hint ? (
         <span
           role="status"
-          className="absolute top-full z-10 mt-2 w-60 rounded-xl bg-slate-900 px-3 py-2 text-center text-xs leading-snug font-normal text-white shadow-lg"
+          className="absolute top-full z-10 mt-2 w-60 rounded-xl bg-slate-900 px-3 py-2 dark:bg-slate-700 text-center text-xs leading-snug font-normal text-white shadow-lg"
         >
           {HINTS[hint]}
         </span>

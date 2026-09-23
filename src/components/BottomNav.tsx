@@ -13,7 +13,7 @@ export function BottomNav() {
   return (
     <nav
       aria-label="Điều hướng chính"
-      className="fixed inset-x-0 bottom-0 z-20 border-t border-slate-200 bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur"
+      className="fixed inset-x-0 bottom-0 z-20 border-t border-slate-200 bg-white/95 dark:border-slate-800 dark:bg-slate-900/95 pb-[env(safe-area-inset-bottom)] backdrop-blur"
     >
       <ul className="mx-auto flex max-w-lg">
         {ITEMS.map((item) => (
@@ -24,7 +24,9 @@ export function BottomNav() {
               className={({ isActive }) =>
                 cn(
                   'flex flex-col items-center gap-0.5 py-2.5 text-xs font-medium transition',
-                  isActive ? 'text-brand-600' : 'text-slate-400 hover:text-slate-600',
+                  isActive
+                    ? 'text-brand-600 dark:text-brand-300'
+                    : 'text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300',
                 )
               }
             >

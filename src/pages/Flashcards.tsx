@@ -62,7 +62,7 @@ export function Flashcards() {
           </Button>
         )}
 
-        <p className="text-center text-sm text-slate-400">
+        <p className="text-center text-sm text-slate-400 dark:text-slate-500">
           Tự trả lời trong đầu trước khi lật — nhớ lâu hơn nhiều.
         </p>
       </div>

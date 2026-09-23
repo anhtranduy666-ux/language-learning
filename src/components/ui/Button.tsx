@@ -1,13 +1,19 @@
 import type { ButtonHTMLAttributes, ReactNode } from 'react'
 import { cn } from '../../lib/cn'
 
-type Variant = 'primary' | 'secondary' | 'ghost' | 'success' | 'danger'
+type Variant = 'primary' | 'secondary' | 'on-brand' | 'ghost' | 'success' | 'danger'
 type Size = 'md' | 'lg'
 
 const VARIANTS: Record<Variant, string> = {
-  primary: 'bg-brand-500 text-white shadow-sm hover:bg-brand-600 active:bg-brand-700',
-  secondary: 'bg-white text-slate-800 ring-1 ring-slate-200 hover:bg-slate-50 active:bg-slate-100',
-  ghost: 'bg-transparent text-slate-600 hover:bg-slate-100 active:bg-slate-200',
+  primary:
+    'bg-brand-500 text-white shadow-sm hover:bg-brand-600 active:bg-brand-700 dark:bg-brand-600 dark:hover:bg-brand-500',
+  secondary:
+    'bg-white text-slate-800 ring-1 ring-slate-200 hover:bg-slate-50 active:bg-slate-100 dark:bg-slate-800 dark:text-slate-100 dark:ring-slate-700 dark:hover:bg-slate-700 dark:active:bg-slate-600',
+  // Nút trắng nằm trên thẻ màu thương hiệu. Thẻ đó đỏ ở cả hai chế độ, nên nút
+  // này cũng giữ nguyên màu — không có biến thể `dark:`.
+  'on-brand': 'bg-white text-brand-700 shadow-sm hover:bg-brand-50 active:bg-brand-100',
+  ghost:
+    'bg-transparent text-slate-600 hover:bg-slate-100 active:bg-slate-200 dark:text-slate-300 dark:hover:bg-slate-800 dark:active:bg-slate-700',
   success: 'bg-emerald-600 text-white shadow-sm hover:bg-emerald-700 active:bg-emerald-800',
   danger: 'bg-amber-500 text-white shadow-sm hover:bg-amber-600 active:bg-amber-700',
 }
