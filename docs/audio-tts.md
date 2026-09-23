@@ -1,7 +1,11 @@
 # Phương án kỹ thuật — Audio phát âm qua Supabase
 
-> Trạng thái: **M1 và M2 đã code xong** (2026-09-23), chờ tài khoản Supabase
-> và khoá Azure để chạy thật. M3 và M4 chưa làm.
+> Trạng thái: **không dùng cho bản hiện tại.** Mã của M1 và M2 đã viết xong và
+> có test, nhưng sản phẩm đang phát âm bằng file sinh sẵn tại máy (Piper) —
+> xem mục "Vì sao không dùng dịch vụ TTS đám mây" trong [../README.md](../README.md).
+> Lý do gọn lại: mọi dịch vụ TTS neural đều bắt buộc có thẻ tín dụng, kể cả bậc
+> miễn phí, mà chủ dự án không có. Tài liệu này giữ nguyên cho lúc nội dung lớn
+> tới mức không nên nhét mp3 vào git nữa.
 > Ngày: 2026-09-22
 > Liên quan: [product_design.md](../product_design.md) Phase 2 & Phase 5, `src/lib/speech.ts`
 

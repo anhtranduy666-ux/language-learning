@@ -43,79 +43,62 @@ chạy thẳng file TypeScript.
 - **Lưu trữ**: tiến độ nằm trong `localStorage`, tự khôi phục khi mở lại.
 - **Giao diện sáng/tối**: chọn Sáng, Tối hoặc Theo máy ở màn hình Cá nhân. Mặc
   định bám theo hệ điều hành. Xem [docs/theme.md](docs/theme.md).
-- **Phát âm**: nút loa ở màn hình từ vựng, flashcard và bài nghe. Xem mục [Âm thanh](#âm-thanh).
+- **Phát âm**: 60 file audio thu sẵn cho toàn bộ từ vựng, chạy được trên mọi
+  máy kể cả khi không cài giọng tiếng Trung. Xem mục [Âm thanh](#âm-thanh).
 
 ## Chưa có
 
 - Authentication và Supabase (Phase 2–3). Hiện chỉ hỏi tên và lưu ở máy.
-- Audio thật: mã đã xong nhưng cần một project Supabase và một khoá TTS mới
-  chạy được — xem mục [Âm thanh](#âm-thanh) bên dưới.
 - Spaced repetition cho flashcard. Bản này mới có hai mức "Chưa nhớ" / "Đã nhớ".
 - Toàn bộ phần AI ở Phase 8.
 
 ## Âm thanh
 
-Nút phát âm thử bốn nguồn, theo thứ tự — chi tiết ở
-[docs/audio-tts.md](docs/audio-tts.md):
+Khoá HSK 1 **đã có sẵn 60 file phát âm** trong `src/assets/audio/`, sinh bằng
+[Piper](https://github.com/OHF-Voice/piper1-gpl) — bộ TTS mã nguồn mở chạy
+ngoại tuyến. File nằm trong repo nên mọi người học đều nghe đúng một bản audio,
+không phụ thuộc máy họ có cài giọng tiếng Trung hay không.
 
-1. **File thu sẵn** trong `src/assets/audio/`. Đặt tên file bằng `id` của từ
-   (`nihao.mp3` cho `你好`) là chạy, không cần khai báo thêm ở đâu.
-2. **CDN Supabase.** Đường dẫn file được suy ra từ chính nội dung cần đọc nên
-   trình duyệt tự tính được URL, không phải hỏi server trước.
-3. **Edge Function `/speak`**, chỉ khi CDN chưa có file.
-4. **Giọng tiếng Trung của hệ điều hành** qua Web Speech API.
+Nút phát âm thử bốn nguồn, theo thứ tự:
 
-Hết cả bốn thì nút chuyển xám, bấm vào sẽ hướng dẫn cách cài giọng tiếng Trung
-thay vì im lặng. Riêng bài tập nghe hiện pinyin thay thế để người học vẫn đi
-hết được bài.
+| Thứ tự | Nguồn | Khi nào dùng |
+| --- | --- | --- |
+| 1 | File trong `src/assets/audio/` | Đường đi thường gặp. Chạy ngoại tuyến. |
+| 2 | CDN Supabase theo hash | Khi đã bật Supabase và từ chưa có file. |
+| 3 | Edge Function `/speak` | Chỉ khi (2) trả 404. |
+| 4 | Giọng hệ điều hành (Web Speech) | Khi không còn nguồn nào khác. |
 
-Lưu ý: Windows **không** cài sẵn giọng tiếng Trung, nên nguồn 4 thường không có
-trên máy người dùng Việt Nam. Đó chính là lý do có nguồn 2 và 3.
+Hết cả bốn thì nút chuyển xám kèm hướng dẫn, chứ không im lặng. Bài tập nghe
+hiện pinyin thay thế để người học vẫn đi hết được bài.
 
-### Cách nhanh nhất: sinh mp3 vào repo
+### Thêm từ mới thì làm gì
 
-Chỉ cần một tài khoản Azure, **không** cần Supabase:
-
-```bash
-cp .env.example .env.local   # điền AZURE_SPEECH_KEY và AZURE_SPEECH_REGION
-npm run prewarm-audio -- --local
-git add src/assets/audio && git commit -m "Add pronunciation audio"
-```
-
-Sinh 60 file, mỗi từ một file, tổng cộng 89 ký tự tiếng Trung — nằm gọn trong
-hạn miễn phí của Azure (500.000 ký tự mỗi tháng). File nằm trong repo nên là
-nguồn số 1 của chuỗi trên: chạy được ngoại tuyến, không phụ thuộc dịch vụ nào
-lúc người học bấm nút.
-
-Đây là chỗ cố tình làm khác [docs/audio-tts.md](docs/audio-tts.md): tài liệu xếp
-"commit mp3 vào repo" làm fallback chứ không làm nguồn chính, vì lo repo phình
-theo nội dung. Với HSK 1 thì 60 file nhỏ không đáng kể. Khi nội dung lớn hơn
-nhiều thì chuyển sang cách dưới đây.
-
-### Cách đầy đủ: audio qua Supabase
-
-Từng bước bấm vào đâu, khoá nào để ở file nào:
-[docs/audio-setup.md](docs/audio-setup.md).
-
-Chưa cấu hình thì nguồn 2 và 3 tự tắt, app lùi về giọng hệ điều hành — `npm run
-dev` của người mới clone repo vẫn chạy ngay, không cần tài khoản Supabase.
-
-Muốn bật thật:
+Thêm từ vào `src/data/hsk1.ts`, rồi:
 
 ```bash
-cp .env.example .env.local        # điền VITE_SUPABASE_URL và VITE_SUPABASE_ANON_KEY
-supabase db push                  # tạo bucket tts và bảng speakable_texts
-supabase secrets set AZURE_SPEECH_KEY=... AZURE_SPEECH_REGION=southeastasia
-supabase functions deploy speak
-npm run prewarm-audio             # sinh sẵn 120 chuỗi của khoá HSK 1
+pip install piper-tts lameenc   # chỉ lần đầu
+npm run generate-audio
+git add src/assets/audio && git commit -m "Add audio for new words"
 ```
 
-`prewarm-audio` cần thêm `SUPABASE_SERVICE_ROLE_KEY`, `AZURE_SPEECH_KEY` và
-`AZURE_SPEECH_REGION` trong `.env.local`. Khoá service role **không** bao giờ
-mang tiền tố `VITE_`: mọi thứ có tiền tố đó đều đi thẳng vào bundle trình duyệt.
+Lần đầu chạy sẽ tải model giọng khoảng 60MB vào `.piper-voices/` (đã được
+`.gitignore` loại trừ). Những từ đã có file thì bỏ qua, chỉ sinh từ mới.
 
-Bảng `speakable_texts` là danh sách chuỗi được phép sinh audio. Không có nó thì
-`/speak` là một proxy TTS miễn phí cho cả internet, chạy bằng hoá đơn của mình.
+Có một test chặn đúng chỗ dễ quên: thêm từ mà chưa sinh audio thì
+`src/lib/audioFiles.test.ts` báo đỏ, và CI không deploy.
+
+### Vì sao không dùng dịch vụ TTS đám mây
+
+[docs/audio-tts.md](docs/audio-tts.md) đề xuất Azure Speech qua Supabase, và
+toàn bộ mã cho đường đó vẫn còn trong repo, đã có test. Nhưng mọi dịch vụ TTS
+neural — Azure, Google, OpenAI — đều **bắt buộc có thẻ tín dụng** kể cả ở bậc
+miễn phí. Chạy Piper tại máy thì không có tài khoản nào để hết hạn, không có
+hạn mức để vượt, và giá vẫn bằng không khi khoá học lớn lên.
+
+Đánh đổi là chất lượng giọng thấp hơn giọng neural của Azure một bậc.
+
+Muốn bật đường Supabase về sau thì xem [docs/audio-setup.md](docs/audio-setup.md).
+Lúc đó nhớ xoá `src/assets/audio/`, vì nguồn 1 được ưu tiên hơn nguồn 2.
 
 ## Cấu trúc mã nguồn
 
@@ -158,7 +141,7 @@ nên chạy được trong `npm test`, không phải cài Deno chỉ để chạ
 
 ## Kiểm thử
 
-295 test, chia làm ba tầng:
+297 test, chia làm ba tầng:
 
 - **Logic** (`src/lib/*.test.ts`, `supabase/functions/speak/handler.test.ts`) — XP, level, streak, thành tích, sinh và chấm bài tập, chế độ sáng/tối, khoá cache audio, đọc/ghi dữ liệu hỏng.
 - **Dữ liệu** (`src/data/hsk1.test.ts`) — mọi từ đều có đủ trường, không trùng id, không từ nào lạc khỏi bài học.

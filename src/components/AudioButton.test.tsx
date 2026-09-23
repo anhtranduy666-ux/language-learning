@@ -4,6 +4,16 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { AudioButton } from './AudioButton'
 import { resetRemoteAudioCache } from '../lib/remoteAudio'
 
+/**
+ * Bỏ qua 60 file mp3 có sẵn trong repo, để test được đúng cảnh máy không phát
+ * âm được — cảnh mà giao diện phải nói rõ cho người học thay vì im lặng.
+ */
+vi.mock('../lib/audioFiles', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../lib/audioFiles')>()
+  return { ...actual, hasRecordedAudio: () => false, audioUrlForWord: () => null }
+})
+
+
 function voice(lang: string): SpeechSynthesisVoice {
   return { lang, name: lang, default: false, localService: true, voiceURI: lang } as SpeechSynthesisVoice
 }

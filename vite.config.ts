@@ -11,6 +11,13 @@ export default defineConfig({
   // deploy đặt biến này; chạy máy hoặc build thường thì vẫn là `/`.
   base: process.env.VITE_BASE_PATH ?? '/',
   plugins: [react(), tailwindcss()],
+  build: {
+    // Mặc định Vite nhúng file dưới 4KB thẳng vào bundle JS dưới dạng base64.
+    // Với mp3 thì đó là tính sai: người học mở trang là phải tải luôn phần
+    // audio của những từ họ chưa xem tới. Để riêng thì trình duyệt chỉ tải
+    // lúc bấm nút, và lần sau đọc từ cache.
+    assetsInlineLimit: (filePath: string) => (filePath.endsWith('.mp3') ? false : undefined),
+  },
   test: {
     globals: true,
     environment: 'jsdom',

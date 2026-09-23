@@ -7,6 +7,18 @@ import {
 } from './speech'
 import { resetRemoteAudioCache } from './remoteAudio'
 
+/**
+ * Repo giờ có sẵn 60 file mp3 trong `src/assets/audio/`, nên `hasRecordedAudio()`
+ * thật luôn trả về true và mọi máy đều phát âm được. Những test bên dưới xét
+ * đúng trường hợp ngược lại — không còn nguồn audio nào — nên phải giả lập lại.
+ */
+const audio = vi.hoisted(() => ({ hasRecorded: false }))
+vi.mock('./audioFiles', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('./audioFiles')>()
+  return { ...actual, hasRecordedAudio: () => audio.hasRecorded }
+})
+
+
 /** Giọng đọc giả, đủ trường để `speech.ts` xét ngôn ngữ. */
 function voice(lang: string, name = lang): SpeechSynthesisVoice {
   return { lang, name, default: false, localService: true, voiceURI: name } as SpeechSynthesisVoice
