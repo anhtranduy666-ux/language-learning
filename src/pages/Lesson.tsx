@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { Link, Navigate, useParams } from 'react-router-dom'
 import { AudioButton } from '../components/AudioButton'
 import { FocusHeader } from '../components/FocusHeader'
+import { MascotSays } from '../components/Mascot'
 import { Button } from '../components/ui/Button'
 import { ALL_LESSONS, wordsOfLesson } from '../data/hsk1'
 import { prefetchAudio } from '../lib/remoteAudio'
@@ -29,9 +30,10 @@ export function Lesson() {
 
       <div className="flex-1">
         <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">Từ mới</h1>
-        <p className="mt-1 text-slate-600 dark:text-slate-400">
-          {words.length} từ. Chạm vào loa để nghe, xem xong thì luyện flashcard.
-        </p>
+
+        <MascotSays mood="vui" className="mt-4">
+          {words.length} từ thôi. Chạm vào loa nghe thử trước đã, rồi mình luyện flashcard nhé.
+        </MascotSays>
 
         <ul className="mt-5 space-y-3">
           {words.map((word) => (

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, Navigate, useLocation, useParams } from 'react-router-dom'
+import { Mascot } from '../components/Mascot'
 import { Button } from '../components/ui/Button'
 import { ProgressBar } from '../components/ui/ProgressBar'
 import { ALL_LESSONS } from '../data/hsk1'
@@ -42,14 +43,21 @@ export function Result() {
   return (
     <div className="flex min-h-dvh flex-col justify-center py-8">
       <div className="text-center">
-        <p aria-hidden="true" className="text-6xl">
-          {percent === 100 ? '🎉' : percent >= 60 ? '👏' : '💪'}
-        </p>
-        <h1 className="mt-4 text-3xl font-bold text-slate-900 dark:text-slate-100">
+        <div className="flex justify-center">
+          <Mascot mood={percent >= 60 ? 'mung' : 'tiec'} size={128} />
+        </div>
+        <h1 className="mt-3 text-3xl font-bold text-slate-900 dark:text-slate-100">
           {percent === 100 ? 'Hoàn hảo!' : percent >= 60 ? 'Làm tốt lắm!' : 'Cứ từ từ thôi'}
         </h1>
         <p className="mt-2 text-slate-600 dark:text-slate-400">
           {lesson.unitTitle} · {lesson.title}
+        </p>
+        <p className="mt-3 text-sm text-slate-600 dark:text-slate-400">
+          {percent === 100
+            ? 'Mầm: không sai câu nào luôn! Mình phục bạn đấy.'
+            : percent >= 60
+              ? 'Mầm: chắc tay rồi. Mai quay lại là nhớ lâu hơn nữa.'
+              : 'Mầm: sai vài câu là chuyện thường thôi. Ôn lại bài này một lượt nhé.'}
         </p>
       </div>
 

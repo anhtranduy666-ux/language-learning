@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { Navigate, useNavigate, useParams } from 'react-router-dom'
 import { AudioButton } from '../components/AudioButton'
 import { FocusHeader } from '../components/FocusHeader'
+import { MascotSays } from '../components/Mascot'
 import { Button } from '../components/ui/Button'
 import { ALL_LESSONS, WORDS, WORD_BY_ID, wordsOfLesson } from '../data/hsk1'
 import { useProgress } from '../context/ProgressContext'
@@ -262,26 +263,22 @@ export function ExercisePage() {
         )}
       >
         {checked && (
-          <p
-            role="status"
-            className={cn(
-              'mb-3 font-semibold',
-              isCorrect ? 'text-emerald-700 dark:text-emerald-300' : 'text-amber-700 dark:text-amber-300',
-            )}
-          >
-            {isCorrect ? (
-              `Chính xác! +${XP_REWARDS.correctAnswer} XP`
-            ) : (
-              <>
-                Chưa đúng.{' '}
-                {isChoice &&
-                  `Đáp án là "${
-                    exercise.choices.find((c) => c.id === exercise.correctChoiceId)?.label
-                  }".`}
-                {!isChoice && 'Xem lại cách ghép ở trên nhé.'}
-              </>
-            )}
-          </p>
+          <div role="status" className="mb-3">
+            <MascotSays mood={isCorrect ? 'mung' : 'tiec'} tone={isCorrect ? 'right' : 'wrong'}>
+              {isCorrect ? (
+                `Chính xác! +${XP_REWARDS.correctAnswer} XP`
+              ) : (
+                <>
+                  Chưa đúng.{' '}
+                  {isChoice &&
+                    `Đáp án là "${
+                      exercise.choices.find((c) => c.id === exercise.correctChoiceId)?.label
+                    }".`}
+                  {!isChoice && 'Xem lại cách ghép ở trên nhé.'}
+                </>
+              )}
+            </MascotSays>
+          </div>
         )}
 
         {checked ? (

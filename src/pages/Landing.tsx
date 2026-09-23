@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Navigate, useNavigate } from 'react-router-dom'
+import { MascotSays } from '../components/Mascot'
 import { Button } from '../components/ui/Button'
 import { useProgress } from '../context/ProgressContext'
 import { isOnboarded } from '../lib/progress'
@@ -27,7 +28,11 @@ export function Landing() {
           Mỗi ngày một chút: từ vựng, pinyin, phát âm và bài tập ngắn. Không cần biết gì trước.
         </p>
 
-        <ul className="mt-8 space-y-3 text-slate-700 dark:text-slate-300">
+        <MascotSays mood="chao" size={84} className="mt-7">
+          Chào bạn! Mình là Mầm. Mình sẽ đi cùng bạn suốt khoá này nhé.
+        </MascotSays>
+
+        <ul className="mt-6 space-y-3 text-slate-700 dark:text-slate-300">
           <li className="flex items-center gap-3">
             <span aria-hidden="true">📇</span> 60 từ HSK 1 kèm phát âm
           </li>

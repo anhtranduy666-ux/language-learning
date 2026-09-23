@@ -1,0 +1,74 @@
+/**
+ * Mầm — nhân vật dẫn đường.
+ *
+ * Nhịp thở nhẹ và cái mầm đung đưa, đủ để nhân vật có vẻ sống chứ không phải
+ * một hình dán. Chỉ đụng `transform`, và nghe theo đúng lựa chọn nền động:
+ * ai đã tắt nền thì cũng không muốn một nhân vật nhún nhảy ở góc màn hình.
+ */
+
+.mascot {
+  transform-origin: 50% 100%;
+  animation: mascot-breathe 3.4s ease-in-out infinite alternate;
+}
+
+/* Lúc reo mừng thì nhún hẳn lên, nhanh hơn nhịp thở thường. */
+.mascot[data-mood='mung'] {
+  animation: mascot-cheer 0.6s ease-in-out infinite alternate;
+}
+
+.mascot-sprout {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: mascot-sway 2.6s ease-in-out infinite alternate;
+}
+
+/* Đuôi bong bóng thoại, trỏ về phía nhân vật. */
+.mascot-bubble::before {
+  content: '';
+  position: absolute;
+  bottom: 14px;
+  left: -6px;
+  width: 12px;
+  height: 12px;
+  transform: rotate(45deg);
+  background: inherit;
+}
+
+@keyframes mascot-breathe {
+  from {
+    transform: scale(1) translateY(0);
+  }
+  to {
+    transform: scale(1.03) translateY(-2px);
+  }
+}
+
+@keyframes mascot-cheer {
+  from {
+    transform: translateY(0) rotate(-2deg);
+  }
+  to {
+    transform: translateY(-6px) rotate(2deg);
+  }
+}
+
+@keyframes mascot-sway {
+  from {
+    transform: rotate(-7deg);
+  }
+  to {
+    transform: rotate(7deg);
+  }
+}
+
+[data-scene='off'] .mascot,
+[data-scene='off'] .mascot-sprout {
+  animation: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mascot,
+  .mascot-sprout {
+    animation: none;
+  }
+}

@@ -139,7 +139,7 @@ describe('Màn hình khoá học', () => {
 describe('Màn hình từ vựng', () => {
   it('hiện đủ số từ của bài học', () => {
     renderApp(`/lesson/${LESSON_ID}`, ONBOARDED)
-    expect(screen.getByText(/6 từ\./)).toBeInTheDocument()
+    expect(screen.getByText(/6 từ thôi/)).toBeInTheDocument()
     for (const word of LESSON_WORDS) {
       expect(screen.getByText(word.meaning)).toBeInTheDocument()
     }
