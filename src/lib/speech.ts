@@ -1,18 +1,20 @@
 /**
  * Phát âm tiếng Trung.
  *
- * Hai nguồn âm thanh, thử lần lượt:
+ * Bốn nguồn âm thanh, thử lần lượt — mục 7 của `docs/audio-tts.md`:
  *
  * 1. File thu sẵn trong `src/assets/audio/` (xem `audioFiles.ts`).
- * 2. Giọng đọc tiếng Trung của hệ điều hành qua Web Speech API.
+ * 2. CDN Supabase, đường dẫn suy ra từ nội dung (xem `remoteAudio.ts`).
+ * 3. Edge Function `/speak`, chỉ khi CDN chưa có file.
+ * 4. Giọng đọc tiếng Trung của hệ điều hành qua Web Speech API.
  *
- * Máy không có giọng tiếng Trung thì Web Speech API im lặng hoàn toàn — không
- * báo lỗi, không phát gì. Vì vậy module này kiểm tra trước xem có giọng tiếng
- * Trung hay không, để giao diện nói rõ cho người học thay vì bấm nút mà không
- * nghe thấy gì.
+ * Hết cả bốn thì nút chuyển xám kèm hướng dẫn, chứ không im lặng: máy không có
+ * giọng tiếng Trung thì Web Speech API không phát gì mà cũng không báo lỗi.
  */
 
-import { audioUrlForWord } from './audioFiles'
+import { audioUrlForWord, hasRecordedAudio } from './audioFiles'
+import { remoteAudioUrl } from './remoteAudio'
+import { hasSupabase } from '../services/supabase'
 
 /** Tình trạng phát âm của máy đang dùng. */
 export type AudioStatus =
@@ -25,6 +27,13 @@ export type AudioStatus =
 
 /** Kết quả một lần bấm nút phát âm. */
 export type PlayResult = 'played' | 'no-chinese-voice' | 'unsupported' | 'error'
+
+/**
+ * Nút phát âm đang ở chặng nào.
+ * Tải file từ mạng có thể mất vài giây, nên giao diện cần phân biệt "đang tải"
+ * với "đang đọc" thay vì để người học nhìn một nút nhấp nháy không rõ vì sao.
+ */
+export type PlayStage = 'loading' | 'speaking'
 
 /** Mã ngôn ngữ được coi là tiếng Trung: phổ thông, Quan thoại, Quảng Đông. */
 const CHINESE_LANGS = ['zh', 'cmn', 'yue']
@@ -59,8 +68,14 @@ export function findChineseVoice(): SpeechSynthesisVoice | null {
   return [...chinese].sort((a, b) => rank(a) - rank(b))[0]
 }
 
-/** Tình trạng phát âm ngay lúc này. */
+/**
+ * Tình trạng phát âm ngay lúc này.
+ *
+ * Có file thu sẵn hoặc có Supabase thì phát được, không cần máy cài giọng
+ * tiếng Trung — đó chính là điều mà phương án audio nhắm tới.
+ */
 export function getAudioStatus(): AudioStatus {
+  if (hasRecordedAudio() || hasSupabase()) return 'ready'
   if (findChineseVoice()) return 'ready'
   if (synth()) return 'no-chinese-voice'
   return 'unsupported'
@@ -170,22 +185,46 @@ function playVoice(text: string, voice: SpeechSynthesisVoice): Promise<PlayResul
 }
 
 /**
- * Phát âm một từ. Ưu tiên file thu sẵn, không có thì dùng giọng hệ điều hành.
+ * Phát âm một từ, thử lần lượt bốn nguồn ở đầu file.
  *
+ * @param input.onStage được gọi mỗi khi đổi chặng, để nút phân biệt "đang tải"
+ * với "đang đọc".
  * @returns kết quả để giao diện biết nên hiện gì — không bao giờ ném lỗi.
  */
-export async function playWord(input: { text: string; wordId?: string }): Promise<PlayResult> {
+export async function playWord(input: {
+  text: string
+  wordId?: string
+  onStage?: (stage: PlayStage) => void
+}): Promise<PlayResult> {
   stopPlayback()
+  const stage = input.onStage ?? (() => {})
 
-  const url = audioUrlForWord(input.wordId)
-  if (url) {
-    const result = await playFile(url)
+  // 1. File thu sẵn: nhanh nhất, chạy được cả khi mất mạng.
+  const local = audioUrlForWord(input.wordId)
+  if (local) {
+    stage('speaking')
+    const result = await playFile(local)
     if (result === 'played') return result
-    // File hỏng hoặc trình duyệt chặn tự phát: vẫn còn cửa giọng hệ điều hành.
+    // File hỏng hoặc trình duyệt chặn tự phát: vẫn còn ba cửa nữa.
   }
 
+  // 2 và 3. CDN Supabase, rồi Edge Function nếu CDN chưa có file.
+  if (hasSupabase()) {
+    stage('loading')
+    const remote = await remoteAudioUrl(input.text)
+    if (remote) {
+      stage('speaking')
+      const result = await playFile(remote)
+      if (result === 'played') return result
+    }
+  }
+
+  // 4. Giọng của hệ điều hành.
   const voice = findChineseVoice()
-  if (voice) return playVoice(input.text, voice)
+  if (voice) {
+    stage('speaking')
+    return playVoice(input.text, voice)
+  }
 
   return synth() ? 'no-chinese-voice' : 'unsupported'
 }

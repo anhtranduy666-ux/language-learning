@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useAudioStatus } from '../hooks/useAudioStatus'
 import { cn } from '../lib/cn'
-import { playWord } from '../lib/speech'
+import { playWord, type PlayStage } from '../lib/speech'
 
 interface AudioButtonProps {
   /** Chuỗi tiếng Trung cần đọc. */
@@ -28,6 +28,12 @@ const HINTS = {
   error: 'Không phát được âm thanh lần này. Thử bấm lại nhé.',
 }
 
+/** Biểu tượng theo chặng. Tải file từ mạng có thể mất vài giây. */
+const STAGE_ICONS: Record<PlayStage, string> = {
+  loading: '⏳',
+  speaking: '🔊',
+}
+
 type Hint = keyof typeof HINTS | null
 
 /**
@@ -38,24 +44,25 @@ type Hint = keyof typeof HINTS | null
  */
 export function AudioButton({ text, wordId, label, size = 'md', className }: AudioButtonProps) {
   const status = useAudioStatus()
-  const [playing, setPlaying] = useState(false)
+  const [stage, setStage] = useState<PlayStage | null>(null)
   const [hint, setHint] = useState<Hint>(null)
 
   const available = status === 'ready'
+  const busy = stage !== null
 
   async function handleClick(event: React.MouseEvent) {
     event.stopPropagation()
     event.preventDefault()
 
-    if (!available) {
-      setHint(status === 'unsupported' ? 'unsupported' : 'no-chinese-voice')
+    if (!available || busy) {
+      if (!available) setHint(status === 'unsupported' ? 'unsupported' : 'no-chinese-voice')
       return
     }
 
     setHint(null)
-    setPlaying(true)
-    const result = await playWord({ text, wordId })
-    setPlaying(false)
+    setStage('speaking')
+    const result = await playWord({ text, wordId, onStage: setStage })
+    setStage(null)
 
     if (result === 'played') return
     setHint(result === 'unsupported' ? 'unsupported' : result === 'error' ? 'error' : 'no-chinese-voice')
@@ -67,18 +74,19 @@ export function AudioButton({ text, wordId, label, size = 'md', className }: Aud
         type="button"
         onClick={handleClick}
         aria-label={label ? `Nghe phát âm ${label}` : 'Nghe phát âm'}
-        data-state={playing ? 'playing' : available ? 'idle' : 'unavailable'}
+        aria-busy={busy}
+        data-state={stage ?? (available ? 'idle' : 'unavailable')}
         className={cn(
           'inline-flex shrink-0 items-center justify-center rounded-full transition active:scale-95',
           available
             ? 'bg-brand-50 text-brand-600 ring-1 ring-brand-100 hover:bg-brand-100 dark:bg-brand-500/15 dark:text-brand-300 dark:ring-brand-500/25 dark:hover:bg-brand-500/25'
             : 'bg-slate-100 text-slate-400 ring-1 ring-slate-200 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-500 dark:ring-slate-700 dark:hover:bg-slate-700',
-          playing && 'animate-pulse bg-brand-100 dark:bg-brand-500/30',
+          busy && 'animate-pulse bg-brand-100 dark:bg-brand-500/30',
           SIZES[size],
           className,
         )}
       >
-        <span aria-hidden="true">{available ? '🔊' : '🔇'}</span>
+        <span aria-hidden="true">{stage ? STAGE_ICONS[stage] : available ? '🔊' : '🔇'}</span>
       </button>
 
       {hint ? (

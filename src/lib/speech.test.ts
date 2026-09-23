@@ -5,6 +5,7 @@ import {
   playWord,
   subscribeAudioStatus,
 } from './speech'
+import { resetRemoteAudioCache } from './remoteAudio'
 
 /** Giọng đọc giả, đủ trường để `speech.ts` xét ngôn ngữ. */
 function voice(lang: string, name = lang): SpeechSynthesisVoice {
@@ -226,5 +227,125 @@ describe('playWord', () => {
     )
 
     await expect(playWord({ text: '你好' })).resolves.toBe('error')
+  })
+})
+
+/**
+ * `Audio` giả. jsdom không phát được media thật: `play()` ném "Not implemented".
+ * @param outcome 'ended' là phát xong, 'error' là file hỏng hoặc bị chặn.
+ */
+function installAudio(outcome: 'ended' | 'error' = 'ended') {
+  const played: string[] = []
+
+  vi.stubGlobal(
+    'Audio',
+    class {
+      private handlers: Record<string, () => void> = {}
+      constructor(public src: string) {}
+      addEventListener(type: string, fn: () => void) {
+        this.handlers[type] = fn
+      }
+      pause() {}
+      play() {
+        played.push(this.src)
+        queueMicrotask(() => this.handlers[outcome]?.())
+        return Promise.resolve()
+      }
+    },
+  )
+
+  return played
+}
+
+/** Bật cấu hình Supabase và trả lời mọi request CDN là "đã có file". */
+function installSupabase() {
+  vi.stubEnv('VITE_SUPABASE_URL', 'https://abc.supabase.co')
+  vi.stubEnv('VITE_SUPABASE_ANON_KEY', 'anon-key')
+  vi.stubGlobal(
+    'fetch',
+    vi.fn(() => Promise.resolve(new Response(null, { status: 200 }))),
+  )
+}
+
+describe('chuỗi nguồn âm thanh', () => {
+  beforeEach(() => {
+    resetRemoteAudioCache()
+  })
+
+  afterEach(() => {
+    vi.unstubAllEnvs()
+  })
+
+  it('có file trên Supabase thì phát file đó, không đụng giọng hệ điều hành', async () => {
+    const synth = install([voice('zh-CN')])
+    const played = installAudio()
+    installSupabase()
+
+    await expect(playWord({ text: '你好' })).resolves.toBe('played')
+
+    expect(played).toHaveLength(1)
+    expect(played[0]).toContain('/storage/v1/object/public/tts/v1/')
+    expect(synth.spoken).toHaveLength(0)
+  })
+
+  it('Supabase hỏng thì vẫn đọc được bằng giọng hệ điều hành', async () => {
+    const synth = install([voice('zh-CN')])
+    installAudio()
+    vi.stubEnv('VITE_SUPABASE_URL', 'https://abc.supabase.co')
+    vi.stubEnv('VITE_SUPABASE_ANON_KEY', 'anon-key')
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(() => Promise.reject(new TypeError('Failed to fetch'))),
+    )
+
+    await expect(playWord({ text: '你好' })).resolves.toBe('played')
+    expect(synth.spoken).toHaveLength(1)
+  })
+
+  it('file tải về hỏng thì lùi tiếp xuống giọng hệ điều hành', async () => {
+    const synth = install([voice('zh-CN')])
+    installAudio('error')
+    installSupabase()
+
+    await expect(playWord({ text: '你好' })).resolves.toBe('played')
+    expect(synth.spoken).toHaveLength(1)
+  })
+
+  it('không còn nguồn nào thì báo lại thay vì im lặng', async () => {
+    install([voice('en-US')])
+    installAudio()
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(() => Promise.resolve(new Response(null, { status: 404 }))),
+    )
+
+    await expect(playWord({ text: '你好' })).resolves.toBe('no-chinese-voice')
+  })
+
+  it('báo chặng đang tải rồi mới tới chặng đang đọc', async () => {
+    install([voice('zh-CN')])
+    installAudio()
+    installSupabase()
+    const stages: string[] = []
+
+    await playWord({ text: '你好', onStage: (stage) => stages.push(stage) })
+
+    expect(stages).toEqual(['loading', 'speaking'])
+  })
+
+  it('chưa cấu hình Supabase thì không hiện chặng tải vô nghĩa', async () => {
+    install([voice('zh-CN')])
+    const stages: string[] = []
+
+    await playWord({ text: '你好', onStage: (stage) => stages.push(stage) })
+
+    expect(stages).toEqual(['speaking'])
+  })
+
+  it('có Supabase thì nút sẵn sàng dù máy chưa cài giọng tiếng Trung', () => {
+    install([voice('en-US')])
+    installSupabase()
+
+    expect(getAudioStatus()).toBe('ready')
   })
 })

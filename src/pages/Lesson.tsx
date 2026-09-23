@@ -1,14 +1,22 @@
+import { useEffect } from 'react'
 import { Link, Navigate, useParams } from 'react-router-dom'
 import { AudioButton } from '../components/AudioButton'
 import { FocusHeader } from '../components/FocusHeader'
 import { Button } from '../components/ui/Button'
 import { ALL_LESSONS, wordsOfLesson } from '../data/hsk1'
+import { prefetchAudio } from '../lib/remoteAudio'
 
 /** Bước 1 của bài học: xem trước toàn bộ từ vựng, nghe phát âm. */
 export function Lesson() {
   const { lessonId = '' } = useParams()
   const lesson = ALL_LESSONS.find((item) => item.id === lessonId)
   const words = wordsOfLesson(lessonId)
+
+  // Nạp sẵn audio của cả bài ngay khi mở trang. Mỗi bài chỉ khoảng sáu từ nên
+  // thường tải xong trước lúc người học đọc hết danh sách và bấm loa.
+  useEffect(() => {
+    prefetchAudio(words.map((word) => word.hanzi))
+  }, [words])
 
   if (!lesson) return <Navigate to="/learn" replace />
 
