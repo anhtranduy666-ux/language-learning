@@ -92,6 +92,9 @@ nhiều thì chuyển sang cách dưới đây.
 
 ### Cách đầy đủ: audio qua Supabase
 
+Từng bước bấm vào đâu, khoá nào để ở file nào:
+[docs/audio-setup.md](docs/audio-setup.md).
+
 Chưa cấu hình thì nguồn 2 và 3 tự tắt, app lùi về giọng hệ điều hành — `npm run
 dev` của người mới clone repo vẫn chạy ngay, không cần tài khoản Supabase.
 

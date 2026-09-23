@@ -17,10 +17,10 @@
  * đi thẳng vào bundle của trình duyệt.
  */
 
-// @ts-expect-error — `handler.ts` được Deno nạp thẳng bằng đường dẫn có đuôi.
+// Deno nạp thẳng file TypeScript nên import phải có đuôi `.ts`.
+// `Deno` là biến toàn cục sẵn có của runtime — cố ý không khai lại ở đây, vì
+// khai lại sẽ che mất kiểu thật và `supabase functions deploy` báo lỗi.
 import { handleSpeak, type SpeakDeps, type SpeakRequest } from './handler.ts'
-
-declare const Deno: { env: { get(key: string): string | undefined }; serve(handler: (req: Request) => Promise<Response>): void }
 
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL') ?? ''
 const SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
@@ -120,7 +120,7 @@ const deps: SpeakDeps = {
         'Cache-Control': '31536000, immutable',
         'x-upsert': 'true',
       },
-      body: bytes as unknown as BodyInit,
+      body: bytes,
     })
     if (!response.ok) throw new Error(`Storage trả ${response.status}`)
   },
