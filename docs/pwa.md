@@ -61,11 +61,18 @@ như Chrome trên Android. Vì vậy app cần **tự hướng dẫn** — xem m
 
 ## 4. Icon
 
-Sinh bằng script, không vẽ tay, để sau này đổi màu thương hiệu thì chạy lại một
-lệnh: `scripts/generate-icons.py`.
+Nguồn là `ava.jpg` ở thư mục gốc. Sinh bằng script chứ không cắt tay, để đổi
+ảnh thì chạy lại một lệnh: `npm run generate-icons`.
 
-Chữ **中** trắng trên nền đỏ thương hiệu `#e2483d`. Một chữ chứ không phải 你好:
-ở cỡ 60px trên màn hình điện thoại, hai chữ nhoè thành vệt.
+**Hạn chế đang có:** ảnh nguồn chỉ 224×224, mà manifest cần bản 512. Phóng hơn
+hai lần nên bản 512 hơi mềm nét — thấy rõ nhất ở màn hình chờ khi mở app trên
+Android. Có file gốc lớn hơn thì thay vào `ava.jpg` rồi chạy lại là hết. Script
+tự cảnh báo khi ảnh nguồn nhỏ hơn 512.
+
+Màu nền để chèn lề cho bản maskable lấy theo **màu phổ biến nhất ở viền ảnh**,
+không lấy trung bình bốn góc: nhân vật thường chạm mép dưới, nên trung bình
+giữa nền trắng và thân nhân vật ra một màu xám không giống chỗ nào trong ảnh,
+thành ra viền lộ rõ.
 
 | File | Cỡ | Dùng cho |
 | --- | --- | --- |

@@ -1,10 +1,18 @@
-"""Sinh icon cho PWA — mục 4 của docs/pwa.md.
+"""Sinh icon cho PWA từ ảnh đại diện — mục 4 của docs/pwa.md.
 
     pip install Pillow
     npm run generate-icons
 
-Vẽ bằng script chứ không cắt tay, để đổi màu thương hiệu hay đổi chữ thì chạy
-lại một lệnh là xong, không phải mở phần mềm đồ hoạ.
+Nguồn là `ava.jpg` ở thư mục gốc. Thay ảnh đó rồi chạy lại là đổi được icon,
+không phải mở phần mềm đồ hoạ.
+
+Bốn file ra khác nhau ở chỗ nào:
+
+- `icon-192`, `icon-512`, `apple-touch-icon`: ảnh phủ kín khung, để vuông.
+  iOS và Android tự bo góc; bo sẵn là thành viền thừa ở bốn góc.
+- `icon-maskable-512`: ảnh thu nhỏ vào giữa, chừa lề. Android cắt icon theo
+  hình dạng người dùng chọn (tròn, vuông bo, giọt nước), nên phần nằm ngoài
+  vòng tròn 80% ở giữa có thể bị xén mất.
 """
 
 from __future__ import annotations
@@ -12,87 +20,90 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image
 
 sys.stdout.reconfigure(encoding="utf-8")
 
 ROOT = Path(__file__).resolve().parent.parent
+SOURCE = ROOT / "ava.jpg"
 OUT_DIR = ROOT / "public"
 
-# Đỏ thương hiệu, đúng --color-brand-500 trong src/index.css.
-BRAND = (226, 72, 61)
-INK = (255, 255, 255)
+# Vùng an toàn của maskable là hình tròn 80% ở giữa. Để 78% cho chắc.
+MASKABLE_COVERAGE = 0.78
 
-# Một chữ chứ không phải 你好: ở cỡ 60px trên màn hình điện thoại, hai chữ
-# nhoè thành vệt không đọc được.
-GLYPH = "中"
-
-# Font có bộ chữ Trung. Thứ tự ưu tiên: đậm trước, vì nét mảnh vỡ ở cỡ nhỏ.
-FONT_CANDIDATES = [
-    r"C:\Windows\Fonts\msyhbd.ttc",
-    r"C:\Windows\Fonts\msyh.ttc",
-    r"C:\Windows\Fonts\simhei.ttf",
-    "/System/Library/Fonts/PingFang.ttc",
-    "/usr/share/fonts/opentype/noto/NotoSansCJK-Bold.ttc",
-]
-
-
-def find_font(size: int) -> ImageFont.FreeTypeFont:
-    for path in FONT_CANDIDATES:
-        if Path(path).exists():
-            return ImageFont.truetype(path, size)
-    raise SystemExit(
-        "Không tìm thấy font có chữ Hán. Cài Noto Sans CJK rồi thêm đường dẫn "
-        "vào FONT_CANDIDATES."
-    )
-
-
-def draw_icon(size: int, coverage: float, rounded: bool) -> Image.Image:
-    """
-    :param coverage: chữ chiếm bao nhiêu phần bề rộng. Bản maskable phải nhỏ
-        lại vì Android cắt icon theo hình dạng người dùng chọn.
-    :param rounded: bo góc. iOS tự bo nên `apple-touch-icon` phải để vuông,
-        bo sẵn là thành viền đen ở bốn góc.
-    """
-    image = Image.new("RGBA", (size, size), (0, 0, 0, 0))
-    draw = ImageDraw.Draw(image)
-
-    if rounded:
-        draw.rounded_rectangle([(0, 0), (size - 1, size - 1)], radius=int(size * 0.22), fill=BRAND)
-    else:
-        draw.rectangle([(0, 0), (size, size)], fill=BRAND)
-
-    font = find_font(int(size * coverage))
-    box = draw.textbbox((0, 0), GLYPH, font=font)
-    draw.text(
-        ((size - (box[2] - box[0])) / 2 - box[0], (size - (box[3] - box[1])) / 2 - box[1]),
-        GLYPH,
-        font=font,
-        fill=INK,
-    )
-    return image
-
-
-# (tên file, cỡ, tỉ lệ chữ, bo góc)
+# (tên file, cỡ, có chừa lề cho Android cắt không)
 ICONS = [
-    ("icon-192.png", 192, 0.62, True),
-    ("icon-512.png", 512, 0.62, True),
-    # Vùng an toàn của maskable là hình tròn 80% ở giữa — chữ phải nhỏ hơn.
-    ("icon-maskable-512.png", 512, 0.46, False),
-    # iOS không đọc icon trong manifest, và tự bo góc hộ.
-    ("apple-touch-icon.png", 180, 0.62, False),
+    ("icon-192.png", 192, False),
+    ("icon-512.png", 512, False),
+    ("icon-maskable-512.png", 512, True),
+    # iOS không đọc icon trong manifest, phải có file riêng đúng tên này.
+    ("apple-touch-icon.png", 180, False),
 ]
+
+
+def load_square() -> Image.Image:
+    """Ảnh nguồn, cắt thành vuông từ giữa. Icon nào cũng vuông."""
+    if not SOURCE.exists():
+        raise SystemExit(f"Không tìm thấy ảnh nguồn: {SOURCE}")
+
+    image = Image.open(SOURCE).convert("RGB")
+    width, height = image.size
+    side = min(width, height)
+    left = (width - side) // 2
+    top = (height - side) // 2
+    return image.crop((left, top, left + side, top + side))
+
+
+def background_of(image: Image.Image) -> tuple[int, int, int]:
+    """
+    Màu nền để chèn lề cho bản maskable.
+
+    Lấy màu **phổ biến nhất** ở viền, không lấy trung bình: nhân vật thường
+    chạm mép dưới, nên trung bình giữa nền trắng và thân nhân vật ra một màu
+    xám không giống chỗ nào trong ảnh, thành ra viền lộ rõ.
+    """
+    side = image.size[0]
+    edge = [(x, 0) for x in range(side)] + [(x, side - 1) for x in range(side)]
+    edge += [(0, y) for y in range(side)] + [(side - 1, y) for y in range(side)]
+
+    counts: dict[tuple[int, int, int], int] = {}
+    for point in edge:
+        # Gom về bậc 16 để những sắc trắng lệch nhau chút ít vẫn tính là một.
+        pixel = tuple(channel // 16 * 16 for channel in image.getpixel(point))
+        counts[pixel] = counts.get(pixel, 0) + 1  # type: ignore[index]
+
+    return max(counts, key=lambda colour: counts[colour])
+
+
+def render(source: Image.Image, size: int, padded: bool) -> Image.Image:
+    if not padded:
+        return source.resize((size, size), Image.LANCZOS)
+
+    canvas = Image.new("RGB", (size, size), background_of(source))
+    inner = int(size * MASKABLE_COVERAGE)
+    offset = (size - inner) // 2
+    canvas.paste(source.resize((inner, inner), Image.LANCZOS), (offset, offset))
+    return canvas
 
 
 def main() -> None:
+    source = load_square()
     OUT_DIR.mkdir(parents=True, exist_ok=True)
 
-    for name, size, coverage, rounded in ICONS:
+    print(f"Nguồn: {SOURCE.name}  {source.size[0]}x{source.size[1]}")
+    largest = max(size for _, size, _ in ICONS)
+    if source.size[0] < largest:
+        print(
+            f"  Lưu ý: ảnh nguồn nhỏ hơn {largest}px nên bản {largest} bị phóng to "
+            f"và sẽ hơi mềm nét. Có file gốc lớn hơn thì thay vào rồi chạy lại."
+        )
+
+    for name, size, padded in ICONS:
         target = OUT_DIR / name
-        draw_icon(size, coverage, rounded).save(target, "PNG")
+        render(source, size, padded).save(target, "PNG")
         print(f"  {name:<26} {size:>3}x{size:<3} {target.stat().st_size:>6} byte")
 
-    print(f"\nXong. File nằm ở public/ và được chép thẳng ra gốc bản build.")
+    print("\nXong. File nằm ở public/ và được chép thẳng ra gốc bản build.")
 
 
 if __name__ == "__main__":
