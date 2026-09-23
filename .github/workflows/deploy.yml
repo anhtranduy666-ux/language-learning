@@ -55,9 +55,9 @@ jobs:
       - name: Dựng fallback cho SPA
         run: cp dist/index.html dist/404.html
 
+      # Cần bật sẵn Pages một lần trong Settings → Pages → Source: GitHub
+      # Actions. Workflow không tự bật hộ được: đó là cấu hình của repo.
       - uses: actions/configure-pages@v5
-        with:
-          enablement: true
 
       - uses: actions/upload-pages-artifact@v3
         with:

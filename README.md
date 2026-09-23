@@ -25,8 +25,9 @@ npm run dev
 | `npm run test:watch` | Chạy test ở chế độ theo dõi |
 | `npm run typecheck` | Kiểm tra kiểu TypeScript |
 | `npm run build` | Build bản production vào `dist/` |
-| `npm run prewarm-audio -- --dry-run` | Liệt kê audio sẽ sinh, không chạm mạng |
-| `npm run prewarm-audio` | Sinh sẵn toàn bộ audio HSK 1 lên Supabase |
+| `npm run prewarm-audio -- --local --dry-run` | Liệt kê audio sẽ sinh, không chạm mạng |
+| `npm run prewarm-audio -- --local` | Sinh 60 file mp3 vào `src/assets/audio/` |
+| `npm run prewarm-audio` | Sinh audio lên Supabase Storage (cần thêm Supabase) |
 
 Yêu cầu Node.js 20 trở lên. Riêng `prewarm-audio` cần Node 22.6 trở lên, vì nó
 chạy thẳng file TypeScript.
@@ -69,7 +70,27 @@ hết được bài.
 Lưu ý: Windows **không** cài sẵn giọng tiếng Trung, nên nguồn 4 thường không có
 trên máy người dùng Việt Nam. Đó chính là lý do có nguồn 2 và 3.
 
-### Bật audio qua Supabase
+### Cách nhanh nhất: sinh mp3 vào repo
+
+Chỉ cần một tài khoản Azure, **không** cần Supabase:
+
+```bash
+cp .env.example .env.local   # điền AZURE_SPEECH_KEY và AZURE_SPEECH_REGION
+npm run prewarm-audio -- --local
+git add src/assets/audio && git commit -m "Add pronunciation audio"
+```
+
+Sinh 60 file, mỗi từ một file, tổng cộng 89 ký tự tiếng Trung — nằm gọn trong
+hạn miễn phí của Azure (500.000 ký tự mỗi tháng). File nằm trong repo nên là
+nguồn số 1 của chuỗi trên: chạy được ngoại tuyến, không phụ thuộc dịch vụ nào
+lúc người học bấm nút.
+
+Đây là chỗ cố tình làm khác [docs/audio-tts.md](docs/audio-tts.md): tài liệu xếp
+"commit mp3 vào repo" làm fallback chứ không làm nguồn chính, vì lo repo phình
+theo nội dung. Với HSK 1 thì 60 file nhỏ không đáng kể. Khi nội dung lớn hơn
+nhiều thì chuyển sang cách dưới đây.
+
+### Cách đầy đủ: audio qua Supabase
 
 Chưa cấu hình thì nguồn 2 và 3 tự tắt, app lùi về giọng hệ điều hành — `npm run
 dev` của người mới clone repo vẫn chạy ngay, không cần tài khoản Supabase.
