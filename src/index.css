@@ -3,6 +3,7 @@
 @import './styles/wordMap.css';
 @import './styles/mascot.css';
 @import './styles/exercise.css';
+@import './styles/bubble.css';
 
 /* Chế độ tối do người học chọn, không bám cứng vào `prefers-color-scheme`.
    Thuộc tính này được đặt trên thẻ `html` — xem `src/lib/theme.ts`. */
@@ -58,17 +59,6 @@
   [data-scene='on'] .surface {
     @apply bg-white/70 ring-white/70 backdrop-blur-xl;
     @apply dark:bg-slate-900/60 dark:ring-slate-100/10;
-  }
-
-  /* Thanh điều hướng: mỏng hơn thẻ vì nó nằm đè lên phần cảnh đẹp nhất. */
-  .surface-nav {
-    @apply border-t border-slate-200 bg-white/95 backdrop-blur;
-    @apply dark:border-slate-800 dark:bg-slate-900/95;
-  }
-
-  [data-scene='on'] .surface-nav {
-    @apply border-white/60 bg-white/60 backdrop-blur-xl;
-    @apply dark:border-slate-100/10 dark:bg-slate-950/55;
   }
 
   /* Hiệu ứng lật flashcard. Phần tử cha cần perspective. */

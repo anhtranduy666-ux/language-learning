@@ -46,6 +46,9 @@ chạy thẳng file TypeScript.
   [docs/exercises.md](docs/exercises.md).
 - **Mầm**: nhân vật dẫn đường tự vẽ bằng SVG — chào, ra đề, khen khi đúng, chữa
   bài khi sai.
+- **Bong bóng chọn**: thanh điều hướng là viên thuốc kính mờ nổi, mục đang chọn
+  nằm trong bong bóng trượt nảy sang mục mới; các bộ chọn ở màn Cá nhân dùng
+  chung kiểu đó. Xem [docs/bubble.md](docs/bubble.md).
 - **Gamification**: XP, level, daily goal, streak và 9 thành tích.
 - **Lưu trữ**: tiến độ nằm trong `localStorage`, tự khôi phục khi mở lại.
 - **Giao diện sáng/tối**: chọn Sáng, Tối hoặc Theo máy ở màn hình Cá nhân. Mặc
@@ -163,9 +166,10 @@ src/
 │   ├── chinese.ts        Tách câu tiếng Trung thành mảnh cho bài ghép câu
 │   ├── pinyin.ts         So khớp pinyin người học gõ, bỏ qua dấu thanh
 │   ├── scene.ts          Mốc nở của nền động, mức chuyển động
+│   ├── nav.ts            Mục nào của thanh điều hướng đang được chọn
 │   ├── wordMap.ts        Toạ độ 60 từ trên bản đồ chòm sao / luống hoa
 │   └── storage.ts        Đọc/ghi localStorage
-├── styles/          CSS của nền động, bản đồ từ, Mầm và bài tập
+├── styles/          CSS của nền động, bản đồ từ, Mầm, bài tập và bong bóng chọn
 ├── services/supabase.ts  Biến môi trường Supabase
 ├── data/hsk1.ts     Nội dung khoá học
 └── types/           Kiểu dữ liệu dùng chung
@@ -187,7 +191,7 @@ nên chạy được trong `npm test`, không phải cài Deno chỉ để chạ
 
 ## Kiểm thử
 
-460 test, chia làm ba tầng:
+480 test, chia làm ba tầng:
 
 - **Logic** (`src/lib/*.test.ts`, `supabase/functions/speak/handler.test.ts`) — XP, level, streak, thành tích, sinh và chấm bài tập, chế độ sáng/tối, nền động, bản đồ 60 từ, khoá cache audio, đọc/ghi dữ liệu hỏng.
 - **Dữ liệu** (`src/data/hsk1.test.ts`) — mọi từ đều có đủ trường, không trùng id, không từ nào lạc khỏi bài học.

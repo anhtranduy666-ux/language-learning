@@ -1,0 +1,139 @@
+/**
+ * Bong bóng chọn — thanh điều hướng nổi và các bộ chọn một-trong-vài.
+ *
+ * Một viên thuốc kính mờ, mục đang chọn nằm trong một bong bóng sáng hơn.
+ * Bong bóng là MỘT phần tử duy nhất trượt từ mục này sang mục kia, chứ không
+ * phải mỗi mục một nền riêng bật tắt: nhờ vậy mắt theo được nó đi đâu, đúng cái
+ * cảm giác của thanh tab kiểu iOS mà người dùng điện thoại đã quen tay.
+ *
+ * Vị trí tính hoàn toàn bằng CSS từ hai biến `--count` và `--index` do React
+ * đặt, nên không phải đo kích thước phần tử nào cả — không đo thì cũng không
+ * có khung hình nào bong bóng đứng sai chỗ trước khi đo xong.
+ */
+
+/* ------------------------------------------------------------- cơ chế -- */
+
+.bubble-track {
+  --bubble-pad: 5px;
+  position: relative;
+  display: flex;
+  padding: var(--bubble-pad);
+}
+
+/*
+ * Bề rộng bong bóng đúng bằng một ô: (khung trừ hai lề) chia số mục. Dịch
+ * `--index` lần chính bề rộng của nó là tới đúng ô cần tới.
+ */
+.bubble-thumb {
+  position: absolute;
+  top: var(--bubble-pad);
+  bottom: var(--bubble-pad);
+  left: var(--bubble-pad);
+  width: calc((100% - 2 * var(--bubble-pad)) / var(--count));
+  border-radius: 999px;
+  transform: translateX(calc(var(--index) * 100%));
+  /* Đường cong vượt quá đích một chút rồi nảy về: đó là chữ "lỏng" trong
+     "liquid glass". Đi thẳng tuột thì trông như một ô màu bị dời chỗ. */
+  transition:
+    transform 520ms cubic-bezier(0.34, 1.4, 0.64, 1),
+    opacity 200ms ease;
+}
+
+.bubble-thumb[data-hidden='true'] {
+  opacity: 0;
+}
+
+/* Các mục đứng trên bong bóng: cùng được định vị, nên xếp theo thứ tự trong DOM. */
+.bubble-track > :not(.bubble-thumb) {
+  position: relative;
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bubble-thumb {
+    transition: opacity 200ms ease;
+  }
+}
+
+/* ---------------------------------------------------- thanh điều hướng -- */
+
+/*
+ * Viên thuốc nổi, tách khỏi mép màn hình. Nó nằm đè lên phần cảnh đẹp nhất —
+ * dải cỏ và cây hoa đào sát đáy — nên phải trong và nhỏ gọn, không được là
+ * một dải đặc che kín bề ngang như thanh điều hướng cũ.
+ */
+.bubble-bar {
+  position: fixed;
+  right: 16px;
+  bottom: calc(env(safe-area-inset-bottom) + 12px);
+  left: 16px;
+  z-index: 20;
+  max-width: 400px;
+  height: 64px;
+  margin-inline: auto;
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.62);
+  -webkit-backdrop-filter: blur(22px) saturate(180%);
+  backdrop-filter: blur(22px) saturate(180%);
+  box-shadow:
+    0 14px 32px -14px rgba(15, 23, 42, 0.4),
+    0 2px 6px rgba(15, 23, 42, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+[data-theme='dark'] .bubble-bar {
+  border-color: rgba(255, 255, 255, 0.12);
+  background: rgba(24, 26, 34, 0.58);
+  box-shadow:
+    0 16px 36px -12px rgba(0, 0, 0, 0.75),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.bubble-bar .bubble-thumb {
+  background: rgba(226, 72, 61, 0.13);
+}
+
+[data-theme='dark'] .bubble-bar .bubble-thumb {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* ------------------------------------------------------- bộ chọn nhỏ -- */
+
+/* Rãnh lõm xuống, bong bóng trắng nổi lên — như một công tắc gạt. */
+.bubble-switch {
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.06);
+  box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.08);
+}
+
+[data-theme='dark'] .bubble-switch {
+  background: rgba(255, 255, 255, 0.07);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.45);
+}
+
+.bubble-switch .bubble-thumb {
+  background: #ffffff;
+  box-shadow:
+    0 2px 8px rgba(15, 23, 42, 0.14),
+    0 1px 2px rgba(15, 23, 42, 0.1);
+}
+
+[data-theme='dark'] .bubble-switch .bubble-thumb {
+  background: rgba(255, 255, 255, 0.16);
+  box-shadow:
+    0 2px 10px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+/*
+ * Màn hình hẹp cỡ iPhone SE đời đầu (320px): ba ô chỉ còn chừng 79px mỗi ô,
+ * không đủ cho cả emoji lẫn "Theo máy". Bỏ emoji — nó chỉ để trang trí, còn
+ * chữ mới là thứ người học đọc.
+ */
+@media (max-width: 359px) {
+  .bubble-switch-icon {
+    display: none;
+  }
+}

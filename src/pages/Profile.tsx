@@ -1,18 +1,18 @@
 import { useState } from 'react'
+import { BubbleSwitch } from '../components/ui/BubbleSwitch'
 import { Button } from '../components/ui/Button'
 import { useProgress } from '../context/ProgressContext'
 import { useScene } from '../context/SceneContext'
 import { useTheme } from '../context/ThemeContext'
-import { cn } from '../lib/cn'
 import { levelFromXp } from '../lib/gamification'
 import type { SceneChoice } from '../lib/scene'
 import type { ThemeChoice } from '../lib/theme'
 import { currentPlatform, shouldOfferInstall } from '../lib/install'
 
 const GOAL_OPTIONS = [
-  { value: 30, label: 'Nhẹ nhàng', hint: '30 XP · khoảng 3 phút' },
-  { value: 50, label: 'Vừa sức', hint: '50 XP · khoảng 5 phút' },
-  { value: 100, label: 'Nghiêm túc', hint: '100 XP · khoảng 10 phút' },
+  { value: 30, label: 'Nhẹ nhàng', hint: '30 XP · khoảng 3 phút mỗi ngày' },
+  { value: 50, label: 'Vừa sức', hint: '50 XP · khoảng 5 phút mỗi ngày' },
+  { value: 100, label: 'Nghiêm túc', hint: '100 XP · khoảng 10 phút mỗi ngày' },
 ]
 
 const THEME_OPTIONS: Array<{ value: ThemeChoice; label: string; icon: string }> = [
@@ -113,40 +113,25 @@ export function Profile() {
 
       {/* Mục tiêu hằng ngày */}
       <section className="surface p-5">
-        <h2 className="font-semibold text-slate-900 dark:text-slate-100">Mục tiêu mỗi ngày</h2>
+        <h2 id="goal-label" className="font-semibold text-slate-900 dark:text-slate-100">
+          Mục tiêu mỗi ngày
+        </h2>
         <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
           Đạt mục tiêu là giữ được streak. Chọn mức bạn theo nổi mỗi ngày.
         </p>
-        <ul className="mt-4 space-y-2">
-          {GOAL_OPTIONS.map((option) => {
-            const active = progress.dailyGoal === option.value
-            return (
-              <li key={option.value}>
-                <button
-                  type="button"
-                  onClick={() => updateDailyGoal(option.value)}
-                  aria-pressed={active}
-                  className={cn(
-                    'flex w-full items-center justify-between rounded-2xl border-2 p-4 text-left transition',
-                    active
-                      ? 'border-brand-500 bg-brand-50 dark:bg-brand-500/15'
-                      : 'border-slate-200 hover:bg-slate-50 dark:border-slate-700 dark:hover:bg-slate-800',
-                  )}
-                >
-                  <span>
-                    <span className="block font-semibold text-slate-900 dark:text-slate-100">{option.label}</span>
-                    <span className="block text-sm text-slate-500 dark:text-slate-400">{option.hint}</span>
-                  </span>
-                  {active && (
-                    <span aria-hidden="true" className="text-brand-600 dark:text-brand-300">
-                      ✓
-                    </span>
-                  )}
-                </button>
-              </li>
-            )
-          })}
-        </ul>
+        <BubbleSwitch
+          labelledBy="goal-label"
+          options={GOAL_OPTIONS}
+          value={progress.dailyGoal}
+          onChange={updateDailyGoal}
+          className="mt-4"
+        />
+        {/* Ba mức vừa đủ chỗ cho tên, không đủ cho phần giải thích — nên chỉ
+            giải thích mức đang chọn, ngay bên dưới. Mục tiêu cũ ngoài ba mức
+            này (dữ liệu lưu từ trước) thì không có dòng nào, thay vì đoán bừa. */}
+        <p className="mt-2 text-center text-sm text-slate-500 dark:text-slate-400" aria-live="polite">
+          {GOAL_OPTIONS.find((option) => option.value === progress.dailyGoal)?.hint}
+        </p>
       </section>
 
       {/* Giao diện */}
@@ -157,32 +142,13 @@ export function Profile() {
         <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
           Học buổi tối thì chế độ tối đỡ chói mắt hơn.
         </p>
-        <div role="group" aria-labelledby="theme-label" className="mt-4 grid grid-cols-3 gap-2">
-          {THEME_OPTIONS.map((option) => {
-            const active = choice === option.value
-            return (
-              <button
-                key={option.value}
-                type="button"
-                onClick={() => setChoice(option.value)}
-                aria-pressed={active}
-                className={cn(
-                  'rounded-2xl border-2 p-3 text-center transition',
-                  active
-                    ? 'border-brand-500 bg-brand-50 dark:bg-brand-500/15'
-                    : 'border-slate-200 hover:bg-slate-50 dark:border-slate-700 dark:hover:bg-slate-800',
-                )}
-              >
-                <span aria-hidden="true" className="block text-xl">
-                  {option.icon}
-                </span>
-                <span className="mt-1 block text-sm font-semibold text-slate-900 dark:text-slate-100">
-                  {option.label}
-                </span>
-              </button>
-            )
-          })}
-        </div>
+        <BubbleSwitch
+          labelledBy="theme-label"
+          options={THEME_OPTIONS}
+          value={choice}
+          onChange={setChoice}
+          className="mt-4"
+        />
 
         {/* Nền động.
             Ba mức chứ không phải công tắc bật/tắt: máy yếu thì cảnh vẫn nên ở
@@ -194,32 +160,13 @@ export function Profile() {
         <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
           Khu vườn ban ngày, bầu trời sao ban đêm — nở dần theo tiến độ hôm nay.
         </p>
-        <div role="group" aria-labelledby="scene-label" className="mt-4 grid grid-cols-3 gap-2">
-          {SCENE_OPTIONS.map((option) => {
-            const active = sceneChoice === option.value
-            return (
-              <button
-                key={option.value}
-                type="button"
-                onClick={() => setSceneChoice(option.value)}
-                aria-pressed={active}
-                className={cn(
-                  'rounded-2xl border-2 p-3 text-center transition',
-                  active
-                    ? 'border-brand-500 bg-brand-50 dark:bg-brand-500/15'
-                    : 'border-slate-200 hover:bg-slate-50 dark:border-slate-700 dark:hover:bg-slate-800',
-                )}
-              >
-                <span aria-hidden="true" className="block text-xl">
-                  {option.icon}
-                </span>
-                <span className="mt-1 block text-sm font-semibold text-slate-900 dark:text-slate-100">
-                  {option.label}
-                </span>
-              </button>
-            )
-          })}
-        </div>
+        <BubbleSwitch
+          labelledBy="scene-label"
+          options={SCENE_OPTIONS}
+          value={sceneChoice}
+          onChange={setSceneChoice}
+          className="mt-4"
+        />
       </section>
 
       {/* Dữ liệu */}

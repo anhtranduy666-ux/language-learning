@@ -18,7 +18,9 @@ export function AppShell() {
   return (
     <div className="min-h-dvh bg-slate-50 dark:bg-slate-950">
       <SceneBackground />
-      <main className="relative z-10 mx-auto w-full max-w-lg px-4 pt-6 pb-24">
+      {/* Chừa chỗ cho thanh điều hướng nổi: cao 64px, cách đáy 12px, cộng
+          vùng an toàn của iPhone — để thẻ cuối cùng không nằm dưới viên thuốc. */}
+      <main className="relative z-10 mx-auto w-full max-w-lg px-4 pt-6 pb-[calc(env(safe-area-inset-bottom)+7rem)]">
         <Outlet />
       </main>
       <BottomNav />
