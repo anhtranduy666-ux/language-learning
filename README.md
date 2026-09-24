@@ -87,6 +87,11 @@ Khoá HSK 1 **đã có sẵn 60 file phát âm** trong `src/assets/audio/`, sinh
 ngoại tuyến. File nằm trong repo nên mọi người học đều nghe đúng một bản audio,
 không phụ thuộc máy họ có cài giọng tiếng Trung hay không.
 
+Máy đọc thẳng từ pinyin viết tay trong dữ liệu, không tự đoán cách đọc chữ Hán,
+và **mọi file đều được đo cao độ để kiểm thanh điệu** trước khi vào repo. Giọng
+đầu tiên từng đọc mọi thanh 4 thành thanh 1; lý do và số đo ở
+[docs/audio-voice.md](docs/audio-voice.md).
+
 Nút phát âm thử bốn nguồn, theo thứ tự:
 
 | Thứ tự | Nguồn | Khi nào dùng |
@@ -104,16 +109,18 @@ hiện pinyin thay thế để người học vẫn đi hết được bài.
 Thêm từ vào `src/data/hsk1.ts`, rồi:
 
 ```bash
-pip install piper-tts lameenc   # chỉ lần đầu
+pip install "piper-tts[alignment]" lameenc unicode-rbnf   # chỉ lần đầu
 npm run generate-audio
 git add src/assets/audio && git commit -m "Add audio for new words"
 ```
 
 Lần đầu chạy sẽ tải model giọng khoảng 60MB vào `.piper-voices/` (đã được
-`.gitignore` loại trừ). Những từ đã có file thì bỏ qua, chỉ sinh từ mới.
+`.gitignore` loại trừ). Những clip đã có thì bỏ qua, chỉ sinh clip mới hoặc
+clip vừa đổi pinyin — `src/assets/audio/manifest.json` ghi lại pinyin đã dùng.
 
-Có một test chặn đúng chỗ dễ quên: thêm từ mà chưa sinh audio thì
-`src/lib/audioFiles.test.ts` báo đỏ, và CI không deploy.
+Có test chặn đúng những chỗ dễ quên: thêm từ mà chưa sinh audio, hoặc sửa
+pinyin mà chưa sinh lại, thì `src/lib/audioFiles.test.ts` báo đỏ, và CI không
+deploy.
 
 ### Vì sao không dùng dịch vụ TTS đám mây
 
@@ -168,6 +175,7 @@ src/
 │   ├── audioCacheKey.ts  Khoá cache audio: chuẩn hoá, băm, dựng URL
 │   ├── remoteAudio.ts    Gọi CDN rồi mới tới Edge Function, có hạn giờ
 │   ├── audioFiles.ts     Quét file audio trong src/assets/audio
+│   ├── speechTokens.ts   Pinyin → âm tiết đánh số cho máy đọc, thanh cần nghe thấy
 │   ├── theme.ts          Đọc/ghi lựa chọn giao diện, gắn vào thẻ html
 │   ├── chinese.ts        Tách câu tiếng Trung thành mảnh cho bài ghép câu
 │   ├── pinyin.ts         So khớp pinyin người học gõ, bỏ qua dấu thanh
@@ -187,7 +195,11 @@ supabase/
     ├── handler.ts   Luật của Edge Function — chạy được bằng npm test
     └── index.ts     Vỏ Deno: nối dây với Storage, PostgREST và Azure
 
-scripts/prewarm-audio.ts   Sinh sẵn toàn bộ audio HSK 1
+scripts/
+├── generate-audio.py   Sinh audio bằng Piper, tại máy — đường đang dùng
+├── tone_check.py       Đo cao độ để chọn bản đọc đúng thanh nhất
+├── dump-clips.ts       Danh sách clip cần sinh, lấy từ src/data
+└── prewarm-audio.ts    Sinh audio qua Azure + Supabase — đường dự phòng
 docs/                      Phương án kỹ thuật cho từng tính năng
 ```
 
@@ -198,7 +210,7 @@ nên chạy được trong `npm test`, không phải cài Deno chỉ để chạ
 
 ## Kiểm thử
 
-480 test, chia làm ba tầng:
+571 test, chia làm ba tầng:
 
 - **Logic** (`src/lib/*.test.ts`, `supabase/functions/speak/handler.test.ts`) — XP, level, streak, thành tích, sinh và chấm bài tập, chế độ sáng/tối, nền động, bản đồ 60 từ, khoá cache audio, đọc/ghi dữ liệu hỏng.
 - **Dữ liệu** (`src/data/hsk1.test.ts`) — mọi từ đều có đủ trường, không trùng id, không từ nào lạc khỏi bài học.

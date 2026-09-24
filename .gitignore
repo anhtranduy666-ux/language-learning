@@ -14,3 +14,6 @@ tsconfig.tsbuildinfo
 
 # Model giọng Piper — 60MB, tải lại được bằng npm run generate-audio
 .piper-voices/
+
+# Bộ nhớ đệm của Python khi chạy scripts/generate-audio.py
+__pycache__/

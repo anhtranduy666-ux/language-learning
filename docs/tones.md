@@ -112,6 +112,16 @@ Nên cả hai dạng đưa **chữ Hán** ra thay. Bài thành "chữ này đọ
 lại trí nhớ thay vì luyện tai, kém hơn nhưng vẫn đáng làm, và người học vẫn đi
 hết được bài. Cùng cách xử lý với bài nghe–viết.
 
+### Phát được âm thì âm phải đúng thanh
+
+Hai dạng bài này chỉ có nghĩa khi file audio đọc đúng thanh. Giọng dùng lúc đầu
+(`huayan`) đọc mọi từ thanh 4 thành một đường phẳng: bài chọn thanh đọc 是 rồi
+hỏi thanh mấy, tai người học nghe ra thanh 1 trong khi đáp án là thanh 4.
+
+Từ 2026-09-24 audio được sinh bằng giọng khác, đọc thẳng từ pinyin, và **mọi
+file đều được máy đo cao độ để kiểm thanh** trước khi đưa vào repo. Chi tiết
+và số đo ở [audio-voice.md](audio-voice.md).
+
 ## 6. Chữa bài
 
 Chọn sai thì Zibi nói rõ **thanh mấy**, không chỉ đưa lại chữ có dấu — người mới
