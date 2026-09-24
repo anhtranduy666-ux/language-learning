@@ -82,8 +82,10 @@ chạy thẳng file TypeScript.
 
 - Authentication và Supabase (Phase 2–3). Hiện chỉ hỏi tên và lưu ở máy.
 - Spaced repetition cho flashcard. Bản này mới có hai mức "Chưa nhớ" / "Đã nhớ".
-- Chấm phát âm cho người học. Đã có phương án kỹ thuật:
-  [docs/pronunciation-scoring.md](docs/pronunciation-scoring.md).
+- Chấm phát âm cho người học. Bản thi công đã chốt — miễn phí, chạy trong
+  trình duyệt, không cần tài khoản:
+  [docs/pronunciation-mvp.md](docs/pronunciation-mvp.md). Phần so sánh các
+  hướng ở [docs/pronunciation-scoring.md](docs/pronunciation-scoring.md).
 - Toàn bộ phần AI ở Phase 8.
 
 ## Âm thanh
