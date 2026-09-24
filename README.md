@@ -40,10 +40,16 @@ chạy thẳng file TypeScript.
 
 - **Nội dung**: khoá HSK 1 với 5 unit, 10 bài học, 60 từ. Mỗi từ có Hanzi, pinyin, nghĩa và câu ví dụ.
 - **Màn hình**: Landing, Home, Course, Lesson, Flashcard, Exercise, Result, Progress, Profile.
-- **Bài tập**: 6 dạng — trắc nghiệm, chọn pinyin, nghe rồi chọn, ghép nối, và hai
+- **Bài tập**: 8 dạng — trắc nghiệm, chọn pinyin, nghe rồi chọn, ghép nối, và hai
   dạng kiểu Duolingo: **ghép câu** (bấm các mảnh chữ Hán theo đúng thứ tự) và
   **nghe rồi viết** (gõ lại bằng pinyin, không cần dấu thanh). Xem
   [docs/exercises.md](docs/exercises.md).
+- **Luyện thanh điệu**: mỗi bài học khép lại bằng hai bài bắt tai phải làm việc —
+  nghe rồi **chọn thanh** (bấm 1 trong 4 nút, âm tiết hiện ra đã bỏ dấu), và
+  **phân biệt thanh** (bốn cách đọc của cùng một từ, chỉ lệch nhau đúng cái
+  thanh: `zāi/zái/zǎi/zài jiàn`). Sáu dạng còn lại đều cho chọn giữa những
+  phương án khác hẳn nhau về phụ âm và vần, nên mắt loại trừ được mà tai không
+  cần làm gì. Xem [docs/tones.md](docs/tones.md).
 - **Mầm**: nhân vật dẫn đường tự vẽ bằng SVG — chào, ra đề, khen khi đúng, chữa
   bài khi sai.
 - **Bong bóng chọn**: thanh điều hướng là viên thuốc kính mờ nổi, mục đang chọn
@@ -148,7 +154,7 @@ src/
 ├── components/      Component dùng lại: Flashcard, BottomNav, AudioButton, ui/
 ├── pages/           Mỗi màn hình một file
 ├── components/scene/  Nền động: khung, khu vườn, bầu trời sao
-├── components/exercise/  Bài ghép câu và bài nghe–viết
+├── components/exercise/  Bài ghép câu, nghe–viết và chọn thanh điệu
 ├── context/
 │   ├── ProgressContext.tsx  Tiến độ người học
 │   ├── SceneContext.tsx     Nền động: đầy đủ / tĩnh / tắt
@@ -156,7 +162,7 @@ src/
 ├── lib/             Logic thuần, không phụ thuộc React
 │   ├── gamification.ts   XP, level, streak, thành tích
 │   ├── progress.ts       Các phép biến đổi tiến độ
-│   ├── exercises.ts      Sinh và chấm cả sáu dạng bài tập
+│   ├── exercises.ts      Sinh và chấm cả tám dạng bài tập
 │   ├── course.ts         Điều hướng trong khoá học
 │   ├── speech.ts         Chuỗi bốn nguồn phát âm
 │   ├── audioCacheKey.ts  Khoá cache audio: chuẩn hoá, băm, dựng URL
@@ -165,6 +171,7 @@ src/
 │   ├── theme.ts          Đọc/ghi lựa chọn giao diện, gắn vào thẻ html
 │   ├── chinese.ts        Tách câu tiếng Trung thành mảnh cho bài ghép câu
 │   ├── pinyin.ts         So khớp pinyin người học gõ, bỏ qua dấu thanh
+│   ├── tones.ts          Đọc, bỏ và gắn lại dấu thanh cho bài luyện thanh
 │   ├── scene.ts          Mốc nở của nền động, mức chuyển động
 │   ├── nav.ts            Mục nào của thanh điều hướng đang được chọn
 │   ├── wordMap.ts        Toạ độ 60 từ trên bản đồ chòm sao / luống hoa

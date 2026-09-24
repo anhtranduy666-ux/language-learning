@@ -24,8 +24,12 @@ Hai thứ quan trọng nhất với người mới học tiếng Trung vì thế
 | **Nghe và viết** | Mầm đọc một từ | Gõ lại bằng pinyin | So sau khi bỏ dấu thanh, khoảng trắng, hoa/thường |
 
 Bài học giờ xoay vòng qua năm dạng theo từng từ — trắc nghiệm, pinyin, nghe,
-ghép câu, nghe–viết — rồi khép lại bằng một bài ghép cặp như cũ. Bài 1 có đủ cả
-sáu dạng.
+ghép câu, nghe–viết — rồi khép lại bằng hai bài luyện thanh và một bài ghép cặp.
+
+> **Cập nhật sau:** hai bài luyện thanh ở cuối mỗi lesson được thêm về sau, vì
+> không dạng nào trong sáu dạng dưới đây kiểm được thanh điệu — kể cả bài
+> nghe–viết, thứ **cố tình** bỏ qua dấu thanh khi chấm. Xem
+> [docs/tones.md](tones.md).
 
 ## 3. Ghép câu
 
@@ -109,9 +113,11 @@ nền động, và với chính việc học: mới nhú, rồi lớn dần.
 ```
 src/lib/chinese.ts                         Tách câu thành mảnh, từ điển phụ
 src/lib/pinyin.ts                          Chuẩn hoá và so khớp pinyin
-src/lib/exercises.ts                       Sinh và chấm cả sáu dạng bài
+src/lib/tones.ts                           Đọc, bỏ và gắn lại dấu thanh
+src/lib/exercises.ts                       Sinh và chấm cả tám dạng bài
 src/components/exercise/SentenceBuilder.tsx
 src/components/exercise/DictationInput.tsx
+src/components/exercise/ToneChoice.tsx
 src/components/Mascot.tsx                  Mầm và bong bóng thoại
 src/styles/mascot.css, src/styles/exercise.css
 ```
