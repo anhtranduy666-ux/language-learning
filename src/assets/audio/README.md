@@ -6,6 +6,9 @@ tay: test sẽ báo đỏ, vì một file lạ dễ làm lẫn hai giọng đọ
 
 - `<id của từ>.mp3` — ví dụ `nihao.mp3` cho từ `你好`, id lấy ở
   [`src/data/hsk1.ts`](../../data/hsk1.ts).
+- `sentences/<khoá>.mp3` — audio đọc cả một câu mẫu. Khoá băm từ chữ Hán và
+  pinyin của câu (`sentenceAudioKey()` ở `src/lib/sentences.ts`), nên sửa câu là
+  ra file mới; script tự xoá file của câu cũ.
 - `manifest.json` — giọng đọc và pinyin đánh số đã dùng cho từng file. Script
   dựa vào đây để chỉ sinh lại những clip vừa đổi pinyin; test dựa vào đây để bắt
   file cũ đọc theo pinyin cũ.

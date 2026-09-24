@@ -12,12 +12,18 @@ import { XP_REWARDS } from '../lib/gamification'
 import { ONBOARDED, renderApp } from '../test/renderApp'
 
 /**
- * Bỏ qua 60 file mp3 có sẵn trong repo, để test được đúng cảnh máy không phát
- * âm được — cảnh mà giao diện phải nói rõ cho người học thay vì im lặng.
+ * Bỏ qua mọi file mp3 có sẵn trong repo — cả của từ lẫn của câu mẫu — để test
+ * được đúng cảnh máy không phát âm được, cảnh mà giao diện phải nói rõ cho
+ * người học thay vì im lặng.
  */
 vi.mock('../lib/audioFiles', async (importOriginal) => {
   const actual = await importOriginal<typeof import('../lib/audioFiles')>()
-  return { ...actual, hasRecordedAudio: () => false, audioUrlForWord: () => null }
+  return {
+    ...actual,
+    hasRecordedAudio: () => false,
+    audioUrlForWord: () => null,
+    audioUrlForSentence: () => null,
+  }
 })
 
 
@@ -201,6 +207,34 @@ describe('Màn hình từ vựng', () => {
     renderApp('/lesson/không-có-bài-này', ONBOARDED)
     expect(screen.getByText('Tiến độ khoá học')).toBeInTheDocument()
   })
+
+  it('mỗi từ có ba câu mẫu, câu nào cũng có pinyin, nghĩa và nút nghe cả câu', () => {
+    renderApp(`/lesson/${LESSON_ID}`, ONBOARDED)
+
+    for (const word of LESSON_WORDS) {
+      const list = screen.getByRole('list', { name: `Câu mẫu với ${word.hanzi}` })
+      expect(within(list).getAllByRole('listitem')).toHaveLength(word.examples.length)
+
+      for (const sentence of word.examples) {
+        expect(
+          within(list).getByRole('button', { name: `Nghe phát âm câu ${sentence.hanzi}` }),
+        ).toBeInTheDocument()
+        expect(list).toHaveTextContent(sentence.pinyin)
+        expect(list).toHaveTextContent(sentence.meaning)
+      }
+    }
+  })
+
+  it('tô từ đang học trong từng câu mẫu', () => {
+    renderApp(`/lesson/${LESSON_ID}`, ONBOARDED)
+    const [word] = LESSON_WORDS
+    const list = screen.getByRole('list', { name: `Câu mẫu với ${word.hanzi}` })
+
+    // Mỗi câu hai chỗ tô: một ở dòng chữ Hán, một ở dòng pinyin.
+    const marks = list.querySelectorAll('mark')
+    expect(marks).toHaveLength(word.examples.length * 2)
+    expect(marks[0]).toHaveTextContent(word.hanzi)
+  })
 })
 
 describe('Flashcard', () => {
@@ -377,6 +411,32 @@ describe('Bài ghép câu', () => {
 
     expect(screen.getByRole('status')).toHaveTextContent('Chưa đúng')
     expect(screen.getByRole('status')).toHaveTextContent(pieces.join(' '))
+  })
+
+  it('chấm xong thì hiện cả câu, kèm pinyin và nút nghe cả câu', async () => {
+    const { user } = await openSentence()
+    const { sentence, pieces } = sentenceExercise()
+
+    await buildSentence(user, pieces)
+    await user.click(screen.getByRole('button', { name: 'Kiểm tra' }))
+
+    const reveal = screen.getByRole('region', { name: 'Cả câu' })
+    expect(reveal).toHaveTextContent(sentence.pinyin)
+    expect(
+      within(reveal).getByRole('button', { name: `Nghe phát âm câu ${sentence.hanzi}` }),
+    ).toBeInTheDocument()
+    // Kho mảnh chữ nhường chỗ: chấm rồi thì không còn gì để bấm.
+    expect(screen.queryByRole('group', { name: 'Các mảnh chữ' })).not.toBeInTheDocument()
+  })
+
+  it('ghép sai vẫn được nghe cả câu đúng', async () => {
+    const { user } = await openSentence()
+    const { sentence, pieces } = sentenceExercise()
+
+    await buildSentence(user, [...pieces].reverse())
+    await user.click(screen.getByRole('button', { name: 'Kiểm tra' }))
+
+    expect(screen.getByRole('region', { name: 'Cả câu' })).toHaveTextContent(sentence.pinyin)
   })
 })
 

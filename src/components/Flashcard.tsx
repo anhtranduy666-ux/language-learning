@@ -1,5 +1,6 @@
 import type { Word } from '../types'
 import { AudioButton } from './AudioButton'
+import { SentenceLine } from './ExampleSentences'
 
 interface FlashcardProps {
   word: Word
@@ -9,9 +10,16 @@ interface FlashcardProps {
 
 /**
  * Thẻ từ vựng hai mặt.
- * Mặt trước chỉ có chữ Hán để người học tự nhớ nghĩa, mặt sau mới lộ pinyin và nghĩa.
+ * Mặt trước chỉ có chữ Hán để người học tự nhớ nghĩa, mặt sau mới lộ pinyin,
+ * nghĩa và câu mẫu chính — câu có nút nghe cả câu.
+ *
+ * Mặt đang quay đi được đánh dấu `inert`: nó vẫn nằm trong DOM để CSS xoay,
+ * nhưng nút loa trên đó không nhận Tab và trình đọc màn hình bỏ qua — nếu
+ * không, người dùng bàn phím sẽ nhảy vào một nút mà mắt không nhìn thấy.
  */
 export function Flashcard({ word, flipped, onFlip }: FlashcardProps) {
+  const [sentence] = word.examples
+
   return (
     <div className="flip-scene w-full">
       <button
@@ -24,7 +32,10 @@ export function Flashcard({ word, flipped, onFlip }: FlashcardProps) {
         data-testid="flashcard"
       >
         {/* Mặt trước */}
-        <div className="flip-face absolute inset-0 flex flex-col items-center justify-center gap-5 rounded-3xl bg-white p-6 shadow-lg ring-1 ring-slate-200 dark:bg-slate-900 dark:ring-slate-700">
+        <div
+          inert={flipped}
+          className="flip-face absolute inset-0 flex flex-col items-center justify-center gap-5 rounded-3xl bg-white p-6 shadow-lg ring-1 ring-slate-200 dark:bg-slate-900 dark:ring-slate-700"
+        >
           <p className="font-hanzi text-7xl font-semibold text-slate-900 sm:text-8xl dark:text-slate-100">
             {word.hanzi}
           </p>
@@ -33,14 +44,21 @@ export function Flashcard({ word, flipped, onFlip }: FlashcardProps) {
         </div>
 
         {/* Mặt sau */}
-        <div className="flip-face flip-face-back absolute inset-0 flex flex-col items-center justify-center gap-3 rounded-3xl bg-brand-500 p-6 text-center text-white shadow-lg dark:bg-brand-600">
+        <div
+          inert={!flipped}
+          className="flip-face flip-face-back absolute inset-0 flex flex-col items-center justify-center gap-2 rounded-3xl bg-brand-500 px-5 py-6 text-center text-white shadow-lg dark:bg-brand-600"
+        >
           <p className="font-hanzi text-4xl font-semibold">{word.hanzi}</p>
           <p className="text-xl text-brand-100">{word.pinyin}</p>
-          <p className="text-2xl font-semibold">{word.meaning}</p>
-          <div className="mt-2 rounded-2xl bg-brand-600/60 px-4 py-3 dark:bg-brand-700/60">
-            <p className="font-hanzi text-base">{word.example}</p>
-            <p className="mt-1 text-sm text-brand-100">{word.exampleMeaning}</p>
-          </div>
+          <p className="text-xl font-semibold">{word.meaning}</p>
+          {sentence && (
+            <SentenceLine
+              sentence={sentence}
+              target={word.hanzi}
+              surface="onBrand"
+              className="mt-2 w-full rounded-2xl bg-brand-600/60 px-3 py-2.5 dark:bg-brand-700/60"
+            />
+          )}
         </div>
       </button>
     </div>

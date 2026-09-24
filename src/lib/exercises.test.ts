@@ -130,7 +130,7 @@ describe('buildExercises', () => {
     expect(kinds.slice(-3)).toEqual(['tone', 'tone-pair', 'matching'])
   })
 
-  it('câu ví dụ quá ngắn để ghép thì thay bằng trắc nghiệm, không bỏ trống', () => {
+  it('từ không có câu mẫu vừa sức thì thay bằng trắc nghiệm, không bỏ trống', () => {
     for (const lessonId of LESSON_IDS) {
       const words = wordsOfLesson(lessonId)
       const exercises = buildExercises(words, WORDS, createRng(seedFromText(lessonId)))
@@ -283,9 +283,20 @@ describe('isChoiceExercise', () => {
   })
 })
 
-/** Một từ giả, để test ghép câu không phụ thuộc câu ví dụ thật có thể đổi sau này. */
+/** Một từ giả, để test ghép câu không phụ thuộc câu mẫu thật có thể đổi sau này. */
 function wordWithExample(example: string, exampleMeaning = 'nghĩa'): Word {
-  return { id: 'thu', hanzi: '我', pinyin: 'wǒ', meaning: 'tôi', example, exampleMeaning }
+  return wordWithExamples([example], exampleMeaning)
+}
+
+/** Từ giả có nhiều câu mẫu, theo đúng thứ tự cho trước. */
+function wordWithExamples(examples: string[], exampleMeaning = 'nghĩa'): Word {
+  return {
+    id: 'thu',
+    hanzi: '我',
+    pinyin: 'wǒ',
+    meaning: 'tôi',
+    examples: examples.map((hanzi) => ({ hanzi, pinyin: '', meaning: exampleMeaning })),
+  }
 }
 
 const LEXICON = [...WORDS.map((word) => word.hanzi), ...EXTRA_LEXICON]
@@ -351,11 +362,41 @@ describe('buildSentenceExercise', () => {
     expect(new Set(ids).size).toBe(ids.length)
   })
 
-  it('mọi câu ví dụ của khoá hoặc ghép được trọn vẹn, hoặc bị loại — không câu nào mất chữ', () => {
+  it('câu mẫu đầu quá ngắn thì lấy câu kế tiếp', () => {
+    const exercise = buildSentenceExercise(
+      wordWithExamples(['请坐。', '我是中国人。']),
+      WORDS,
+      LEXICON,
+      createRng(3),
+    )!
+
+    expect(exercise.sentence.hanzi).toBe('我是中国人。')
+    expect(exercise.pieces).toEqual(['我', '是', '中国', '人'])
+  })
+
+  it('không câu mẫu nào vừa sức thì không ra bài ghép', () => {
+    expect(
+      buildSentenceExercise(wordWithExamples(['请坐。', '谢谢你！']), WORDS, LEXICON, createRng(1)),
+    ).toBeNull()
+  })
+
+  it('mang theo câu mẫu gốc, để chấm xong đọc lại được cả câu', () => {
+    const word = WORD_BY_ID.wo
+    const exercise = buildSentenceExercise(word, WORDS, LEXICON, createRng(1))!
+
+    expect(exercise.sentence).toBe(word.examples[0])
+    expect(exercise.meaning).toBe(word.examples[0].meaning)
+  })
+
+  it('mọi từ của khoá ghép được trọn vẹn một câu mẫu của chính nó — không câu nào mất chữ', () => {
     for (const word of WORDS) {
       const exercise = buildSentenceExercise(word, WORDS, LEXICON, createRng(1))
-      if (!exercise) continue
-      expect(exercise.answer, word.example).toBe(stripPunctuation(word.example).replace(/\s/g, ''))
+      // Ba câu mẫu của mỗi từ đủ đa dạng để luôn có một câu vừa sức.
+      expect(exercise, word.id).not.toBeNull()
+      expect(word.examples, word.id).toContain(exercise!.sentence)
+      expect(exercise!.answer, word.id).toBe(
+        stripPunctuation(exercise!.sentence.hanzi).replace(/\s/g, ''),
+      )
     }
   })
 })

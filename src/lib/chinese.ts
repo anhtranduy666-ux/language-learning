@@ -19,24 +19,62 @@ const HAN = /[一-鿿]/
 const PUNCTUATION = /[，。、？！：；「」『』（）《》〈〉…·,.?!:;()[\]{}"'“”‘’—–-]/g
 
 /**
- * Những từ nhiều chữ xuất hiện trong câu ví dụ nhưng không nằm trong 60 từ
+ * Những từ nhiều chữ xuất hiện trong câu mẫu nhưng không nằm trong 60 từ
  * HSK 1. Thiếu chúng thì câu bị cắt vụn ra từng chữ ở đúng những chỗ khó nhất.
  *
- * Danh sách cố ý ngắn và chỉ gồm từ thật sự có trong dữ liệu — thêm câu ví dụ
- * mới mà quên bổ sung ở đây thì câu đó chỉ bị cắt vụn hơn, không vỡ gì cả.
+ * Danh sách chỉ gồm từ thật sự có trong câu mẫu — `chinese.test.ts` kiểm điều
+ * đó. Thêm câu mẫu mới mà quên bổ sung ở đây thì câu đó chỉ bị cắt vụn hơn,
+ * không vỡ gì cả.
+ *
+ * Cố ý **không** gộp những cụm mà mỗi chữ đã là một từ trong khoá, như 回家
+ * hay 星期天: tách ra thì người học được bấm lại đúng những từ vừa học.
  */
 export const EXTRA_LEXICON = [
+  // Người và nơi chốn
   '哥哥',
-  '高兴',
-  '知道',
+  '孩子',
+  '他们',
+  '小明',
+  '学校',
+  '医院',
+  '北京',
+  '越南',
+  // Việc làm
   '学习',
   '上课',
+  '下课',
+  '工作',
+  '休息',
+  '起床',
+  '睡觉',
+  '吃饭',
+  '喝茶',
+  '认识',
+  '知道',
+  '喜欢',
+  '欢迎',
+  '回来',
+  '请问',
+  // Đồ vật và thời gian
+  '苹果',
+  '杯子',
+  '早饭',
+  '汉语',
+  '天气',
+  '问题',
+  '生日',
+  '新年',
+  '今年',
+  '明年',
+  // Còn lại
+  '高兴',
+  '快乐',
+  '好吃',
   '这个',
   '很多',
+  '多少',
   '没有',
-  '可以',
-  '喝茶',
-  '今年',
+  '一起',
 ] as const
 
 /** Bỏ dấu câu, gom khoảng trắng. */

@@ -25,7 +25,7 @@ chạy toàn màn hình không thấy thanh Safari, và **dùng được khi m�
 
 Vì sao hợp với dự án này:
 
-- Toàn bộ nội dung đã là file tĩnh. 60 file audio, khoá học nằm trong mã nguồn,
+- Toàn bộ nội dung đã là file tĩnh. 239 file audio (60 từ, 179 câu mẫu), khoá học nằm trong mã nguồn,
   tiến độ trong `localStorage` — **không có gì cần gọi server lúc học**. Đây là
   trường hợp lý tưởng cho offline, không phải thứ phải gượng ép.
 - Mỗi lần đẩy code là người dùng có bản mới, không chờ duyệt store.
@@ -90,14 +90,18 @@ theo hình dạng do người dùng chọn.
 
 ## 5. Chiến lược cache
 
-**Precache tất cả**, gồm cả 60 file audio.
+**Precache tất cả**, gồm cả 239 file audio — 60 từ và 179 câu mẫu.
 
 ```
-JS      ~100 KB (gzip)
-CSS      ~33 KB
-audio   ~412 KB
-tổng    ~550 KB
+JS      ~390 KB (~120 KB gzip)
+CSS      ~63 KB
+audio   ~2,2 MB
+tổng    ~2,9 MB, 253 mục
 ```
+
+Audio câu mẫu chiếm phần lớn, và vẫn đáng precache: service worker tải một lần,
+chạy ngầm sau lần mở đầu tiên, còn nghe cả câu là một trong những thứ chính
+người học mở app ra để làm — kể cả lúc không có mạng.
 
 550 KB nhỏ hơn một tấm ảnh chụp. Đổi lại được tính chất đáng giá: **cài xong là
 dùng được trọn vẹn khi không có mạng**, kể cả phần nghe phát âm — vốn là thứ

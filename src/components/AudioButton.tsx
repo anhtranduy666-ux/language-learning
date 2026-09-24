@@ -8,6 +8,8 @@ interface AudioButtonProps {
   text: string
   /** Id của từ, để tìm file audio thu sẵn. */
   wordId?: string
+  /** File thu sẵn cho đúng `text` — dùng cho câu mẫu, vốn không có id như từ. */
+  clipUrl?: string | null
   /** Nhãn cho trình đọc màn hình, ví dụ tên từ đang nghe. */
   label?: string
   size?: 'sm' | 'md' | 'lg'
@@ -42,7 +44,14 @@ type Hint = keyof typeof HINTS | null
  * Nút luôn hiện, kể cả khi máy chưa phát âm được — bấm vào sẽ hiện hướng dẫn
  * thay vì im lặng không phản hồi.
  */
-export function AudioButton({ text, wordId, label, size = 'md', className }: AudioButtonProps) {
+export function AudioButton({
+  text,
+  wordId,
+  clipUrl,
+  label,
+  size = 'md',
+  className,
+}: AudioButtonProps) {
   const status = useAudioStatus()
   const [stage, setStage] = useState<PlayStage | null>(null)
   const [hint, setHint] = useState<Hint>(null)
@@ -61,7 +70,7 @@ export function AudioButton({ text, wordId, label, size = 'md', className }: Aud
 
     setHint(null)
     setStage('speaking')
-    const result = await playWord({ text, wordId, onStage: setStage })
+    const result = await playWord({ text, wordId, clipUrl, onStage: setStage })
     setStage(null)
 
     if (result === 'played') return

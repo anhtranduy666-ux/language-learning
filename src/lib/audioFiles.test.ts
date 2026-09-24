@@ -1,7 +1,14 @@
 import { describe, expect, it } from 'vitest'
 import manifest from '../assets/audio/manifest.json'
 import { WORDS, WORD_BY_ID } from '../data/hsk1'
-import { AUDIO_FILE_URLS, audioUrlForWord, hasRecordedAudio } from './audioFiles'
+import {
+  AUDIO_FILE_URLS,
+  SENTENCE_AUDIO_URLS,
+  audioUrlForSentence,
+  audioUrlForWord,
+  hasRecordedAudio,
+} from './audioFiles'
+import { sentenceAudioKey } from './sentences'
 import { speechTokens } from './speechTokens'
 
 /** Pinyin đánh số mà `npm run generate-audio` đã đưa cho máy đọc, theo tên file. */
@@ -54,5 +61,44 @@ describe('audioFiles', () => {
 
   it('hasRecordedAudio phản ánh đúng số file đang có', () => {
     expect(hasRecordedAudio()).toBe(Object.keys(AUDIO_FILE_URLS).length > 0)
+  })
+})
+
+describe('audio của câu mẫu', () => {
+  const SENTENCES = WORDS.flatMap((word) => word.examples)
+
+  it('câu mẫu nào cũng có file đọc cả câu', () => {
+    // Thêm hay sửa câu mà quên `npm run generate-audio` thì nút loa của câu đó
+    // phải nhờ giọng máy — trên điện thoại không cài giọng tiếng Trung là câm.
+    const missing = SENTENCES.filter((sentence) => !audioUrlForSentence(sentence)).map(
+      (sentence) => sentence.hanzi,
+    )
+    expect(missing).toEqual([])
+  })
+
+  it('không có file câu nào bị bỏ rơi', () => {
+    // Tên file băm từ nội dung câu, nên sửa câu là sinh ra tên mới. File cũ còn
+    // nằm lại thì vẫn bị đóng gói vào bản offline mà không ai phát tới.
+    const keys = new Set(SENTENCES.map(sentenceAudioKey))
+    const orphans = Object.keys(SENTENCE_AUDIO_URLS).filter((key) => !keys.has(key))
+    expect(orphans).toEqual([])
+  })
+
+  it('file của mỗi câu được đọc từ đúng pinyin của câu đó', () => {
+    const stale = SENTENCES.filter(
+      (sentence) =>
+        SPOKEN[`sentences/${sentenceAudioKey(sentence)}.mp3`] !==
+        speechTokens(sentence.pinyin).join(' '),
+    ).map((sentence) => sentence.hanzi)
+    expect(stale).toEqual([])
+  })
+
+  it('file của câu khác file của từ, dù câu chỉ có đúng một chữ', () => {
+    const [sentence] = WORD_BY_ID.ni.examples
+    expect(audioUrlForSentence(sentence)).not.toBe(audioUrlForWord('ni'))
+  })
+
+  it('câu chưa có trong khoá học thì không có file', () => {
+    expect(audioUrlForSentence({ hanzi: '我爱你。', pinyin: 'Wǒ ài nǐ.', meaning: '' })).toBeNull()
   })
 })

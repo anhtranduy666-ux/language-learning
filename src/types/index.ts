@@ -1,15 +1,34 @@
 /** Kiểu dữ liệu dùng chung cho toàn bộ ứng dụng. */
 
+/**
+ * Một câu mẫu: từ đang học ghép với những từ khác thành câu hoàn chỉnh.
+ *
+ * Câu nào cũng có audio đọc **cả câu**, sinh sẵn từ chính `pinyin` dưới đây —
+ * xem `docs/example-sentences.md`.
+ */
+export interface ExampleSentence {
+  /** Câu tiếng Trung, có dấu câu: `你叫什么名字？`. */
+  hanzi: string
+  /**
+   * Pinyin theo từng âm tiết, mỗi chữ Hán đúng một âm tiết: `Nǐ jiào shén me míng zi?`.
+   * Viết hoa chữ đầu câu và tên riêng; dấu câu dính vào âm tiết đứng trước.
+   */
+  pinyin: string
+  /** Nghĩa tiếng Việt. */
+  meaning: string
+}
+
 /** Một từ vựng. Mỗi từ luôn có đủ Hanzi / Pinyin / nghĩa để hiển thị trên flashcard. */
 export interface Word {
   id: string
   hanzi: string
   pinyin: string
   meaning: string
-  /** Câu ví dụ bằng tiếng Trung. */
-  example: string
-  /** Nghĩa tiếng Việt của câu ví dụ. */
-  exampleMeaning: string
+  /**
+   * Câu mẫu có chứa từ này. Câu đầu tiên là câu chính: hiện ở mặt sau
+   * flashcard, và được ưu tiên cho bài ghép câu.
+   */
+  examples: ExampleSentence[]
 }
 
 /** Một bài học: gồm một nhóm từ vựng và phần luyện tập đi kèm. */
@@ -102,6 +121,8 @@ export interface SentenceExercise {
   prompt: string
   /** Nghĩa tiếng Việt của câu — đây là đề bài. */
   meaning: string
+  /** Câu mẫu gốc, để chấm xong thì hiện lại cả câu kèm pinyin và audio. */
+  sentence: ExampleSentence
   /** Câu đúng, đã bỏ dấu câu và khoảng trắng. */
   answer: string
   /** Các mảnh của câu đúng, theo đúng thứ tự — dùng để chữa bài. */

@@ -118,7 +118,10 @@ export function subscribeAudioStatus(onChange: (status: AudioStatus) => void): (
   }
 }
 
-/** Một từ đọc lâu nhất cỡ vài giây; quá mốc này coi như trình duyệt đã nuốt câu. */
+/**
+ * Một câu mẫu dài nhất đọc chậm cũng chỉ cỡ 4–5 giây; quá mốc này coi như
+ * trình duyệt đã nuốt câu.
+ */
 const MAX_UTTERANCE_MS = 10_000
 
 /** Audio đang phát, giữ lại để lần bấm sau cắt ngang được lần trước. */
@@ -185,8 +188,12 @@ function playVoice(text: string, voice: SpeechSynthesisVoice): Promise<PlayResul
 }
 
 /**
- * Phát âm một từ, thử lần lượt bốn nguồn ở đầu file.
+ * Phát âm một từ hoặc cả một câu, thử lần lượt bốn nguồn ở đầu file.
  *
+ * @param input.text chuỗi tiếng Trung — dùng cho ba nguồn sau nếu không có file.
+ * @param input.wordId id của từ, để tìm file thu sẵn của từ đó.
+ * @param input.clipUrl file thu sẵn cho đúng chuỗi này, ví dụ audio một câu mẫu.
+ * Có thì dùng trước `wordId`.
  * @param input.onStage được gọi mỗi khi đổi chặng, để nút phân biệt "đang tải"
  * với "đang đọc".
  * @returns kết quả để giao diện biết nên hiện gì — không bao giờ ném lỗi.
@@ -194,13 +201,14 @@ function playVoice(text: string, voice: SpeechSynthesisVoice): Promise<PlayResul
 export async function playWord(input: {
   text: string
   wordId?: string
+  clipUrl?: string | null
   onStage?: (stage: PlayStage) => void
 }): Promise<PlayResult> {
   stopPlayback()
   const stage = input.onStage ?? (() => {})
 
   // 1. File thu sẵn: nhanh nhất, chạy được cả khi mất mạng.
-  const local = audioUrlForWord(input.wordId)
+  const local = input.clipUrl ?? audioUrlForWord(input.wordId)
   if (local) {
     stage('speaking')
     const result = await playFile(local)

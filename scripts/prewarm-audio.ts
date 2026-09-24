@@ -74,21 +74,21 @@ function requireEnv(names: Array<[string, string]>): void {
 }
 
 /**
- * Mọi chuỗi tiếng Trung cần đọc.
+ * Mọi chuỗi tiếng Trung cần đọc: từng từ, và cả ba câu mẫu của mỗi từ.
  *
- * Chế độ local chỉ lấy từ vựng: giao diện mới chỉ có nút loa cho từ, chưa có
- * nút nào đọc câu ví dụ, nên sinh câu ví dụ lúc này là sinh ra file không ai dùng.
+ * Chế độ local chỉ lấy từ vựng. Audio câu mẫu trong repo do
+ * `npm run generate-audio` sinh, đặt tên theo `sentenceAudioKey()` và đã qua
+ * bước chấm thanh — ghi đè bằng một giọng khác ở đây là lẫn hai giọng trong
+ * cùng một bài học.
  */
 async function collectClips(onlyWords: boolean): Promise<Clip[]> {
   const clips: Clip[] = []
 
   for (const word of WORDS) {
-    const parts = onlyWords
-      ? ([['word', word.hanzi]] as const)
-      : ([
-          ['word', word.hanzi],
-          ['example', word.example],
-        ] as const)
+    const parts: Array<[Clip['source'], string]> = [['word', word.hanzi]]
+    if (!onlyWords) {
+      for (const sentence of word.examples) parts.push(['example', sentence.hanzi])
+    }
 
     for (const [source, text] of parts) {
       const request = { text, voice: DEFAULT_VOICE, rate: DEFAULT_RATE }

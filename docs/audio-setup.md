@@ -17,7 +17,7 @@ làm là những chỗ chạy bằng lệnh.
 1. Vào [portal.azure.com](https://portal.azure.com) → **Create a resource** →
    tìm **Speech service** → Create.
 2. Pricing tier chọn **F0 (Free)**. Hạn mức 500.000 ký tự neural mỗi tháng.
-   Cả khoá HSK 1 chỉ 459 ký tự, sinh đúng một lần.
+   Cả khoá HSK 1 — 60 từ và 179 câu mẫu — chỉ 1.265 ký tự, sinh đúng một lần.
 3. Tạo xong, vào **Keys and Endpoint**, chép lại:
    - **KEY 1** → `AZURE_SPEECH_KEY`
    - **Location/Region** (dạng `southeastasia`, `eastus`…) → `AZURE_SPEECH_REGION`
@@ -111,7 +111,7 @@ Rồi đẩy một commit để GitHub Actions build lại với hai secret ở 
 
 | Khoản | Mức dùng | Hạn miễn phí |
 | --- | --- | --- |
-| Azure Speech F0 | 459 ký tự, sinh một lần | 500.000 ký tự/tháng |
+| Azure Speech F0 | 1.265 ký tự, sinh một lần | 500.000 ký tự/tháng |
 | Supabase Storage | ~1 MB mp3 | 1 GB |
 | Supabase Edge Function | gần như không gọi | 500.000 lượt/tháng |
 | GitHub Pages | site tĩnh | 100 GB băng thông/tháng |

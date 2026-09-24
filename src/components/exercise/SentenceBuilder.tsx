@@ -1,5 +1,7 @@
+import { WORD_BY_ID } from '../../data/hsk1'
 import { cn } from '../../lib/cn'
 import type { SentenceExercise } from '../../types'
+import { SentenceLine } from '../ExampleSentences'
 import { MascotSays } from '../Mascot'
 
 interface SentenceBuilderProps {
@@ -32,6 +34,10 @@ const TILE_IDLE =
  * Mảnh đã dùng để lại một ô trống đúng kích thước trong kho, chứ không biến
  * mất: nếu các mảnh còn lại dồn lên lấp chỗ, ngón tay đang nhắm mảnh kế tiếp
  * sẽ bấm trúng mảnh khác.
+ *
+ * Chấm xong — đúng hay sai — kho mảnh nhường chỗ cho **cả câu**: chữ Hán,
+ * pinyin, và nút nghe cả câu. Ghép đúng thứ tự mới là một nửa; nghe câu đó
+ * trôi thành một hơi mới là thứ người học mang đi được.
  */
 export function SentenceBuilder({
   exercise,
@@ -77,33 +83,45 @@ export function SentenceBuilder({
         ))}
       </div>
 
-      <div role="group" aria-label="Các mảnh chữ" className="mt-8 flex flex-wrap justify-center gap-2">
-        {exercise.tiles.map((tile) =>
-          used.has(tile.id) ? (
-            // Ô trống giữ chỗ, cùng cỡ với mảnh thật.
-            <span
-              key={tile.id}
-              aria-hidden="true"
-              className={cn(
-                TILE,
-                'border-slate-200 bg-slate-100 text-transparent dark:border-slate-700 dark:bg-slate-800/50',
-              )}
-            >
-              {tile.label}
-            </span>
-          ) : (
-            <button
-              key={tile.id}
-              type="button"
-              disabled={checked}
-              onClick={() => onPick(tile.id)}
-              className={cn(TILE, TILE_IDLE, checked && 'opacity-60')}
-            >
-              {tile.label}
-            </button>
-          ),
-        )}
-      </div>
+      {checked ? (
+        <section aria-label="Cả câu" className="sentence-reveal mt-8">
+          <p className="text-xs font-semibold tracking-wide text-slate-500 uppercase dark:text-slate-400">
+            Nghe lại cả câu
+          </p>
+          <SentenceLine
+            sentence={exercise.sentence}
+            target={WORD_BY_ID[exercise.wordId]?.hanzi}
+            className="surface mt-2 rounded-2xl px-3 py-3"
+          />
+        </section>
+      ) : (
+        <div role="group" aria-label="Các mảnh chữ" className="mt-8 flex flex-wrap justify-center gap-2">
+          {exercise.tiles.map((tile) =>
+            used.has(tile.id) ? (
+              // Ô trống giữ chỗ, cùng cỡ với mảnh thật.
+              <span
+                key={tile.id}
+                aria-hidden="true"
+                className={cn(
+                  TILE,
+                  'border-slate-200 bg-slate-100 text-transparent dark:border-slate-700 dark:bg-slate-800/50',
+                )}
+              >
+                {tile.label}
+              </span>
+            ) : (
+              <button
+                key={tile.id}
+                type="button"
+                onClick={() => onPick(tile.id)}
+                className={cn(TILE, TILE_IDLE)}
+              >
+                {tile.label}
+              </button>
+            ),
+          )}
+        </div>
+      )}
     </div>
   )
 }

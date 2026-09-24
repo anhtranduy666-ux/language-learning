@@ -38,7 +38,10 @@ chạy thẳng file TypeScript.
 
 ## Đã có trong bản này
 
-- **Nội dung**: khoá HSK 1 với 5 unit, 10 bài học, 60 từ. Mỗi từ có Hanzi, pinyin, nghĩa và câu ví dụ.
+- **Nội dung**: khoá HSK 1 với 5 unit, 10 bài học, 60 từ. Mỗi từ có Hanzi, pinyin, nghĩa và
+  **ba câu mẫu** ghép từ đó với những từ khác — câu nào cũng có pinyin, nghĩa và
+  **audio đọc cả câu**, từ đang học được tô ở cả chữ Hán lẫn pinyin. Xem
+  [docs/example-sentences.md](docs/example-sentences.md).
 - **Màn hình**: Landing, Home, Course, Lesson, Flashcard, Exercise, Result, Progress, Profile.
 - **Bài tập**: 8 dạng — trắc nghiệm, chọn pinyin, nghe rồi chọn, ghép nối, và hai
   dạng kiểu Duolingo: **ghép câu** (bấm các mảnh chữ Hán theo đúng thứ tự) và
@@ -68,8 +71,9 @@ chạy thẳng file TypeScript.
   là một ngôi sao trong chòm (chế độ tối) hoặc một bông hoa trong luống (chế độ
   sáng). Học xong một unit là cả chòm sáng hẳn. Xem
   [docs/word-map.md](docs/word-map.md).
-- **Phát âm**: 60 file audio thu sẵn cho toàn bộ từ vựng, chạy được trên mọi
-  máy kể cả khi không cài giọng tiếng Trung. Xem mục [Âm thanh](#âm-thanh).
+- **Phát âm**: 60 file audio cho từ và 179 file đọc cả câu mẫu, thu sẵn và đã
+  được máy kiểm thanh điệu, chạy được trên mọi máy kể cả khi không cài giọng
+  tiếng Trung. Xem mục [Âm thanh](#âm-thanh).
 - **Cài được lên điện thoại**: thêm vào màn hình chính iPhone hoặc Android,
   chạy toàn màn hình và **dùng được khi mất mạng**, kể cả phần nghe phát âm.
   Xem [docs/pwa.md](docs/pwa.md).
@@ -82,7 +86,8 @@ chạy thẳng file TypeScript.
 
 ## Âm thanh
 
-Khoá HSK 1 **đã có sẵn 60 file phát âm** trong `src/assets/audio/`, sinh bằng
+Khoá HSK 1 **đã có sẵn 60 file phát âm cho từ và 179 file cho câu mẫu** trong
+`src/assets/audio/`, sinh bằng
 [Piper](https://github.com/OHF-Voice/piper1-gpl) — bộ TTS mã nguồn mở chạy
 ngoại tuyến. File nằm trong repo nên mọi người học đều nghe đúng một bản audio,
 không phụ thuộc máy họ có cài giọng tiếng Trung hay không.
@@ -148,7 +153,7 @@ cũng hiện sẵn hướng dẫn này khi phát hiện bạn đang dùng Safari
 ứng dụng**.
 
 Cài xong thì bật chế độ máy bay vẫn học được trọn vẹn: toàn bộ bài học, bài tập
-và 60 file phát âm đều nằm trong máy.
+và toàn bộ audio — 60 từ, 179 câu mẫu — đều nằm trong máy.
 
 Vì sao không làm app native để lên App Store: cần tài khoản Apple Developer
 99 USD/năm kèm thẻ tín dụng. Chi tiết và những gì PWA **không** làm được trên
@@ -158,7 +163,7 @@ iOS nằm ở [docs/pwa.md](docs/pwa.md).
 
 ```
 src/
-├── components/      Component dùng lại: Flashcard, BottomNav, AudioButton, ui/
+├── components/      Component dùng lại: Flashcard, ExampleSentences, BottomNav, AudioButton, ui/
 ├── pages/           Mỗi màn hình một file
 ├── components/scene/  Nền động: khung, khu vườn, bầu trời sao
 ├── components/exercise/  Bài ghép câu, nghe–viết và chọn thanh điệu
@@ -176,6 +181,7 @@ src/
 │   ├── remoteAudio.ts    Gọi CDN rồi mới tới Edge Function, có hạn giờ
 │   ├── audioFiles.ts     Quét file audio trong src/assets/audio
 │   ├── speechTokens.ts   Pinyin → âm tiết đánh số cho máy đọc, thanh cần nghe thấy
+│   ├── sentences.ts      Câu mẫu: ghép chữ với âm tiết, tô từ đang học, tên file audio
 │   ├── theme.ts          Đọc/ghi lựa chọn giao diện, gắn vào thẻ html
 │   ├── chinese.ts        Tách câu tiếng Trung thành mảnh cho bài ghép câu
 │   ├── pinyin.ts         So khớp pinyin người học gõ, bỏ qua dấu thanh
@@ -210,10 +216,10 @@ nên chạy được trong `npm test`, không phải cài Deno chỉ để chạ
 
 ## Kiểm thử
 
-571 test, chia làm ba tầng:
+616 test, chia làm ba tầng:
 
 - **Logic** (`src/lib/*.test.ts`, `supabase/functions/speak/handler.test.ts`) — XP, level, streak, thành tích, sinh và chấm bài tập, chế độ sáng/tối, nền động, bản đồ 60 từ, khoá cache audio, đọc/ghi dữ liệu hỏng.
-- **Dữ liệu** (`src/data/hsk1.test.ts`) — mọi từ đều có đủ trường, không trùng id, không từ nào lạc khỏi bài học.
+- **Dữ liệu** (`src/data/hsk1.test.ts`) — mọi từ đều có đủ trường, không trùng id, không từ nào lạc khỏi bài học; mỗi câu mẫu có đúng một âm tiết pinyin cho mỗi chữ Hán, và mọi âm tiết là âm tiết tiếng Trung có thật.
 - **Giao diện** (`src/components/*.test.tsx`, `src/pages/app-flow.test.tsx`) — dựng app thật trong bộ nhớ và đi trọn một buổi học, đúng tiêu chí nghiệm thu của Version 2.
 
 Test chạy trong `StrictMode` giống hệt bản thật, nên những lỗi do hàm cập nhật state không thuần tuý sẽ lộ ra ngay trong suite.

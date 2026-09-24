@@ -20,7 +20,7 @@ Hai thứ quan trọng nhất với người mới học tiếng Trung vì thế
 
 | Dạng | Đề bài | Người học làm gì | Chấm thế nào |
 | --- | --- | --- | --- |
-| **Ghép câu** | Zibi đọc nghĩa tiếng Việt của câu ví dụ | Bấm các mảnh chữ Hán theo đúng thứ tự | So chuỗi chữ ghép lại với câu đúng |
+| **Ghép câu** | Zibi đọc nghĩa tiếng Việt của một câu mẫu | Bấm các mảnh chữ Hán theo đúng thứ tự | So chuỗi chữ ghép lại với câu đúng |
 | **Nghe và viết** | Zibi đọc một từ | Gõ lại bằng pinyin | So sau khi bỏ dấu thanh, khoảng trắng, hoa/thường |
 
 Bài học giờ xoay vòng qua năm dạng theo từng từ — trắc nghiệm, pinyin, nghe,
@@ -39,19 +39,26 @@ Tiếng Trung viết liền, nên phải tự cắt câu thành mảnh. Cắt t�
 bài học: 学生 là "học sinh", tách thành 学 và 生 là hai mảnh vô nghĩa.
 
 `tokenizeChinese()` trong `src/lib/chinese.ts` khớp tham lam **từ dài nhất
-trước**, dựa trên chính 60 từ của khoá cộng một danh sách phụ ngắn
-(`EXTRA_LEXICON`) gồm những từ nhiều chữ có trong câu ví dụ mà không thuộc HSK 1
-— 学习, 高兴, 知道, 今年… Chữ không thuộc từ nào thì đứng riêng. Tên riêng chữ
-Latin như "Tom" giữ nguyên một mảnh.
+trước**, dựa trên chính 60 từ của khoá cộng một danh sách phụ
+(`EXTRA_LEXICON`) gồm những từ nhiều chữ có trong câu mẫu mà không thuộc 60 từ
+— 学习, 喜欢, 苹果, 请问… Chữ không thuộc từ nào thì đứng riêng. Chữ Latin, nếu
+có, giữ nguyên một mảnh.
 
-Bất biến được test chốt cho cả 60 câu: **ghép các mảnh lại phải ra đúng câu
-gốc** — không mất chữ, không nhân đôi chữ.
+Cố ý **không** gộp những cụm mà mỗi chữ đã là một từ trong khoá, như 回家 hay
+星期天: tách ra thì người học được bấm lại đúng những từ vừa học.
+
+Bất biến được test chốt cho cả 180 câu mẫu: **ghép các mảnh lại phải ra đúng
+câu gốc** — không mất chữ, không nhân đôi chữ. Một test khác chốt rằng từ điển
+phụ chỉ gồm từ thật sự có trong câu mẫu.
 
 ### Chọn câu và mảnh nhiễu
 
 - Câu dưới 3 mảnh (谢谢你, 请喝茶) không đủ để nghĩ; trên 7 mảnh thì quá sức người
-  mới. Từ nào có câu như thế thì được hỏi bằng trắc nghiệm thay vào, không để
-  trống.
+  mới. Mỗi từ có ba câu mẫu ([example-sentences.md](example-sentences.md)), và
+  bài ghép lấy **câu đầu tiên vừa sức**: 请 có 请喝茶 và 请坐 đều quá ngắn, nên
+  dùng câu thứ ba 请问，你叫什么名字？. Hiện từ nào cũng có ít nhất một câu vừa
+  sức — test chốt điều đó — nhưng lối lùi về trắc nghiệm vẫn còn cho nội dung
+  thêm sau này.
 - Thêm **2 mảnh nhiễu** lấy từ các từ khác trong khoá, **không trùng chữ nào**
   với câu đúng. Một mảnh nhiễu trùng chữ sẽ làm câu có hai cách ghép đều đúng.
 - Id mảnh theo vị trí chứ không theo chữ, vì một câu có thể có hai chữ 我.
@@ -63,6 +70,10 @@ Mảnh chữ làm kiểu phím bấm — viền dưới dày, bấm xuống thì
 lại một ô trống đúng kích thước trong kho chứ không biến mất: nếu các mảnh còn
 lại dồn lên lấp chỗ, ngón tay đang nhắm mảnh kế tiếp sẽ bấm trúng mảnh khác.
 Bấm mảnh trên dòng trả lời là trả nó về kho.
+
+Chấm xong — đúng hay sai — kho mảnh nhường chỗ cho **cả câu**: chữ Hán có tô từ
+đang học, pinyin, và nút nghe cả câu. Ghép đúng thứ tự mới là một nửa; nghe câu
+đó trôi thành một hơi mới là thứ người học mang đi được.
 
 ## 4. Nghe và viết
 
@@ -129,10 +140,10 @@ src/styles/mascot.css, src/styles/exercise.css
 
 | Phạm vi | File | Nội dung |
 | --- | --- | --- |
-| Tách từ | `src/lib/chinese.test.ts` | Từ dài nhất trước; từ ba chữ; tên riêng Latin; không có từ điển vẫn chạy; **cả 60 câu ví dụ ghép lại ra đúng câu gốc**. |
+| Tách từ | `src/lib/chinese.test.ts` | Từ dài nhất trước; từ ba chữ; tên riêng Latin; không có từ điển vẫn chạy; **cả 180 câu mẫu ghép lại ra đúng câu gốc**; từ điển phụ không có từ thừa. |
 | Pinyin | `src/lib/pinyin.test.ts` | Bỏ bốn thanh; ü và v; khoảng trắng, dấu nháy, hoa thường; bỏ trống không bao giờ tính đúng; cả 60 từ gõ không dấu đều khớp. |
-| Sinh và chấm | `src/lib/exercises.test.ts` | Đủ sáu dạng; câu quá ngắn thì thay bằng trắc nghiệm; **mọi bài học đều sinh đủ bài**; mảnh nhiễu không trùng chữ; mảnh trùng chữ có id riêng và bấm cái nào trước cũng đúng. |
-| Giao diện | `src/pages/app-flow.test.tsx` | Zibi đọc đề; bấm mảnh lên dòng và trả về kho; ghép sai thì chỉ ra câu đúng; gõ không dấu được tính đúng; Enter là chấm; máy không có âm thì hiện chữ Hán mà không lộ pinyin. |
+| Sinh và chấm | `src/lib/exercises.test.ts` | Đủ sáu dạng; câu mẫu đầu quá ngắn thì lấy câu kế; không câu nào vừa sức thì thay bằng trắc nghiệm; **từ nào cũng ghép được một câu của chính nó**; **mọi bài học đều sinh đủ bài**; mảnh nhiễu không trùng chữ; mảnh trùng chữ có id riêng và bấm cái nào trước cũng đúng. |
+| Giao diện | `src/pages/app-flow.test.tsx` | Zibi đọc đề; bấm mảnh lên dòng và trả về kho; ghép sai thì chỉ ra câu đúng; chấm xong — đúng hay sai — hiện cả câu kèm pinyin và nút nghe; gõ không dấu được tính đúng; Enter là chấm; máy không có âm thì hiện chữ Hán mà không lộ pinyin. |
 | Zibi | `src/components/Mascot.test.tsx` | Là hình trang trí; mỗi tâm trạng một bộ mặt; lời thoại là chữ thật. |
 
 ## 8. Không nằm trong phạm vi
@@ -140,5 +151,5 @@ src/styles/mascot.css, src/styles/exercise.css
 - **Nói vào micro** như Duolingo: cần nhận dạng giọng nói tiếng Trung, mà Web
   Speech API không có trên Firefox và không chạy khi mất mạng.
 - **Gõ chữ Hán** bằng bộ gõ: người mới chưa cài và chưa biết dùng bộ gõ pinyin.
-- Ghép câu có nhiều đáp án đúng (đảo trạng ngữ thời gian, v.v.) — câu ví dụ
-  hiện tại chỉ có một trật tự tự nhiên.
+- Ghép câu có nhiều đáp án đúng (đảo trạng ngữ thời gian, v.v.) — câu mẫu
+  được bài ghép chọn hiện chỉ có một trật tự tự nhiên.

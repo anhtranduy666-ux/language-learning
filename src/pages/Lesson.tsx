@@ -1,13 +1,14 @@
 import { useEffect } from 'react'
 import { Link, Navigate, useParams } from 'react-router-dom'
 import { AudioButton } from '../components/AudioButton'
+import { ExampleSentences } from '../components/ExampleSentences'
 import { FocusHeader } from '../components/FocusHeader'
 import { MascotSays } from '../components/Mascot'
 import { Button } from '../components/ui/Button'
 import { ALL_LESSONS, wordsOfLesson } from '../data/hsk1'
 import { prefetchAudio } from '../lib/remoteAudio'
 
-/** Bước 1 của bài học: xem trước toàn bộ từ vựng, nghe phát âm. */
+/** Bước 1 của bài học: xem trước toàn bộ từ vựng, nghe phát âm từng từ và cả câu mẫu. */
 export function Lesson() {
   const { lessonId = '' } = useParams()
   const lesson = ALL_LESSONS.find((item) => item.id === lessonId)
@@ -32,7 +33,8 @@ export function Lesson() {
         <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">Từ mới</h1>
 
         <MascotSays mood="vui" className="mt-4">
-          {words.length} từ thôi. Chạm vào loa nghe thử trước đã, rồi mình luyện flashcard nhé.
+          {words.length} từ thôi. Nghe từng từ, rồi nghe cả câu mẫu để biết nó đi với chữ khác ra
+          sao — xong mình luyện flashcard nhé.
         </MascotSays>
 
         <ul className="mt-5 space-y-3">
@@ -50,10 +52,7 @@ export function Lesson() {
                 <AudioButton text={word.hanzi} wordId={word.id} label={word.hanzi} size="sm" />
               </div>
 
-              <div className="mt-3 rounded-xl bg-slate-50 px-3 py-2 dark:bg-slate-800/60">
-                <p className="font-hanzi text-sm text-slate-700 dark:text-slate-300">{word.example}</p>
-                <p className="text-xs text-slate-500 dark:text-slate-400">{word.exampleMeaning}</p>
-              </div>
+              <ExampleSentences word={word} className="mt-3" />
             </li>
           ))}
         </ul>

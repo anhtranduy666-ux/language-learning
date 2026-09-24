@@ -1,4 +1,4 @@
-"""Sinh file phát âm cho toàn bộ từ vựng, chạy ngay trên máy.
+"""Sinh file phát âm cho toàn bộ từ vựng và câu mẫu, chạy ngay trên máy.
 
 Dùng Piper — bộ TTS mã nguồn mở chạy ngoại tuyến. Không tài khoản, không khoá
 API, không hạn mức: sửa `src/data/hsk1.ts` rồi chạy lại là xong.
@@ -68,7 +68,7 @@ SYNTHESIS = {
 }
 
 # Số bản sinh cho mỗi clip. Từ ngắn nên sinh nhiều bản cũng nhanh.
-CANDIDATES = {"word": 16, "sentence": 8}
+CANDIDATES = {"word": 16, "sentence": 16}
 
 # Câu đệm cho từ đơn: "我说，__，你说。" — xem mục 2 ở đầu file.
 CARRIER_BEFORE = ["wo3", "shuo1", "，"]
@@ -263,10 +263,20 @@ def main() -> None:
         encoding="utf-8",
     )
 
+    # Câu mẫu bị sửa hay bị bỏ thì file cũ thành rác: tên file băm từ nội dung
+    # nên không bao giờ được dùng lại. Chỉ dọn trong `sentences/` — file từ đặt
+    # tên theo id, xoá nhầm thì mất tiếng cả một từ.
+    removed = 0
+    for stale in sorted((AUDIO_DIR / "sentences").glob("*.mp3")):
+        if f"sentences/{stale.name}" not in clips_out:
+            stale.unlink()
+            removed += 1
+
     total = sum((AUDIO_DIR / path).stat().st_size for path in clips_out)
-    print(f"\nSinh mới {created}, đã có sẵn {skipped}. Tổng {total / 1024:.0f} KB.")
+    print(f"\nSinh mới {created}, đã có sẵn {skipped}, xoá {removed} file câu cũ. Tổng {total / 1024:.0f} KB.")
     if weak:
-        print(f"\n{len(weak)} clip vẫn có âm tiết chưa đạt sau {max(CANDIDATES.values())} lần thử:")
+        print(f"\n{len(weak)} clip vẫn có âm tiết chưa đạt sau {max(CANDIDATES.values())} lần thử —")
+        print("xoá riêng file đó rồi chạy lại để thử thêm một lượt:")
         for line in weak:
             print(f"  {line}")
     if created:

@@ -361,3 +361,35 @@ describe('chuỗi nguồn âm thanh', () => {
     expect(getAudioStatus()).toBe('ready')
   })
 })
+
+describe('audio cả câu', () => {
+  const SENTENCE = '你叫什么名字？'
+
+  it('câu có file thu sẵn thì phát file đó, không để máy đọc', async () => {
+    const synth = install([voice('zh-CN')])
+    const played = installAudio()
+
+    await expect(playWord({ text: SENTENCE, clipUrl: '/audio/cau.mp3' })).resolves.toBe('played')
+
+    expect(played).toEqual(['/audio/cau.mp3'])
+    expect(synth.spoken).toHaveLength(0)
+  })
+
+  it('file của câu được ưu tiên hơn file của từ', async () => {
+    install([voice('zh-CN')])
+    const played = installAudio()
+
+    await playWord({ text: SENTENCE, wordId: 'ni', clipUrl: '/audio/cau.mp3' })
+
+    expect(played).toEqual(['/audio/cau.mp3'])
+  })
+
+  it('file của câu hỏng thì giọng hệ điều hành đọc cả câu, không chỉ một từ', async () => {
+    const synth = install([voice('zh-CN')])
+    installAudio('error')
+
+    await expect(playWord({ text: SENTENCE, clipUrl: '/audio/cau.mp3' })).resolves.toBe('played')
+
+    expect(synth.spoken.map((utterance) => utterance.text)).toEqual([SENTENCE])
+  })
+})

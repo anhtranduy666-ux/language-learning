@@ -52,7 +52,7 @@ thấy gì chuyển động cả, và tưởng tính năng bị hỏng. Mốc `d
 
 | Phương án | Vì sao loại |
 | --- | --- |
-| Ảnh nền JPG/PNG | App là PWA chạy offline: ba tấm ảnh nền đẹp là service worker phải precache thêm vài MB, trong khi cả bộ 60 file phát âm hiện chỉ có 1 MB. Gradient + SVG tốn vài KB. |
+| Ảnh nền JPG/PNG | App là PWA chạy offline: ba tấm ảnh nền đẹp là service worker phải precache thêm vài MB, trong khi toàn bộ audio — 60 từ và 179 câu mẫu — cũng chỉ khoảng 2 MB. Gradient + SVG tốn vài KB. |
 | Canvas + `requestAnimationFrame` | Điều khiển được nhiều hơn, nhưng phải tự quản vòng lặp, tự dừng khi tab ẩn, tự xử lý DPI. CSS animation được trình duyệt chạy thẳng trên compositor và tự dừng khi trang bị ẩn. |
 | Nền động chỉ là trang trí, không gắn tiến độ | Mất đúng phần đáng giá. Một khung cảnh đẹp mà đứng yên thì xem hai hôm là chán. |
 | Công tắc bật/tắt hai trạng thái | Máy yếu không cần *mất* khung cảnh, chỉ cần nó đứng yên. Xem mục 5. |

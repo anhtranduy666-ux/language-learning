@@ -14,6 +14,7 @@
  */
 
 import { WORDS } from '../src/data/hsk1.ts'
+import { sentenceAudioKey } from '../src/lib/sentences.ts'
 import { expectedTones, speechTokens } from '../src/lib/speechTokens.ts'
 
 interface Clip {
@@ -24,15 +25,21 @@ interface Clip {
   expect: number[]
 }
 
-const clips: Clip[] = WORDS.map((word) => {
-  const tokens = speechTokens(word.pinyin)
-  return {
-    path: `${word.id}.mp3`,
-    kind: 'word',
-    hanzi: word.hanzi,
-    tokens,
-    expect: expectedTones(tokens),
-  }
-})
+function clip(path: string, kind: Clip['kind'], hanzi: string, pinyin: string): Clip {
+  const tokens = speechTokens(pinyin)
+  return { path, kind, hanzi, tokens, expect: expectedTones(tokens) }
+}
 
-process.stdout.write(JSON.stringify(clips))
+const words = WORDS.map((word) => clip(`${word.id}.mp3`, 'word', word.hanzi, word.pinyin))
+
+// Một câu có thể là câu mẫu của hai từ (你叫什么名字 của cả 你 lẫn 叫) — tên file
+// băm từ nội dung nên trùng nhau, và chỉ cần sinh một lần.
+const sentences = new Map<string, Clip>()
+for (const sentence of WORDS.flatMap((word) => word.examples)) {
+  const path = `sentences/${sentenceAudioKey(sentence)}.mp3`
+  if (!sentences.has(path)) {
+    sentences.set(path, clip(path, 'sentence', sentence.hanzi, sentence.pinyin))
+  }
+}
+
+process.stdout.write(JSON.stringify([...words, ...sentences.values()]))

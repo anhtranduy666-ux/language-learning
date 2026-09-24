@@ -93,9 +93,13 @@ phẳng hơn. [`tone_check.py`](../scripts/tone_check.py) chấm từng bản:
 | 3 | Thấp hơn mặt bằng cả câu, hoặc có chỗ trũng |
 | 4 | Đổ xuống hơn 10% |
 
-Script sinh tối đa 16 bản cho mỗi từ và 8 bản cho mỗi câu, dừng sớm khi mọi âm
-tiết đều đạt, rồi giữ bản có nhiều âm tiết đạt nhất. Với 60 từ hiện có: sinh 6
-bản thì 54 từ đạt trọn, 16 bản thì 59, và sinh lại riêng 明天 thì đủ **60/60**.
+Script sinh tối đa 16 bản cho mỗi clip, dừng sớm khi mọi âm tiết đều đạt, rồi
+giữ bản có nhiều âm tiết đạt nhất. Với 60 từ hiện có: sinh 6 bản thì 54 từ đạt
+trọn, 16 bản thì 59, và sinh lại riêng 明天 thì đủ **60/60**.
+
+Với 179 câu mẫu, **92,2%** âm tiết đạt sau khi chọn bản (mỗi lần sinh là 78%),
+132 câu đạt trọn. Số đo và những gì đã thử cho câu nằm ở
+[example-sentences.md](example-sentences.md).
 
 ### Thanh mong đợi khác thanh viết ở đâu
 
@@ -139,15 +143,15 @@ npm run generate-audio
 - `src/assets/audio/manifest.json` ghi giọng và pinyin đã dùng cho từng file.
   Chạy lại thì chỉ sinh clip mới hoặc clip vừa đổi pinyin; đổi giọng thì sinh lại
   tất cả.
-- Cả 60 từ mất khoảng 10 giây.
+- Cả 60 từ mất khoảng 10 giây, 179 câu mẫu khoảng một phút.
 
-Hai test chặn đúng những chỗ dễ quên:
+Test chặn đúng những chỗ dễ quên:
 
 | Quên gì | Test báo đỏ |
 | --- | --- |
-| Thêm từ mà chưa sinh audio | `audioFiles.test.ts` — mọi từ đều có file |
+| Thêm từ hoặc câu mẫu mà chưa sinh audio | `audioFiles.test.ts` — từ nào, câu nào cũng có file |
 | Sửa pinyin mà chưa sinh lại | `audioFiles.test.ts` — pinyin trong manifest khớp dữ liệu |
-| Gõ nhầm pinyin (`shie`, `zhogn`) | `speechTokens.test.ts` — mọi âm tiết là âm tiết có thật |
+| Gõ nhầm pinyin (`shie`, `zhogn`) | `speechTokens.test.ts`, `hsk1.test.ts` — mọi âm tiết là âm tiết có thật |
 
 ## 7. Giấy phép
 

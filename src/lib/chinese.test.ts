@@ -49,10 +49,10 @@ describe('tokenizeChinese', () => {
     expect(tokenizeChinese('。', LEXICON)).toEqual([])
   })
 
-  it('ghép lại cả 60 câu ví dụ đều ra đúng câu gốc — không mất chữ, không nhân đôi chữ', () => {
-    for (const word of WORDS) {
-      const tokens = tokenizeChinese(word.example, LEXICON)
-      expect(tokens.join(''), word.example).toBe(stripPunctuation(word.example).replace(/\s/g, ''))
+  it('ghép lại cả 180 câu mẫu đều ra đúng câu gốc — không mất chữ, không nhân đôi chữ', () => {
+    for (const { hanzi } of WORDS.flatMap((word) => word.examples)) {
+      const tokens = tokenizeChinese(hanzi, LEXICON)
+      expect(tokens.join(''), hanzi).toBe(stripPunctuation(hanzi).replace(/\s/g, ''))
     }
   })
 
@@ -60,6 +60,13 @@ describe('tokenizeChinese', () => {
     // Mỗi từ ở đây từng bị cắt thành hai chữ rời khi chưa có trong EXTRA_LEXICON.
     expect(tokenizeChinese('我在中国学习。', LEXICON)).toContain('学习')
     expect(tokenizeChinese('她很高兴。', LEXICON)).toContain('高兴')
-    expect(tokenizeChinese('今年是好年。', LEXICON)).toContain('今年')
+    expect(tokenizeChinese('今年我二十岁。', LEXICON)).toContain('今年')
+    expect(tokenizeChinese('请问，你叫什么名字？', LEXICON)).toEqual(['请问', '你', '叫', '什么', '名字'])
+  })
+
+  it('từ điển phụ chỉ gồm từ thật sự có trong câu mẫu', () => {
+    const text = WORDS.flatMap((word) => word.examples.map((sentence) => sentence.hanzi)).join('')
+    const unused = EXTRA_LEXICON.filter((word) => !text.includes(word))
+    expect(unused).toEqual([])
   })
 })

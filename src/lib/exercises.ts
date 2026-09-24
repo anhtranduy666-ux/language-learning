@@ -128,10 +128,11 @@ export const SENTENCE_MAX_TILES = 7
 export const SENTENCE_DISTRACTORS = 2
 
 /**
- * Bài ghép câu từ câu ví dụ của một từ.
+ * Bài ghép câu từ câu mẫu của một từ.
  *
- * Trả `null` khi câu quá ngắn hoặc quá dài — nơi gọi sẽ thay bằng dạng bài khác
- * thay vì đưa ra một câu ghép hai mảnh chẳng dạy được gì.
+ * Lấy câu mẫu **đầu tiên vừa sức**: câu chính thường là câu hay nhất, nhưng
+ * `请坐。` chỉ có hai mảnh, không có gì để nghĩ — khi đó dùng câu kế tiếp.
+ * Không câu nào vừa sức thì trả `null`, và nơi gọi thay bằng dạng bài khác.
  *
  * Mảnh nhiễu là những từ khác trong khoá, không trùng chữ nào với câu đúng: một
  * mảnh nhiễu trùng chữ với đáp án sẽ làm câu có hai cách ghép đều đúng.
@@ -142,8 +143,14 @@ export function buildSentenceExercise(
   lexicon: readonly string[],
   rng: () => number,
 ): SentenceExercise | null {
-  const pieces = tokenizeChinese(word.example, lexicon)
-  if (pieces.length < SENTENCE_MIN_TILES || pieces.length > SENTENCE_MAX_TILES) return null
+  const fits = (pieces: string[]) =>
+    pieces.length >= SENTENCE_MIN_TILES && pieces.length <= SENTENCE_MAX_TILES
+  const chosen = word.examples
+    .map((sentence) => ({ sentence, pieces: tokenizeChinese(sentence.hanzi, lexicon) }))
+    .find(({ pieces }) => fits(pieces))
+  if (!chosen) return null
+
+  const { sentence, pieces } = chosen
 
   const inAnswer = new Set(pieces)
   const answerChars = new Set(pieces.join(''))
@@ -165,7 +172,8 @@ export function buildSentenceExercise(
     kind: 'sentence',
     wordId: word.id,
     prompt: 'Sắp xếp thành câu đúng',
-    meaning: word.exampleMeaning,
+    meaning: sentence.meaning,
+    sentence,
     answer: pieces.join(''),
     pieces,
     tiles,
@@ -250,7 +258,7 @@ const ROTATION = ['multiple-choice', 'pinyin', 'listening', 'sentence', 'dictati
  * Sinh bộ bài tập cho một lesson: mỗi từ một câu, xoay vòng qua năm dạng, rồi
  * khép lại bằng hai bài luyện thanh và một bài ghép nối.
  *
- * Câu ví dụ nào quá ngắn để ghép thì từ đó được hỏi bằng trắc nghiệm thay vào.
+ * Từ nào không có câu mẫu vừa sức để ghép thì được hỏi bằng trắc nghiệm thay vào.
  *
  * `pool` là kho từ để lấy đáp án nhiễu — thường là toàn bộ từ vựng của khoá học.
  */

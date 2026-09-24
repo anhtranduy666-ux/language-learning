@@ -5,12 +5,18 @@ import { AudioButton } from './AudioButton'
 import { resetRemoteAudioCache } from '../lib/remoteAudio'
 
 /**
- * Bỏ qua 60 file mp3 có sẵn trong repo, để test được đúng cảnh máy không phát
- * âm được — cảnh mà giao diện phải nói rõ cho người học thay vì im lặng.
+ * Bỏ qua mọi file mp3 có sẵn trong repo — cả của từ lẫn của câu mẫu — để test
+ * được đúng cảnh máy không phát âm được, cảnh mà giao diện phải nói rõ cho
+ * người học thay vì im lặng.
  */
 vi.mock('../lib/audioFiles', async (importOriginal) => {
   const actual = await importOriginal<typeof import('../lib/audioFiles')>()
-  return { ...actual, hasRecordedAudio: () => false, audioUrlForWord: () => null }
+  return {
+    ...actual,
+    hasRecordedAudio: () => false,
+    audioUrlForWord: () => null,
+    audioUrlForSentence: () => null,
+  }
 })
 
 
