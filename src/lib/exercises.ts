@@ -5,10 +5,19 @@ import type {
   Exercise,
   MatchingExercise,
   SentenceExercise,
+  ToneExercise,
   Word,
 } from '../types'
 import { EXTRA_LEXICON, tokenizeChinese } from './chinese'
 import { matchesPinyin } from './pinyin'
+import {
+  isSingleToned,
+  splitSyllables,
+  stripTone,
+  toneOf,
+  tonedSyllableIndex,
+  wordToneVariants,
+} from './tones'
 
 /**
  * Bộ sinh số giả ngẫu nhiên có seed (mulberry32).
@@ -176,12 +185,70 @@ export function buildDictationExercise(word: Word): DictationExercise {
   }
 }
 
+/**
+ * Bài chọn thanh điệu, từ một từ **một âm tiết** có thanh rõ ràng.
+ *
+ * Từ nhiều âm tiết không hỏi kiểu này được: "thanh của 你好 là gì" không có câu
+ * trả lời duy nhất. Những từ đó đã có `buildTonePairExercise` lo.
+ *
+ * Trả `null` khi từ không đủ điều kiện, để nơi gọi chọn từ khác.
+ */
+export function buildToneExercise(word: Word): ToneExercise | null {
+  if (!isSingleToned(word.pinyin)) return null
+
+  const syllable = splitSyllables(word.pinyin)[0]
+  return {
+    id: `tone-${word.id}`,
+    kind: 'tone',
+    wordId: word.id,
+    prompt: 'Từ bạn vừa nghe mang thanh nào?',
+    syllable: stripTone(syllable),
+    tone: toneOf(syllable),
+    hanzi: word.hanzi,
+    meaning: word.meaning,
+  }
+}
+
+/**
+ * Bài phân biệt thanh: bốn cách đọc của **cùng một từ**, chỉ lệch nhau đúng
+ * cái thanh của một âm tiết.
+ *
+ * Khác hẳn bài `pinyin` sẵn có, nơi ba phương án nhiễu lấy từ những từ khác —
+ * `nǐ` đứng cạnh `shǎo`, `qī`, `wǒ` thì đoán được bằng phụ âm, tai không cần
+ * làm gì. Ở đây `nī / ní / nǐ / nì` chỉ còn mỗi cao độ để mà phân biệt.
+ *
+ * Trả `null` khi cả từ đều là thanh nhẹ, tức không có gì để phân biệt.
+ */
+export function buildTonePairExercise(word: Word): ChoiceExercise | null {
+  const index = tonedSyllableIndex(word.pinyin)
+  if (index === -1) return null
+
+  const variants = wordToneVariants(word.pinyin, index)
+  const correctTone = toneOf(splitSyllables(word.pinyin)[index])
+
+  // Không trộn: bốn phương án cố tình xếp theo thứ tự thanh 1 → 4, để người
+  // học đọc được bảng thanh điệu chứ không chỉ dò tìm chữ khớp.
+  const choices: Choice[] = variants.map((label, position) => ({
+    id: `c-tone-${position + 1}`,
+    label,
+  }))
+
+  return {
+    id: `tone-pair-${word.id}`,
+    kind: 'tone-pair',
+    wordId: word.id,
+    prompt: 'Nghe rồi chọn cách đọc đúng',
+    choices,
+    correctChoiceId: `c-tone-${correctTone}`,
+  }
+}
+
 /** Các dạng bài xoay vòng theo từng từ của bài học. */
 const ROTATION = ['multiple-choice', 'pinyin', 'listening', 'sentence', 'dictation'] as const
 
 /**
- * Sinh bộ bài tập cho một lesson: mỗi từ một câu, xoay vòng qua năm dạng,
- * rồi khép lại bằng một bài ghép nối.
+ * Sinh bộ bài tập cho một lesson: mỗi từ một câu, xoay vòng qua năm dạng, rồi
+ * khép lại bằng hai bài luyện thanh và một bài ghép nối.
  *
  * Câu ví dụ nào quá ngắn để ghép thì từ đó được hỏi bằng trắc nghiệm thay vào.
  *
@@ -245,13 +312,48 @@ export function buildExercises(
   })
 
   const matching = buildMatchingExercise(words, rng)
-  return matching ? [...exercises, matching] : exercises
+  return [...exercises, ...buildToneDrills(words, rng), ...(matching ? [matching] : [])]
 }
 
-/** Bài chọn một đáp án: trắc nghiệm nghĩa, chọn pinyin, hoặc nghe rồi chọn. */
+/**
+ * Hai bài luyện thanh, chốt lại phần bài tập của mỗi lesson.
+ *
+ * Cố tình **không** nhét vào vòng xoay theo từng từ: vòng xoay đã có năm dạng
+ * và mỗi lesson chỉ sáu từ, nên thêm vào đó thì có lesson được luyện thanh, có
+ * lesson không. Thanh điệu quan trọng tới mức không được phép rơi vào may rủi,
+ * nên nó là phần cố định của mọi bài.
+ *
+ * Hai bài cố ý rơi vào hai từ khác nhau, và bài phân biệt thanh ưu tiên từ
+ * nhiều âm tiết, để hai bài không hỏi đúng một thứ hai lần.
+ */
+export function buildToneDrills(words: readonly Word[], rng: () => number): Exercise[] {
+  if (words.length === 0) return []
+
+  const shuffled = shuffle(words, rng)
+  const drills: Exercise[] = []
+
+  // Bài chọn thanh cần từ một âm tiết. Lesson nào không có thì bỏ qua bài này,
+  // bài phân biệt thanh phía dưới vẫn chạy.
+  const toneWord = shuffled.find((word) => isSingleToned(word.pinyin))
+  const tone = toneWord ? buildToneExercise(toneWord) : null
+  if (tone) drills.push(tone)
+
+  const rest = shuffled.filter((word) => word.id !== toneWord?.id)
+  const pairWord =
+    rest.find((word) => splitSyllables(word.pinyin).length > 1) ?? rest[0] ?? shuffled[0]
+  const pair = buildTonePairExercise(pairWord)
+  if (pair) drills.push(pair)
+
+  return drills
+}
+
+/** Bài chọn một đáp án: trắc nghiệm nghĩa, chọn pinyin, nghe rồi chọn, phân biệt thanh. */
 export function isChoiceExercise(exercise: Exercise): exercise is ChoiceExercise {
   return (
-    exercise.kind === 'multiple-choice' || exercise.kind === 'pinyin' || exercise.kind === 'listening'
+    exercise.kind === 'multiple-choice' ||
+    exercise.kind === 'pinyin' ||
+    exercise.kind === 'listening' ||
+    exercise.kind === 'tone-pair'
   )
 }
 
@@ -285,6 +387,11 @@ export function gradeDictation(exercise: DictationExercise, input: string): bool
   return matchesPinyin(input, exercise.answer)
 }
 
+/** Chấm bài chọn thanh. `picked` là 0 khi người học chưa chọn gì. */
+export function gradeTone(exercise: ToneExercise, picked: number): boolean {
+  return picked === exercise.tone
+}
+
 /** Nhãn tiếng Việt của từng dạng bài tập, dùng cho tiêu đề màn hình. */
 export const KIND_LABEL: Record<Exercise['kind'], string> = {
   'multiple-choice': 'Trắc nghiệm',
@@ -293,4 +400,6 @@ export const KIND_LABEL: Record<Exercise['kind'], string> = {
   matching: 'Ghép nối',
   sentence: 'Ghép câu',
   dictation: 'Nghe và viết',
+  tone: 'Thanh điệu',
+  'tone-pair': 'Phân biệt thanh',
 }

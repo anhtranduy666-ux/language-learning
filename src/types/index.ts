@@ -36,7 +36,14 @@ export interface Course {
   units: Unit[]
 }
 
-/** Các dạng bài tập. Bốn dạng đầu là của Version 2, hai dạng sau thêm sau này. */
+/**
+ * Các dạng bài tập. Bốn dạng đầu là của Version 2, những dạng sau thêm dần.
+ *
+ * `tone` và `tone-pair` là hai dạng luyện thanh điệu — thứ quyết định nhất với
+ * người mới học tiếng Trung, và cũng là thứ năm dạng còn lại không kiểm được:
+ * dạng nào cũng cho chọn giữa những phương án khác hẳn nhau về phụ âm và vần,
+ * nên tai có nghe nhầm thanh thì mắt vẫn loại trừ ra đáp án đúng.
+ */
 export type ExerciseKind =
   | 'multiple-choice'
   | 'matching'
@@ -44,6 +51,8 @@ export type ExerciseKind =
   | 'pinyin'
   | 'sentence'
   | 'dictation'
+  | 'tone'
+  | 'tone-pair'
 
 /** Một lựa chọn trong bài tập trắc nghiệm. */
 export interface Choice {
@@ -51,10 +60,16 @@ export interface Choice {
   label: string
 }
 
-/** Bài tập chọn một đáp án đúng: trắc nghiệm nghĩa, nghe, hoặc chọn pinyin. */
+/**
+ * Bài tập chọn một đáp án đúng: trắc nghiệm nghĩa, nghe, chọn pinyin, hoặc
+ * phân biệt thanh.
+ *
+ * `tone-pair` dùng chung cấu trúc này vì cách chơi và cách chấm y hệt; chỉ
+ * khác ở chỗ bốn phương án được dựng từ cùng một từ, chỉ lệch nhau đúng cái thanh.
+ */
 export interface ChoiceExercise {
   id: string
-  kind: Extract<ExerciseKind, 'multiple-choice' | 'listening' | 'pinyin'>
+  kind: Extract<ExerciseKind, 'multiple-choice' | 'listening' | 'pinyin' | 'tone-pair'>
   /** Từ vựng được hỏi. */
   wordId: string
   prompt: string
@@ -109,7 +124,32 @@ export interface DictationExercise {
   hanzi: string
 }
 
-export type Exercise = ChoiceExercise | MatchingExercise | SentenceExercise | DictationExercise
+/**
+ * Bài chọn thanh điệu: nghe một từ một âm tiết rồi bấm một trong bốn thanh.
+ *
+ * Chỉ một cú chạm, không phải gõ gì — nhưng người học buộc phải phân biệt được
+ * cao độ, vì đề bài đưa ra âm tiết **đã bỏ dấu** nên không đọc ra thanh bằng mắt.
+ */
+export interface ToneExercise {
+  id: string
+  kind: Extract<ExerciseKind, 'tone'>
+  wordId: string
+  prompt: string
+  /** Âm tiết đã bỏ dấu thanh, ví dụ `hao` — đây là phần hiện cho người học. */
+  syllable: string
+  /** Thanh đúng, 1–4. */
+  tone: number
+  /** Hiện thay cho nút loa khi máy không phát được âm. */
+  hanzi: string
+  meaning: string
+}
+
+export type Exercise =
+  | ChoiceExercise
+  | MatchingExercise
+  | SentenceExercise
+  | DictationExercise
+  | ToneExercise
 
 /** Trạng thái ghi nhớ của một từ, dùng cho flashcard. */
 export interface WordProgress {

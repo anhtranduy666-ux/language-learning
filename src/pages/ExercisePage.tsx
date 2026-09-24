@@ -5,6 +5,7 @@ import { FocusHeader } from '../components/FocusHeader'
 import { MascotSays } from '../components/Mascot'
 import { DictationInput } from '../components/exercise/DictationInput'
 import { SentenceBuilder } from '../components/exercise/SentenceBuilder'
+import { ToneChoice } from '../components/exercise/ToneChoice'
 import { Button } from '../components/ui/Button'
 import { ALL_LESSONS, WORDS, WORD_BY_ID, wordsOfLesson } from '../data/hsk1'
 import { useProgress } from '../context/ProgressContext'
@@ -18,10 +19,12 @@ import {
   gradeDictation,
   gradeMatching,
   gradeSentence,
+  gradeTone,
   isChoiceExercise,
   seedFromText,
 } from '../lib/exercises'
 import { XP_REWARDS } from '../lib/gamification'
+import { TONE_NAMES, applyTone } from '../lib/tones'
 import type { Exercise } from '../types'
 
 /**
@@ -77,6 +80,7 @@ export function ExercisePage() {
   const [activeLeft, setActiveLeft] = useState('')
   const [picked, setPicked] = useState<string[]>([])
   const [typed, setTyped] = useState('')
+  const [pickedTone, setPickedTone] = useState(0)
   const [checked, setChecked] = useState(false)
   const [correctCount, setCorrectCount] = useState(0)
 
@@ -100,6 +104,10 @@ export function ExercisePage() {
     case 'dictation':
       hasAnswer = typed.trim() !== ''
       isCorrect = gradeDictation(exercise, typed)
+      break
+    case 'tone':
+      hasAnswer = pickedTone !== 0
+      isCorrect = gradeTone(exercise, pickedTone)
       break
     default:
       hasAnswer = choiceId !== ''
@@ -133,6 +141,7 @@ export function ExercisePage() {
     setActiveLeft('')
     setPicked([])
     setTyped('')
+    setPickedTone(0)
     setChecked(false)
   }
 
@@ -172,7 +181,7 @@ export function ExercisePage() {
 
         {isChoice ? (
           <>
-            {exercise.kind === 'listening' ? (
+            {exercise.kind === 'listening' || exercise.kind === 'tone-pair' ? (
               <div className="mt-6 flex flex-col items-center gap-3">
                 <AudioButton
                   text={WORD_BY_ID[exercise.wordId]?.hanzi ?? ''}
@@ -180,15 +189,27 @@ export function ExercisePage() {
                   label="từ trong câu hỏi"
                   size="lg"
                 />
-                {/* Không có âm thì bài nghe sẽ không thể làm được, nên hiện pinyin
-                    thay thế để người học vẫn đi hết bài. */}
+                {/* Không có âm thì bài nghe không làm được, nên phải đưa ra một
+                    gợi ý thay thế — nhưng mỗi dạng bài cần một thứ khác nhau.
+                    Bài nghe chọn chữ thì hiện pinyin; bài phân biệt thanh thì
+                    không được, vì pinyin chính là đáp án. Chữ Hán là thứ duy
+                    nhất còn lại mà vẫn để bài làm được. */}
                 {audioStatus !== 'ready' ? (
-                  <p className="max-w-xs text-center text-sm text-slate-500 dark:text-slate-400">
-                    Máy chưa phát âm được nên bài nghe hiện pinyin thay thế:{' '}
-                    <span className="font-medium text-slate-700 dark:text-slate-200">
-                      {WORD_BY_ID[exercise.wordId]?.pinyin}
-                    </span>
-                  </p>
+                  exercise.kind === 'listening' ? (
+                    <p className="max-w-xs text-center text-sm text-slate-500 dark:text-slate-400">
+                      Máy chưa phát âm được nên bài nghe hiện pinyin thay thế:{' '}
+                      <span className="font-medium text-slate-700 dark:text-slate-200">
+                        {WORD_BY_ID[exercise.wordId]?.pinyin}
+                      </span>
+                    </p>
+                  ) : (
+                    <p className="max-w-xs text-center text-sm text-slate-500 dark:text-slate-400">
+                      Máy chưa phát âm được, nên bạn chọn cách đọc của chữ này nhé:{' '}
+                      <span className="font-hanzi text-xl font-semibold text-slate-700 dark:text-slate-200">
+                        {WORD_BY_ID[exercise.wordId]?.hanzi}
+                      </span>
+                    </p>
+                  )
                 ) : null}
               </div>
             ) : (
@@ -210,6 +231,9 @@ export function ExercisePage() {
                       className={cn(
                         'w-full rounded-2xl border-2 p-4 text-left text-lg font-medium transition',
                         exercise.kind === 'listening' && 'font-hanzi text-2xl',
+                        // Bốn phương án chỉ lệch nhau đúng một dấu thanh, nên
+                        // phải đủ to để nhìn ra dấu mà không cần căng mắt.
+                        exercise.kind === 'tone-pair' && 'text-center text-2xl tracking-wide',
                         CHOICE_STYLES[choiceState(checked, selected, isRight)],
                       )}
                     >
@@ -237,6 +261,13 @@ export function ExercisePage() {
             isCorrect={isCorrect}
             onChange={setTyped}
             onSubmit={check}
+          />
+        ) : exercise.kind === 'tone' ? (
+          <ToneChoice
+            exercise={exercise}
+            picked={pickedTone}
+            checked={checked}
+            onPick={setPickedTone}
           />
         ) : (
           <div className="mt-6 grid grid-cols-2 gap-3">
@@ -353,6 +384,18 @@ function WrongAnswerHint({ exercise }: { exercise: Exercise }) {
           <span className="font-hanzi">({exercise.hanzi})</span>.
         </>
       )
+    case 'tone': {
+      // Chữa bài thanh điệu phải nói rõ *thanh mấy*, không chỉ đưa lại chữ có
+      // dấu: người mới nhìn `hǎo` chưa chắc đọc ra đó là thanh 3.
+      const name = TONE_NAMES.find((item) => item.tone === exercise.tone)
+      return (
+        <>
+          <span className="font-hanzi">{exercise.hanzi}</span> đọc là{' '}
+          <span className="font-semibold">{applyTone(exercise.syllable, exercise.tone)}</span> —{' '}
+          {name?.label.toLowerCase()}, {name?.hint}.
+        </>
+      )
+    }
     default:
       return (
         <>

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { WORDS, wordsOfLesson } from '../data/hsk1'
+import { WORDS, WORD_BY_ID, wordsOfLesson } from '../data/hsk1'
 import type { ChoiceExercise, MatchingExercise, SentenceExercise, Word } from '../types'
 import { EXTRA_LEXICON, stripPunctuation } from './chinese'
 import {
@@ -10,19 +10,27 @@ import {
   buildExercises,
   buildMatchingExercise,
   buildSentenceExercise,
+  buildToneDrills,
+  buildToneExercise,
+  buildTonePairExercise,
   createRng,
   gradeChoice,
   gradeDictation,
   gradeMatching,
   gradeSentence,
+  gradeTone,
   isChoiceExercise,
   seedFromText,
   shuffle,
 } from './exercises'
+import { stripTone, toneOf } from './tones'
 
 const LESSON_WORDS = wordsOfLesson('u1l1')
 
 const LESSON_IDS = ['u1l1', 'u1l2', 'u2l1', 'u2l2', 'u3l1', 'u3l2', 'u4l1', 'u4l2', 'u5l1', 'u5l2']
+
+/** Phần đuôi cố định của mỗi lesson: chọn thanh, phân biệt thanh, ghép nối. */
+const TAIL_EXERCISES = 3
 
 describe('createRng', () => {
   it('cùng seed cho cùng chuỗi số', () => {
@@ -83,16 +91,43 @@ describe('buildExercises', () => {
     expect(buildExercises([], WORDS, createRng(1))).toEqual([])
   })
 
-  it('sinh một câu cho mỗi từ, cộng thêm một bài ghép nối', () => {
+  it('sinh một câu cho mỗi từ, cộng hai bài luyện thanh và một bài ghép nối', () => {
     const exercises = buildExercises(LESSON_WORDS, WORDS, createRng(1))
-    expect(exercises).toHaveLength(LESSON_WORDS.length + 1)
+    expect(exercises).toHaveLength(LESSON_WORDS.length + TAIL_EXERCISES)
   })
 
-  it('dùng đủ cả sáu dạng bài tập', () => {
+  it('dùng đủ cả tám dạng bài tập', () => {
     const kinds = new Set(buildExercises(LESSON_WORDS, WORDS, createRng(1)).map((e) => e.kind))
     expect(kinds).toEqual(
-      new Set(['multiple-choice', 'pinyin', 'listening', 'sentence', 'dictation', 'matching']),
+      new Set([
+        'multiple-choice',
+        'pinyin',
+        'listening',
+        'sentence',
+        'dictation',
+        'tone',
+        'tone-pair',
+        'matching',
+      ]),
     )
+  })
+
+  it('bài nào cũng có đủ hai bài luyện thanh, không lesson nào bị bỏ qua', () => {
+    for (const lessonId of LESSON_IDS) {
+      const kinds = buildExercises(
+        wordsOfLesson(lessonId),
+        WORDS,
+        createRng(seedFromText(lessonId)),
+      ).map((exercise) => exercise.kind)
+
+      expect(kinds, lessonId).toContain('tone')
+      expect(kinds, lessonId).toContain('tone-pair')
+    }
+  })
+
+  it('hai bài luyện thanh đứng ngay trước bài ghép nối, khép lại phần bài tập', () => {
+    const kinds = buildExercises(LESSON_WORDS, WORDS, createRng(1)).map((e) => e.kind)
+    expect(kinds.slice(-3)).toEqual(['tone', 'tone-pair', 'matching'])
   })
 
   it('câu ví dụ quá ngắn để ghép thì thay bằng trắc nghiệm, không bỏ trống', () => {
@@ -100,7 +135,7 @@ describe('buildExercises', () => {
       const words = wordsOfLesson(lessonId)
       const exercises = buildExercises(words, WORDS, createRng(seedFromText(lessonId)))
 
-      expect(exercises, lessonId).toHaveLength(words.length + 1)
+      expect(exercises, lessonId).toHaveLength(words.length + TAIL_EXERCISES)
       for (const exercise of exercises) {
         if (exercise.kind === 'sentence') {
           expect(exercise.pieces.length).toBeGreaterThanOrEqual(SENTENCE_MIN_TILES)
@@ -142,7 +177,13 @@ describe('buildExercises', () => {
       if (!isChoiceExercise(exercise)) continue
       const word = LESSON_WORDS.find((item) => item.id === exercise.wordId)!
       const correct = exercise.choices.find((c) => c.id === exercise.correctChoiceId)!
-      const expected = { 'multiple-choice': word.meaning, pinyin: word.pinyin, listening: word.hanzi }
+      const expected = {
+        'multiple-choice': word.meaning,
+        pinyin: word.pinyin,
+        listening: word.hanzi,
+        // Bài phân biệt thanh hỏi chính cách đọc của từ, nên đáp án là pinyin gốc.
+        'tone-pair': word.pinyin,
+      }
       expect(correct.label).toBe(expected[exercise.kind])
     }
   })
@@ -230,10 +271,15 @@ describe('gradeMatching', () => {
 })
 
 describe('isChoiceExercise', () => {
-  it('chỉ ba dạng chọn đáp án mới được coi là bài chọn đáp án', () => {
+  it('chỉ những dạng chọn đáp án mới được coi là bài chọn đáp án', () => {
     const exercises = buildExercises(LESSON_WORDS, WORDS, createRng(1))
     const others = exercises.filter((e) => !isChoiceExercise(e)).map((e) => e.kind)
-    expect(new Set(others)).toEqual(new Set(['sentence', 'dictation', 'matching']))
+    expect(new Set(others)).toEqual(new Set(['sentence', 'dictation', 'tone', 'matching']))
+  })
+
+  it('bài phân biệt thanh dùng chung đường chấm với các bài chọn đáp án', () => {
+    const exercise = buildTonePairExercise(WORD_BY_ID.nihao)!
+    expect(isChoiceExercise(exercise)).toBe(true)
   })
 })
 
@@ -372,5 +418,143 @@ describe('buildDictationExercise và gradeDictation', () => {
 
   it('bỏ trống thì sai', () => {
     expect(gradeDictation(exercise, '   ')).toBe(false)
+  })
+})
+
+describe('buildToneExercise', () => {
+  it('dựng bài từ một từ một âm tiết', () => {
+    const exercise = buildToneExercise(WORD_BY_ID.hao)!
+    expect(exercise.kind).toBe('tone')
+    expect(exercise.syllable).toBe('hao')
+    expect(exercise.tone).toBe(3)
+  })
+
+  it('đề bài đưa ra âm tiết đã bỏ dấu, không lộ đáp án', () => {
+    for (const id of ['ni', 'wo', 'shi', 'bu', 'qing']) {
+      const exercise = buildToneExercise(WORD_BY_ID[id])!
+      expect(toneOf(exercise.syllable), id).toBe(0)
+    }
+  })
+
+  it('giữ lại chữ Hán và nghĩa để chữa bài', () => {
+    const exercise = buildToneExercise(WORD_BY_ID.wo)!
+    expect(exercise.hanzi).toBe('我')
+    expect(exercise.meaning).toBe('tôi')
+  })
+
+  it('từ chối từ nhiều âm tiết, vì câu hỏi sẽ không có đáp án duy nhất', () => {
+    expect(buildToneExercise(WORD_BY_ID.nihao)).toBeNull()
+    expect(buildToneExercise(WORD_BY_ID.zaijian)).toBeNull()
+  })
+
+  it('từ chối âm tiết thanh nhẹ', () => {
+    const neutral: Word = { ...WORD_BY_ID.wo, id: 'nhe', pinyin: 'ma' }
+    expect(buildToneExercise(neutral)).toBeNull()
+  })
+
+  it('mọi từ một âm tiết trong khoá đều dựng được bài', () => {
+    const single = WORDS.filter((word) => !word.pinyin.includes(' '))
+    expect(single.length).toBeGreaterThan(20)
+    for (const word of single) {
+      const exercise = buildToneExercise(word)
+      expect(exercise, word.id).not.toBeNull()
+      expect(exercise!.tone, word.id).toBeGreaterThanOrEqual(1)
+      expect(exercise!.tone, word.id).toBeLessThanOrEqual(4)
+    }
+  })
+})
+
+describe('gradeTone', () => {
+  const exercise = buildToneExercise(WORD_BY_ID.hao)!
+
+  it('đúng khi chọn trúng thanh', () => {
+    expect(gradeTone(exercise, 3)).toBe(true)
+  })
+
+  it('sai khi chọn nhầm thanh', () => {
+    for (const tone of [1, 2, 4]) {
+      expect(gradeTone(exercise, tone)).toBe(false)
+    }
+  })
+
+  it('sai khi chưa chọn gì', () => {
+    expect(gradeTone(exercise, 0)).toBe(false)
+  })
+})
+
+describe('buildTonePairExercise', () => {
+  it('bốn phương án chỉ lệch nhau đúng cái thanh', () => {
+    const exercise = buildTonePairExercise(WORD_BY_ID.nihao)!
+    const stripped = exercise.choices.map((choice) =>
+      choice.label.split(' ').map(stripTone).join(' '),
+    )
+    expect(new Set(stripped).size).toBe(1)
+  })
+
+  it('có đúng bốn phương án, không trùng nhau', () => {
+    const exercise = buildTonePairExercise(WORD_BY_ID.zaijian)!
+    expect(exercise.choices).toHaveLength(4)
+    expect(new Set(exercise.choices.map((choice) => choice.label)).size).toBe(4)
+  })
+
+  it('đáp án đúng chính là pinyin thật của từ', () => {
+    for (const word of WORDS) {
+      const exercise = buildTonePairExercise(word)!
+      const correct = exercise.choices.find((choice) => choice.id === exercise.correctChoiceId)!
+      expect(correct.label, word.id).toBe(word.pinyin)
+    }
+  })
+
+  it('xếp phương án theo thứ tự thanh 1 đến 4 chứ không trộn', () => {
+    const exercise = buildTonePairExercise(WORD_BY_ID.hao)!
+    expect(exercise.choices.map((choice) => choice.label)).toEqual(['hāo', 'háo', 'hǎo', 'hào'])
+  })
+
+  it('giữ nguyên âm tiết thanh nhẹ, chỉ đổi âm tiết có thanh', () => {
+    const exercise = buildTonePairExercise(WORD_BY_ID.xiexie)!
+    for (const choice of exercise.choices) {
+      expect(choice.label.endsWith(' xie'), choice.label).toBe(true)
+    }
+  })
+
+  it('từ chối từ không có âm tiết nào mang thanh', () => {
+    const neutral: Word = { ...WORD_BY_ID.wo, id: 'nhe', pinyin: 'ma ma' }
+    expect(buildTonePairExercise(neutral)).toBeNull()
+  })
+})
+
+describe('buildToneDrills', () => {
+  it('trả về mảng rỗng khi không có từ nào', () => {
+    expect(buildToneDrills([], createRng(1))).toEqual([])
+  })
+
+  it('sinh đúng hai bài, mỗi dạng một bài', () => {
+    const drills = buildToneDrills(LESSON_WORDS, createRng(1))
+    expect(drills.map((drill) => drill.kind)).toEqual(['tone', 'tone-pair'])
+  })
+
+  it('hai bài rơi vào hai từ khác nhau', () => {
+    for (const lessonId of LESSON_IDS) {
+      const drills = buildToneDrills(wordsOfLesson(lessonId), createRng(seedFromText(lessonId)))
+      const wordIds = drills.map((drill) => ('wordId' in drill ? drill.wordId : ''))
+      expect(new Set(wordIds).size, lessonId).toBe(drills.length)
+    }
+  })
+
+  it('ổn định với cùng một seed', () => {
+    expect(buildToneDrills(LESSON_WORDS, createRng(7))).toEqual(
+      buildToneDrills(LESSON_WORDS, createRng(7)),
+    )
+  })
+
+  it('lesson không có từ một âm tiết thì bỏ bài chọn thanh, vẫn giữ bài phân biệt', () => {
+    const multiOnly = [WORD_BY_ID.nihao, WORD_BY_ID.zaijian, WORD_BY_ID.xiexie]
+    const drills = buildToneDrills(multiOnly, createRng(1))
+    expect(drills.map((drill) => drill.kind)).toEqual(['tone-pair'])
+  })
+
+  it('chỉ có một từ thì vẫn sinh được bài, không vỡ', () => {
+    const drills = buildToneDrills([WORD_BY_ID.hao], createRng(1))
+    expect(drills.length).toBeGreaterThan(0)
   })
 })

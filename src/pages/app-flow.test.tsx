@@ -34,6 +34,24 @@ const LISTENING_INDEX = EXERCISES.findIndex((exercise) => exercise.kind === 'lis
 const SENTENCE_INDEX = EXERCISES.findIndex((exercise) => exercise.kind === 'sentence')
 const DICTATION_INDEX = EXERCISES.findIndex((exercise) => exercise.kind === 'dictation')
 
+/** Vị trí hai bài luyện thanh, nằm ở cuối mỗi bài học. */
+const TONE_INDEX = EXERCISES.findIndex((exercise) => exercise.kind === 'tone')
+const TONE_PAIR_INDEX = EXERCISES.findIndex((exercise) => exercise.kind === 'tone-pair')
+
+/** Bài chọn thanh của bài học, đã thu hẹp kiểu để test đọc được `tone`. */
+function toneExercise() {
+  const exercise = EXERCISES[TONE_INDEX]
+  if (exercise?.kind !== 'tone') throw new Error('Bài học mẫu phải có một bài chọn thanh')
+  return exercise
+}
+
+/** Bài phân biệt thanh của bài học. */
+function tonePairExercise() {
+  const exercise = EXERCISES[TONE_PAIR_INDEX]
+  if (exercise?.kind !== 'tone-pair') throw new Error('Bài học mẫu phải có một bài phân biệt thanh')
+  return exercise
+}
+
 /** Bài ghép câu của bài học, đã thu hẹp kiểu để test đọc được `pieces`. */
 function sentenceExercise() {
   const exercise = EXERCISES[SENTENCE_INDEX]
@@ -81,6 +99,8 @@ async function answerExercises(user: UserEvent, list: typeof EXERCISES) {
       }
     } else if (exercise.kind === 'sentence') {
       await buildSentence(user, exercise.pieces)
+    } else if (exercise.kind === 'tone') {
+      await user.click(screen.getByRole('button', { name: new RegExp(`Thanh ${exercise.tone}`) }))
     } else {
       await user.type(screen.getByLabelText('Pinyin bạn nghe được'), exercise.answer)
     }
@@ -635,5 +655,122 @@ describe('Mời cài lên màn hình chính', () => {
     renderApp('/profile', ONBOARDED)
 
     expect(screen.queryByRole('heading', { name: 'Cài vào màn hình chính' })).not.toBeInTheDocument()
+  })
+})
+
+describe('Bài chọn thanh điệu', () => {
+  /** Mở thẳng tới bài chọn thanh bằng cách làm đúng mọi bài trước nó. */
+  async function openTone() {
+    const utils = renderApp(`/lesson/${LESSON_ID}/exercise`, ONBOARDED)
+    await answerExercises(utils.user, EXERCISES.slice(0, TONE_INDEX))
+    return utils
+  }
+
+  it('mọi bài học đều có bài luyện thanh, không rơi vào may rủi', () => {
+    expect(TONE_INDEX).toBeGreaterThanOrEqual(0)
+    expect(TONE_PAIR_INDEX).toBeGreaterThanOrEqual(0)
+  })
+
+  it('đề bài đưa ra âm tiết đã bỏ dấu, không lộ thanh', async () => {
+    await openTone()
+    const exercise = toneExercise()
+
+    expect(screen.getByText(exercise.syllable)).toBeInTheDocument()
+  })
+
+  it('hiện đủ bốn thanh để chọn', async () => {
+    await openTone()
+
+    for (const tone of [1, 2, 3, 4]) {
+      expect(screen.getByRole('button', { name: new RegExp(`Thanh ${tone}`) })).toBeInTheDocument()
+    }
+  })
+
+  it('chưa chọn thanh nào thì chưa cho kiểm tra', async () => {
+    await openTone()
+    expect(screen.getByRole('button', { name: 'Kiểm tra' })).toBeDisabled()
+  })
+
+  it('chọn đúng thanh thì được tính đúng', async () => {
+    const { user } = await openTone()
+    const exercise = toneExercise()
+
+    await user.click(screen.getByRole('button', { name: new RegExp(`Thanh ${exercise.tone}`) }))
+    await user.click(screen.getByRole('button', { name: 'Kiểm tra' }))
+
+    expect(screen.getByRole('status')).toHaveTextContent(`Chính xác! +${XP_REWARDS.correctAnswer} XP`)
+  })
+
+  it('chọn sai thì Mầm nói rõ đó là thanh mấy', async () => {
+    const { user } = await openTone()
+    const exercise = toneExercise()
+    const wrongTone = exercise.tone === 1 ? 2 : 1
+
+    await user.click(screen.getByRole('button', { name: new RegExp(`Thanh ${wrongTone}`) }))
+    await user.click(screen.getByRole('button', { name: 'Kiểm tra' }))
+
+    const status = screen.getByRole('status')
+    expect(status).toHaveTextContent('Chưa đúng')
+    expect(status).toHaveTextContent(`thanh ${exercise.tone}`)
+  })
+
+  it('máy không phát được âm thì Mầm đưa chữ Hán ra thay', async () => {
+    await openTone()
+    const exercise = toneExercise()
+
+    expect(screen.getByText(/Máy chưa phát âm được/)).toBeInTheDocument()
+    expect(screen.getAllByText(exercise.hanzi).length).toBeGreaterThan(0)
+  })
+})
+
+describe('Bài phân biệt thanh', () => {
+  async function openTonePair() {
+    const utils = renderApp(`/lesson/${LESSON_ID}/exercise`, ONBOARDED)
+    await answerExercises(utils.user, EXERCISES.slice(0, TONE_PAIR_INDEX))
+    return utils
+  }
+
+  it('bốn phương án chỉ lệch nhau đúng cái thanh', async () => {
+    await openTonePair()
+
+    for (const choice of tonePairExercise().choices) {
+      expect(screen.getByRole('button', { name: choice.label })).toBeInTheDocument()
+    }
+  })
+
+  it('chọn đúng cách đọc thì được tính đúng', async () => {
+    const { user } = await openTonePair()
+    const exercise = tonePairExercise()
+    const correct = exercise.choices.find((c) => c.id === exercise.correctChoiceId)!
+
+    await user.click(screen.getByRole('button', { name: correct.label }))
+    await user.click(screen.getByRole('button', { name: 'Kiểm tra' }))
+
+    expect(screen.getByRole('status')).toHaveTextContent(`Chính xác! +${XP_REWARDS.correctAnswer} XP`)
+  })
+
+  it('chọn sai thì chỉ ra cách đọc đúng', async () => {
+    const { user } = await openTonePair()
+    const exercise = tonePairExercise()
+    const correct = exercise.choices.find((c) => c.id === exercise.correctChoiceId)!
+    const wrong = exercise.choices.find((c) => c.id !== exercise.correctChoiceId)!
+
+    await user.click(screen.getByRole('button', { name: wrong.label }))
+    await user.click(screen.getByRole('button', { name: 'Kiểm tra' }))
+
+    const status = screen.getByRole('status')
+    expect(status).toHaveTextContent('Chưa đúng')
+    expect(status).toHaveTextContent(correct.label)
+  })
+
+  it('máy không phát được âm thì đưa chữ Hán ra, không đưa pinyin vì đó là đáp án', async () => {
+    await openTonePair()
+    const exercise = tonePairExercise()
+    const correct = exercise.choices.find((c) => c.id === exercise.correctChoiceId)!
+
+    expect(screen.getByText(/chọn cách đọc của chữ này/)).toBeInTheDocument()
+
+    // Pinyin đúng chỉ được phép xuất hiện ở đúng một chỗ: chính cái nút để chọn.
+    expect(screen.getAllByText(correct.label)).toHaveLength(1)
   })
 })
