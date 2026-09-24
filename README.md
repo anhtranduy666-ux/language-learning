@@ -40,7 +40,12 @@ chạy thẳng file TypeScript.
 
 - **Nội dung**: khoá HSK 1 với 5 unit, 10 bài học, 60 từ. Mỗi từ có Hanzi, pinyin, nghĩa và câu ví dụ.
 - **Màn hình**: Landing, Home, Course, Lesson, Flashcard, Exercise, Result, Progress, Profile.
-- **Bài tập**: đủ 4 dạng của Version 2 — trắc nghiệm, ghép nối, nghe, chọn pinyin.
+- **Bài tập**: 6 dạng — trắc nghiệm, chọn pinyin, nghe rồi chọn, ghép nối, và hai
+  dạng kiểu Duolingo: **ghép câu** (bấm các mảnh chữ Hán theo đúng thứ tự) và
+  **nghe rồi viết** (gõ lại bằng pinyin, không cần dấu thanh). Xem
+  [docs/exercises.md](docs/exercises.md).
+- **Mầm**: nhân vật dẫn đường tự vẽ bằng SVG — chào, ra đề, khen khi đúng, chữa
+  bài khi sai.
 - **Gamification**: XP, level, daily goal, streak và 9 thành tích.
 - **Lưu trữ**: tiến độ nằm trong `localStorage`, tự khôi phục khi mở lại.
 - **Giao diện sáng/tối**: chọn Sáng, Tối hoặc Theo máy ở màn hình Cá nhân. Mặc
@@ -140,6 +145,7 @@ src/
 ├── components/      Component dùng lại: Flashcard, BottomNav, AudioButton, ui/
 ├── pages/           Mỗi màn hình một file
 ├── components/scene/  Nền động: khung, khu vườn, bầu trời sao
+├── components/exercise/  Bài ghép câu và bài nghe–viết
 ├── context/
 │   ├── ProgressContext.tsx  Tiến độ người học
 │   ├── SceneContext.tsx     Nền động: đầy đủ / tĩnh / tắt
@@ -147,17 +153,19 @@ src/
 ├── lib/             Logic thuần, không phụ thuộc React
 │   ├── gamification.ts   XP, level, streak, thành tích
 │   ├── progress.ts       Các phép biến đổi tiến độ
-│   ├── exercises.ts      Sinh và chấm bài tập
+│   ├── exercises.ts      Sinh và chấm cả sáu dạng bài tập
 │   ├── course.ts         Điều hướng trong khoá học
 │   ├── speech.ts         Chuỗi bốn nguồn phát âm
 │   ├── audioCacheKey.ts  Khoá cache audio: chuẩn hoá, băm, dựng URL
 │   ├── remoteAudio.ts    Gọi CDN rồi mới tới Edge Function, có hạn giờ
 │   ├── audioFiles.ts     Quét file audio trong src/assets/audio
 │   ├── theme.ts          Đọc/ghi lựa chọn giao diện, gắn vào thẻ html
+│   ├── chinese.ts        Tách câu tiếng Trung thành mảnh cho bài ghép câu
+│   ├── pinyin.ts         So khớp pinyin người học gõ, bỏ qua dấu thanh
 │   ├── scene.ts          Mốc nở của nền động, mức chuyển động
 │   ├── wordMap.ts        Toạ độ 60 từ trên bản đồ chòm sao / luống hoa
 │   └── storage.ts        Đọc/ghi localStorage
-├── styles/          CSS của nền động và bản đồ từ
+├── styles/          CSS của nền động, bản đồ từ, Mầm và bài tập
 ├── services/supabase.ts  Biến môi trường Supabase
 ├── data/hsk1.ts     Nội dung khoá học
 └── types/           Kiểu dữ liệu dùng chung
@@ -179,7 +187,7 @@ nên chạy được trong `npm test`, không phải cài Deno chỉ để chạ
 
 ## Kiểm thử
 
-403 test, chia làm ba tầng:
+460 test, chia làm ba tầng:
 
 - **Logic** (`src/lib/*.test.ts`, `supabase/functions/speak/handler.test.ts`) — XP, level, streak, thành tích, sinh và chấm bài tập, chế độ sáng/tối, nền động, bản đồ 60 từ, khoá cache audio, đọc/ghi dữ liệu hỏng.
 - **Dữ liệu** (`src/data/hsk1.test.ts`) — mọi từ đều có đủ trường, không trùng id, không từ nào lạc khỏi bài học.

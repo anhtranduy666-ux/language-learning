@@ -30,6 +30,23 @@ const EXERCISES = buildExercises(LESSON_WORDS, WORDS, createRng(seedFromText(LES
 /** Vị trí câu nghe đầu tiên — phần audio của Version 2 được kiểm ở đây. */
 const LISTENING_INDEX = EXERCISES.findIndex((exercise) => exercise.kind === 'listening')
 
+/** Vị trí bài ghép câu và bài nghe–viết đầu tiên của bài học. */
+const SENTENCE_INDEX = EXERCISES.findIndex((exercise) => exercise.kind === 'sentence')
+const DICTATION_INDEX = EXERCISES.findIndex((exercise) => exercise.kind === 'dictation')
+
+/** Bài ghép câu của bài học, đã thu hẹp kiểu để test đọc được `pieces`. */
+function sentenceExercise() {
+  const exercise = EXERCISES[SENTENCE_INDEX]
+  if (exercise?.kind !== 'sentence') throw new Error('Bài học mẫu phải có một bài ghép câu')
+  return exercise
+}
+
+function dictationExercise() {
+  const exercise = EXERCISES[DICTATION_INDEX]
+  if (exercise?.kind !== 'dictation') throw new Error('Bài học mẫu phải có một bài nghe–viết')
+  return exercise
+}
+
 /** Đọc con số trên một thẻ chỉ số của màn hình Tiến độ. */
 function metric(label: string): string {
   const card = screen.getByRole('group', { name: label })
@@ -55,17 +72,32 @@ async function answerExercises(user: UserEvent, list: typeof EXERCISES) {
     if (isChoiceExercise(exercise)) {
       const correct = exercise.choices.find((c) => c.id === exercise.correctChoiceId)!
       await user.click(screen.getByRole('button', { name: correct.label }))
-    } else {
+    } else if (exercise.kind === 'matching') {
       for (const [leftId, rightId] of Object.entries(exercise.answerKey)) {
         const left = exercise.left.find((c) => c.id === leftId)!
         const right = exercise.right.find((c) => c.id === rightId)!
         await user.click(screen.getByRole('button', { name: left.label }))
         await user.click(screen.getByRole('button', { name: right.label }))
       }
+    } else if (exercise.kind === 'sentence') {
+      await buildSentence(user, exercise.pieces)
+    } else {
+      await user.type(screen.getByLabelText('Pinyin bạn nghe được'), exercise.answer)
     }
 
     await user.click(screen.getByRole('button', { name: 'Kiểm tra' }))
     await user.click(screen.getByRole('button', { name: /Tiếp tục|Xem kết quả/ }))
+  }
+}
+
+/**
+ * Bấm các mảnh theo thứ tự cho trước. Luôn lấy mảnh còn trong kho, không lấy
+ * mảnh đã lên dòng trả lời — câu có thể có hai mảnh cùng chữ.
+ */
+async function buildSentence(user: UserEvent, pieces: readonly string[]) {
+  for (const piece of pieces) {
+    const bank = screen.getByRole('group', { name: 'Các mảnh chữ' })
+    await user.click(within(bank).getAllByRole('button', { name: piece })[0])
   }
 }
 
@@ -260,6 +292,136 @@ describe('Bài tập', () => {
     const listening = EXERCISES[LISTENING_INDEX]
     if (!isChoiceExercise(listening)) throw new Error('Câu này phải là dạng nghe')
     expect(screen.getByText(WORDS.find((w) => w.id === listening.wordId)!.pinyin)).toBeInTheDocument()
+  })
+})
+
+describe('Bài ghép câu', () => {
+  /** Mở thẳng tới bài ghép câu bằng cách làm đúng mọi bài trước nó. */
+  async function openSentence() {
+    const utils = renderApp(`/lesson/${LESSON_ID}/exercise`, ONBOARDED)
+    await answerExercises(utils.user, EXERCISES.slice(0, SENTENCE_INDEX))
+    return utils
+  }
+
+  const bank = () => screen.getByRole('group', { name: 'Các mảnh chữ' })
+  const line = () => screen.getByRole('group', { name: 'Câu của bạn' })
+
+  it('Mầm đọc nghĩa tiếng Việt của câu làm đề bài', async () => {
+    await openSentence()
+
+    expect(screen.getByText('Sắp xếp thành câu đúng')).toBeInTheDocument()
+    expect(screen.getByText(sentenceExercise().meaning)).toBeInTheDocument()
+  })
+
+  it('bấm một mảnh thì nó lên dòng trả lời', async () => {
+    const { user } = await openSentence()
+    const first = sentenceExercise().pieces[0]
+
+    await user.click(within(bank()).getAllByRole('button', { name: first })[0])
+
+    expect(within(line()).getByRole('button', { name: first })).toBeInTheDocument()
+  })
+
+  it('bấm mảnh trên dòng trả lời thì nó về lại kho', async () => {
+    const { user } = await openSentence()
+    const first = sentenceExercise().pieces[0]
+    const before = within(bank()).getAllByRole('button').length
+
+    await user.click(within(bank()).getAllByRole('button', { name: first })[0])
+    await user.click(within(line()).getByRole('button', { name: first }))
+
+    expect(within(line()).queryAllByRole('button')).toHaveLength(0)
+    expect(within(bank()).getAllByRole('button')).toHaveLength(before)
+  })
+
+  it('chưa bấm mảnh nào thì chưa cho kiểm tra', async () => {
+    await openSentence()
+    expect(screen.getByRole('button', { name: 'Kiểm tra' })).toBeDisabled()
+  })
+
+  it('ghép đúng thì Mầm khen và cộng XP', async () => {
+    const { user } = await openSentence()
+
+    await buildSentence(user, sentenceExercise().pieces)
+    await user.click(screen.getByRole('button', { name: 'Kiểm tra' }))
+
+    expect(screen.getByRole('status')).toHaveTextContent(`Chính xác! +${XP_REWARDS.correctAnswer} XP`)
+  })
+
+  it('ghép sai thứ tự thì Mầm chỉ ra câu đúng', async () => {
+    const { user } = await openSentence()
+    const pieces = sentenceExercise().pieces
+
+    await buildSentence(user, [...pieces].reverse())
+    await user.click(screen.getByRole('button', { name: 'Kiểm tra' }))
+
+    expect(screen.getByRole('status')).toHaveTextContent('Chưa đúng')
+    expect(screen.getByRole('status')).toHaveTextContent(pieces.join(' '))
+  })
+})
+
+describe('Bài nghe và viết', () => {
+  async function openDictation() {
+    const utils = renderApp(`/lesson/${LESSON_ID}/exercise`, ONBOARDED)
+    await answerExercises(utils.user, EXERCISES.slice(0, DICTATION_INDEX))
+    return utils
+  }
+
+  const field = () => screen.getByLabelText('Pinyin bạn nghe được')
+
+  it('có ô để gõ pinyin, và nói rõ không cần gõ dấu thanh', async () => {
+    await openDictation()
+
+    expect(field()).toBeInTheDocument()
+    expect(screen.getByText(/Không cần gõ dấu thanh/)).toBeInTheDocument()
+  })
+
+  it('máy không phát được âm thì Mầm đưa chữ Hán ra thay, không để lộ pinyin', async () => {
+    // Bộ test này giả lập máy không có âm — xem `vi.mock` ở đầu file.
+    await openDictation()
+    const exercise = dictationExercise()
+
+    expect(screen.getByText(exercise.hanzi)).toBeInTheDocument()
+    expect(screen.queryByText(exercise.answer)).not.toBeInTheDocument()
+  })
+
+  it('gõ không dấu vẫn được tính đúng', async () => {
+    const { user } = await openDictation()
+    const plain = dictationExercise().answer.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+
+    await user.type(field(), plain)
+    await user.click(screen.getByRole('button', { name: 'Kiểm tra' }))
+
+    expect(screen.getByRole('status')).toHaveTextContent('Chính xác!')
+  })
+
+  it('bấm Enter trong ô gõ là chấm bài luôn', async () => {
+    const { user } = await openDictation()
+
+    await user.type(field(), `${dictationExercise().answer}{Enter}`)
+
+    expect(screen.getByRole('status')).toHaveTextContent('Chính xác!')
+  })
+
+  it('gõ sai thì Mầm đưa đáp án có dấu và chữ Hán', async () => {
+    const { user } = await openDictation()
+    const exercise = dictationExercise()
+
+    await user.type(field(), 'sai bet')
+    await user.click(screen.getByRole('button', { name: 'Kiểm tra' }))
+
+    expect(screen.getByRole('status')).toHaveTextContent('Chưa đúng')
+    expect(screen.getByRole('status')).toHaveTextContent(exercise.answer)
+    expect(screen.getByRole('status')).toHaveTextContent(exercise.hanzi)
+  })
+
+  it('chấm xong thì khoá ô gõ lại', async () => {
+    const { user } = await openDictation()
+
+    await user.type(field(), dictationExercise().answer)
+    await user.click(screen.getByRole('button', { name: 'Kiểm tra' }))
+
+    expect(field()).toBeDisabled()
   })
 })
 

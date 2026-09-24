@@ -36,8 +36,14 @@ export interface Course {
   units: Unit[]
 }
 
-/** Bốn dạng bài tập của Version 2. */
-export type ExerciseKind = 'multiple-choice' | 'matching' | 'listening' | 'pinyin'
+/** Các dạng bài tập. Bốn dạng đầu là của Version 2, hai dạng sau thêm sau này. */
+export type ExerciseKind =
+  | 'multiple-choice'
+  | 'matching'
+  | 'listening'
+  | 'pinyin'
+  | 'sentence'
+  | 'dictation'
 
 /** Một lựa chọn trong bài tập trắc nghiệm. */
 export interface Choice {
@@ -67,7 +73,43 @@ export interface MatchingExercise {
   answerKey: Record<string, string>
 }
 
-export type Exercise = ChoiceExercise | MatchingExercise
+/**
+ * Bài ghép câu: bấm từng mảnh chữ theo thứ tự để dựng lại câu.
+ *
+ * Đề bài là nghĩa tiếng Việt, nên người học phải nhớ cả từ lẫn trật tự từ —
+ * thứ mà bài trắc nghiệm không kiểm được.
+ */
+export interface SentenceExercise {
+  id: string
+  kind: Extract<ExerciseKind, 'sentence'>
+  /** Từ vựng mà câu ví dụ này đi kèm. */
+  wordId: string
+  prompt: string
+  /** Nghĩa tiếng Việt của câu — đây là đề bài. */
+  meaning: string
+  /** Câu đúng, đã bỏ dấu câu và khoảng trắng. */
+  answer: string
+  /** Các mảnh của câu đúng, theo đúng thứ tự — dùng để chữa bài. */
+  pieces: string[]
+  /** Các mảnh để bấm, đã trộn và có thêm mảnh nhiễu. */
+  tiles: Choice[]
+}
+
+/** Bài nghe rồi viết lại bằng pinyin. */
+export interface DictationExercise {
+  id: string
+  kind: Extract<ExerciseKind, 'dictation'>
+  wordId: string
+  prompt: string
+  /** Pinyin đúng, còn nguyên dấu thanh để hiện lại lúc chữa bài. */
+  answer: string
+  /** Gợi ý nghĩa, để người mới không bí hoàn toàn. */
+  meaning: string
+  /** Hiện thay cho nút loa khi máy không phát được âm. */
+  hanzi: string
+}
+
+export type Exercise = ChoiceExercise | MatchingExercise | SentenceExercise | DictationExercise
 
 /** Trạng thái ghi nhớ của một từ, dùng cho flashcard. */
 export interface WordProgress {

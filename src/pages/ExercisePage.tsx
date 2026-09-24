@@ -3,6 +3,8 @@ import { Navigate, useNavigate, useParams } from 'react-router-dom'
 import { AudioButton } from '../components/AudioButton'
 import { FocusHeader } from '../components/FocusHeader'
 import { MascotSays } from '../components/Mascot'
+import { DictationInput } from '../components/exercise/DictationInput'
+import { SentenceBuilder } from '../components/exercise/SentenceBuilder'
 import { Button } from '../components/ui/Button'
 import { ALL_LESSONS, WORDS, WORD_BY_ID, wordsOfLesson } from '../data/hsk1'
 import { useProgress } from '../context/ProgressContext'
@@ -13,11 +15,14 @@ import {
   buildExercises,
   createRng,
   gradeChoice,
+  gradeDictation,
   gradeMatching,
+  gradeSentence,
   isChoiceExercise,
   seedFromText,
 } from '../lib/exercises'
 import { XP_REWARDS } from '../lib/gamification'
+import type { Exercise } from '../types'
 
 /**
  * Màu của một ô theo trạng thái của nó.
@@ -53,7 +58,7 @@ function choiceState(
   return selected ? 'wrong' : 'dimmed'
 }
 
-/** Bước 3: làm bài tập. Bốn dạng của Version 2 đều xuất hiện ở đây. */
+/** Bước 3: làm bài tập. Cả sáu dạng đều xuất hiện ở đây. */
 export function ExercisePage() {
   const { lessonId = '' } = useParams()
   const navigate = useNavigate()
@@ -70,6 +75,8 @@ export function ExercisePage() {
   const [choiceId, setChoiceId] = useState('')
   const [matches, setMatches] = useState<Record<string, string>>({})
   const [activeLeft, setActiveLeft] = useState('')
+  const [picked, setPicked] = useState<string[]>([])
+  const [typed, setTyped] = useState('')
   const [checked, setChecked] = useState(false)
   const [correctCount, setCorrectCount] = useState(0)
 
@@ -79,12 +86,25 @@ export function ExercisePage() {
   const isLast = index === exercises.length - 1
   const isChoice = isChoiceExercise(exercise)
 
-  const hasAnswer = isChoice
-    ? choiceId !== ''
-    : Object.keys(matches).length === Object.keys(exercise.answerKey).length
-  const isCorrect = isChoice
-    ? gradeChoice(exercise, choiceId)
-    : gradeMatching(exercise, matches)
+  let hasAnswer: boolean
+  let isCorrect: boolean
+  switch (exercise.kind) {
+    case 'matching':
+      hasAnswer = Object.keys(matches).length === Object.keys(exercise.answerKey).length
+      isCorrect = gradeMatching(exercise, matches)
+      break
+    case 'sentence':
+      hasAnswer = picked.length > 0
+      isCorrect = gradeSentence(exercise, picked)
+      break
+    case 'dictation':
+      hasAnswer = typed.trim() !== ''
+      isCorrect = gradeDictation(exercise, typed)
+      break
+    default:
+      hasAnswer = choiceId !== ''
+      isCorrect = gradeChoice(exercise, choiceId)
+  }
 
   function check() {
     setChecked(true)
@@ -111,6 +131,8 @@ export function ExercisePage() {
     setChoiceId('')
     setMatches({})
     setActiveLeft('')
+    setPicked([])
+    setTyped('')
     setChecked(false)
   }
 
@@ -198,6 +220,24 @@ export function ExercisePage() {
               })}
             </ul>
           </>
+        ) : exercise.kind === 'sentence' ? (
+          <SentenceBuilder
+            exercise={exercise}
+            picked={picked}
+            checked={checked}
+            isCorrect={isCorrect}
+            onPick={(tileId) => setPicked((current) => [...current, tileId])}
+            onUnpick={(tileId) => setPicked((current) => current.filter((id) => id !== tileId))}
+          />
+        ) : exercise.kind === 'dictation' ? (
+          <DictationInput
+            exercise={exercise}
+            value={typed}
+            checked={checked}
+            isCorrect={isCorrect}
+            onChange={setTyped}
+            onSubmit={check}
+          />
         ) : (
           <div className="mt-6 grid grid-cols-2 gap-3">
             <ul className="space-y-3">
@@ -269,12 +309,7 @@ export function ExercisePage() {
                 `Chính xác! +${XP_REWARDS.correctAnswer} XP`
               ) : (
                 <>
-                  Chưa đúng.{' '}
-                  {isChoice &&
-                    `Đáp án là "${
-                      exercise.choices.find((c) => c.id === exercise.correctChoiceId)?.label
-                    }".`}
-                  {!isChoice && 'Xem lại cách ghép ở trên nhé.'}
+                  Chưa đúng. <WrongAnswerHint exercise={exercise} />
                 </>
               )}
             </MascotSays>
@@ -298,4 +333,31 @@ export function ExercisePage() {
       </div>
     </>
   )
+}
+
+/** Lời chữa bài của Mầm khi trả lời sai — mỗi dạng bài cần chỉ ra một thứ khác. */
+function WrongAnswerHint({ exercise }: { exercise: Exercise }) {
+  switch (exercise.kind) {
+    case 'matching':
+      return <>Xem lại cách ghép ở trên nhé.</>
+    case 'sentence':
+      return (
+        <>
+          Câu đúng là <span className="font-hanzi font-semibold">{exercise.pieces.join(' ')}</span>.
+        </>
+      )
+    case 'dictation':
+      return (
+        <>
+          Đáp án là <span className="font-semibold">{exercise.answer}</span>{' '}
+          <span className="font-hanzi">({exercise.hanzi})</span>.
+        </>
+      )
+    default:
+      return (
+        <>
+          Đáp án là "{exercise.choices.find((choice) => choice.id === exercise.correctChoiceId)?.label}".
+        </>
+      )
+  }
 }

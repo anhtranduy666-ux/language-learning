@@ -1,0 +1,22 @@
+/**
+ * Bài tập — những chi tiết Tailwind diễn đạt vụng.
+ */
+
+/*
+ * Dòng kẻ giữa của vùng trả lời bài ghép câu, để người học thấy câu dài tới
+ * đâu thì sang dòng. Viền dưới là dòng thứ hai, do Tailwind vẽ.
+ */
+.sentence-lines {
+  --sentence-line: rgb(203 213 225);
+  background-image: linear-gradient(
+    to bottom,
+    transparent calc(50% - 1px),
+    var(--sentence-line) calc(50% - 1px),
+    var(--sentence-line) 50%,
+    transparent 50%
+  );
+}
+
+[data-theme='dark'] .sentence-lines {
+  --sentence-line: rgb(71 85 105);
+}
