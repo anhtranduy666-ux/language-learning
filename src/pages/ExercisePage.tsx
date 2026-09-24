@@ -366,7 +366,7 @@ export function ExercisePage() {
   )
 }
 
-/** Lời chữa bài của Mầm khi trả lời sai — mỗi dạng bài cần chỉ ra một thứ khác. */
+/** Lời chữa bài của Zibi khi trả lời sai — mỗi dạng bài cần chỉ ra một thứ khác. */
 function WrongAnswerHint({ exercise }: { exercise: Exercise }) {
   switch (exercise.kind) {
     case 'matching':

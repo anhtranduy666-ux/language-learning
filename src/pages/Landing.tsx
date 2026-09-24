@@ -29,7 +29,7 @@ export function Landing() {
         </p>
 
         <MascotSays mood="chao" size={84} className="mt-7">
-          Chào bạn! Mình là Mầm. Mình sẽ đi cùng bạn suốt khoá này nhé.
+          Chào bạn! Mình là Zibi. Mình sẽ đi cùng bạn suốt khoá này nhé.
         </MascotSays>
 
         <ul className="mt-6 space-y-3 text-slate-700 dark:text-slate-300">

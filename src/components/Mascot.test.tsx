@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import { Mascot, MascotSays } from './Mascot'
 
-/** Mầm là hình trang trí nên không có vai trò nào để hỏi — tìm thẳng bằng lớp. */
+/** Zibi là hình trang trí nên không có vai trò nào để hỏi — tìm thẳng bằng lớp. */
 const mascot = () => document.querySelector('.mascot')
 
 describe('Mascot', () => {
@@ -34,9 +34,9 @@ describe('Mascot', () => {
 
 describe('MascotSays', () => {
   it('lời thoại là chữ thật trong DOM, không phải mô tả một bức ảnh', () => {
-    render(<MascotSays mood="chao">Chào bạn, mình là Mầm.</MascotSays>)
+    render(<MascotSays mood="chao">Chào bạn, mình là Zibi.</MascotSays>)
 
-    expect(screen.getByText('Chào bạn, mình là Mầm.')).toBeInTheDocument()
+    expect(screen.getByText('Chào bạn, mình là Zibi.')).toBeInTheDocument()
     expect(mascot()).toHaveAttribute('aria-hidden', 'true')
   })
 

@@ -326,7 +326,7 @@ describe('Bài ghép câu', () => {
   const bank = () => screen.getByRole('group', { name: 'Các mảnh chữ' })
   const line = () => screen.getByRole('group', { name: 'Câu của bạn' })
 
-  it('Mầm đọc nghĩa tiếng Việt của câu làm đề bài', async () => {
+  it('Zibi đọc nghĩa tiếng Việt của câu làm đề bài', async () => {
     await openSentence()
 
     expect(screen.getByText('Sắp xếp thành câu đúng')).toBeInTheDocument()
@@ -359,7 +359,7 @@ describe('Bài ghép câu', () => {
     expect(screen.getByRole('button', { name: 'Kiểm tra' })).toBeDisabled()
   })
 
-  it('ghép đúng thì Mầm khen và cộng XP', async () => {
+  it('ghép đúng thì Zibi khen và cộng XP', async () => {
     const { user } = await openSentence()
 
     await buildSentence(user, sentenceExercise().pieces)
@@ -368,7 +368,7 @@ describe('Bài ghép câu', () => {
     expect(screen.getByRole('status')).toHaveTextContent(`Chính xác! +${XP_REWARDS.correctAnswer} XP`)
   })
 
-  it('ghép sai thứ tự thì Mầm chỉ ra câu đúng', async () => {
+  it('ghép sai thứ tự thì Zibi chỉ ra câu đúng', async () => {
     const { user } = await openSentence()
     const pieces = sentenceExercise().pieces
 
@@ -396,7 +396,7 @@ describe('Bài nghe và viết', () => {
     expect(screen.getByText(/Không cần gõ dấu thanh/)).toBeInTheDocument()
   })
 
-  it('máy không phát được âm thì Mầm đưa chữ Hán ra thay, không để lộ pinyin', async () => {
+  it('máy không phát được âm thì Zibi đưa chữ Hán ra thay, không để lộ pinyin', async () => {
     // Bộ test này giả lập máy không có âm — xem `vi.mock` ở đầu file.
     await openDictation()
     const exercise = dictationExercise()
@@ -423,7 +423,7 @@ describe('Bài nghe và viết', () => {
     expect(screen.getByRole('status')).toHaveTextContent('Chính xác!')
   })
 
-  it('gõ sai thì Mầm đưa đáp án có dấu và chữ Hán', async () => {
+  it('gõ sai thì Zibi đưa đáp án có dấu và chữ Hán', async () => {
     const { user } = await openDictation()
     const exercise = dictationExercise()
 
@@ -701,7 +701,7 @@ describe('Bài chọn thanh điệu', () => {
     expect(screen.getByRole('status')).toHaveTextContent(`Chính xác! +${XP_REWARDS.correctAnswer} XP`)
   })
 
-  it('chọn sai thì Mầm nói rõ đó là thanh mấy', async () => {
+  it('chọn sai thì Zibi nói rõ đó là thanh mấy', async () => {
     const { user } = await openTone()
     const exercise = toneExercise()
     const wrongTone = exercise.tone === 1 ? 2 : 1
@@ -714,7 +714,7 @@ describe('Bài chọn thanh điệu', () => {
     expect(status).toHaveTextContent(`thanh ${exercise.tone}`)
   })
 
-  it('máy không phát được âm thì Mầm đưa chữ Hán ra thay', async () => {
+  it('máy không phát được âm thì Zibi đưa chữ Hán ra thay', async () => {
     await openTone()
     const exercise = toneExercise()
 

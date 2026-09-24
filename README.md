@@ -50,7 +50,7 @@ chạy thẳng file TypeScript.
   thanh: `zāi/zái/zǎi/zài jiàn`). Sáu dạng còn lại đều cho chọn giữa những
   phương án khác hẳn nhau về phụ âm và vần, nên mắt loại trừ được mà tai không
   cần làm gì. Xem [docs/tones.md](docs/tones.md).
-- **Mầm**: nhân vật dẫn đường tự vẽ bằng SVG — chào, ra đề, khen khi đúng, chữa
+- **Zibi**: nhân vật dẫn đường tự vẽ bằng SVG — chào, ra đề, khen khi đúng, chữa
   bài khi sai.
 - **Bong bóng chọn**: thanh điều hướng là viên thuốc kính mờ nổi, mục đang chọn
   nằm trong bong bóng trượt nảy sang mục mới; các bộ chọn ở màn Cá nhân dùng
@@ -176,7 +176,7 @@ src/
 │   ├── nav.ts            Mục nào của thanh điều hướng đang được chọn
 │   ├── wordMap.ts        Toạ độ 60 từ trên bản đồ chòm sao / luống hoa
 │   └── storage.ts        Đọc/ghi localStorage
-├── styles/          CSS của nền động, bản đồ từ, Mầm, bài tập và bong bóng chọn
+├── styles/          CSS của nền động, bản đồ từ, Zibi, bài tập và bong bóng chọn
 ├── services/supabase.ts  Biến môi trường Supabase
 ├── data/hsk1.ts     Nội dung khoá học
 └── types/           Kiểu dữ liệu dùng chung

@@ -1,13 +1,13 @@
 import { cn } from '../lib/cn'
 
 /**
- * Tâm trạng của Mầm. Mỗi tâm trạng đổi mắt, miệng và tay — thân thì giữ nguyên,
+ * Tâm trạng của Zibi. Mỗi tâm trạng đổi mắt, miệng và tay — thân thì giữ nguyên,
  * để người học nhận ra vẫn là một nhân vật.
  */
 export type MascotMood = 'chao' | 'vui' | 'nghi' | 'mung' | 'tiec'
 
 /**
- * Mầm — nhân vật dẫn đường của app.
+ * Zibi — nhân vật dẫn đường của app.
  *
  * Một mầm cây tròn, vẽ hoàn toàn bằng SVG nên nhẹ như phần nền và không thêm
  * file nào vào bản offline. Cái mầm trên đầu là chủ ý: nó nối nhân vật với khu
@@ -34,7 +34,7 @@ export function Mascot({
       className={cn('mascot', className)}
       data-mood={mood}
     >
-      {/* Mầm trên đầu */}
+      {/* Cái mầm trên đầu */}
       <g className="mascot-sprout">
         <path
           d="M60 30c0-9 1-15 3-20"
@@ -175,7 +175,7 @@ function Mouth({ mood }: { mood: MascotMood }) {
 }
 
 /**
- * Mầm nói một câu.
+ * Zibi nói một câu.
  *
  * Nhân vật là hình trang trí, còn lời thoại là chữ thật trong DOM — người dùng
  * trình đọc màn hình nghe được đúng câu đó, không phải nghe mô tả một bức ảnh.

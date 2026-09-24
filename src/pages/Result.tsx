@@ -54,10 +54,10 @@ export function Result() {
         </p>
         <p className="mt-3 text-sm text-slate-600 dark:text-slate-400">
           {percent === 100
-            ? 'Mầm: không sai câu nào luôn! Mình phục bạn đấy.'
+            ? 'Zibi: không sai câu nào luôn! Mình phục bạn đấy.'
             : percent >= 60
-              ? 'Mầm: chắc tay rồi. Mai quay lại là nhớ lâu hơn nữa.'
-              : 'Mầm: sai vài câu là chuyện thường thôi. Ôn lại bài này một lượt nhé.'}
+              ? 'Zibi: chắc tay rồi. Mai quay lại là nhớ lâu hơn nữa.'
+              : 'Zibi: sai vài câu là chuyện thường thôi. Ôn lại bài này một lượt nhé.'}
         </p>
       </div>
 

@@ -46,7 +46,7 @@ function toneState(
  * Không bắt gõ gì cả: gõ `ǎ` trên bàn phím thường là cực hình, và đó là lý do
  * bài nghe–viết phải bỏ qua dấu thanh khi chấm. Bài này lấp đúng chỗ trống ấy.
  *
- * Máy không phát được âm thì Mầm đưa chữ Hán ra thay — bài thành "chữ này đọc
+ * Máy không phát được âm thì Zibi đưa chữ Hán ra thay — bài thành "chữ này đọc
  * thanh mấy", tức là ôn lại trí nhớ thay vì luyện tai. Vẫn đáng làm, và vẫn đi
  * hết được bài.
  */
@@ -62,7 +62,7 @@ export function ToneChoice({ exercise, picked, checked, onPick }: ToneChoiceProp
             <AudioButton
               text={exercise.hanzi}
               wordId={exercise.wordId}
-              label="từ Mầm đọc"
+              label="từ Zibi đọc"
               size="md"
             />
             <span>Nghe mình đọc rồi chọn thanh điệu nhé.</span>

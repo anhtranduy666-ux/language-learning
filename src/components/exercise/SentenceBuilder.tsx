@@ -26,7 +26,7 @@ const TILE_IDLE =
 /**
  * Bài ghép câu.
  *
- * Mầm nói câu bằng tiếng Việt, người học bấm các mảnh chữ Hán theo đúng thứ
+ * Zibi nói câu bằng tiếng Việt, người học bấm các mảnh chữ Hán theo đúng thứ
  * tự để dựng lại câu đó. Bấm một mảnh ở dòng trả lời là trả nó về kho.
  *
  * Mảnh đã dùng để lại một ô trống đúng kích thước trong kho, chứ không biến

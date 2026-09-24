@@ -18,11 +18,11 @@ interface DictationInputProps {
 /**
  * Bài nghe rồi viết.
  *
- * Mầm đọc một từ, người học gõ lại bằng pinyin. Không bắt gõ dấu thanh: bàn
+ * Zibi đọc một từ, người học gõ lại bằng pinyin. Không bắt gõ dấu thanh: bàn
  * phím thường không có ǎ hay ǜ, và bắt học cách gõ chúng là dạy một thứ chẳng
  * liên quan gì tới tiếng Trung. Chấm ở `src/lib/pinyin.ts`.
  *
- * Máy không phát được âm thì bài nghe không làm được, nên Mầm đưa chữ Hán ra
+ * Máy không phát được âm thì bài nghe không làm được, nên Zibi đưa chữ Hán ra
  * thay — bài thành "viết pinyin của chữ này", vẫn đáng làm và vẫn đi hết bài
  * được. Đưa pinyin ra như bài nghe chọn đáp án thì lộ luôn đáp án.
  */
@@ -52,7 +52,7 @@ export function DictationInput({
             <AudioButton
               text={exercise.hanzi}
               wordId={exercise.wordId}
-              label="từ Mầm đọc"
+              label="từ Zibi đọc"
               size="md"
             />
             <span>Nghe mình đọc rồi gõ lại bằng pinyin nhé.</span>

@@ -40,8 +40,8 @@ bàn phím.
 
 | Dạng | Đề bài | Người học làm gì | Dùng cho từ nào |
 | --- | --- | --- | --- |
-| **Thanh điệu** (`tone`) | Mầm đọc một từ, màn hình hiện âm tiết **đã bỏ dấu** (`hao`) | Bấm một trong bốn nút thanh | Từ **một âm tiết** có thanh rõ |
-| **Phân biệt thanh** (`tone-pair`) | Mầm đọc một từ | Chọn một trong bốn cách đọc của **chính từ đó**, chỉ lệch nhau đúng cái thanh | Mọi từ |
+| **Thanh điệu** (`tone`) | Zibi đọc một từ, màn hình hiện âm tiết **đã bỏ dấu** (`hao`) | Bấm một trong bốn nút thanh | Từ **một âm tiết** có thanh rõ |
+| **Phân biệt thanh** (`tone-pair`) | Zibi đọc một từ | Chọn một trong bốn cách đọc của **chính từ đó**, chỉ lệch nhau đúng cái thanh | Mọi từ |
 
 Ví dụ bài phân biệt thanh với 再见:
 
@@ -114,7 +114,7 @@ hết được bài. Cùng cách xử lý với bài nghe–viết.
 
 ## 6. Chữa bài
 
-Chọn sai thì Mầm nói rõ **thanh mấy**, không chỉ đưa lại chữ có dấu — người mới
+Chọn sai thì Zibi nói rõ **thanh mấy**, không chỉ đưa lại chữ có dấu — người mới
 nhìn `nǐ` chưa chắc đọc ra đó là thanh 3:
 
 > Chưa đúng. 你 đọc là **nǐ** — thanh 3, xuống rồi lên.
@@ -128,7 +128,7 @@ người học quen mặt dấu thanh ngay trong lúc chọn, không phải họ
 | --- | --- | --- |
 | Thanh điệu | `src/lib/tones.test.ts` | Đọc/bỏ/gắn dấu; quy tắc `a > o > e > nguyên âm cuối`; `iu` và `ui`; ü không bị nhầm; **cả 60 từ dựng lại đúng pinyin gốc**, và bỏ dấu rồi gắn lại ra chính nó |
 | Sinh bài | `src/lib/exercises.test.ts` | Đề bài không lộ thanh; bốn phương án chỉ lệch đúng cái thanh; đáp án đúng là pinyin thật; **mọi lesson đều có đủ hai bài luyện thanh**; hai bài rơi vào hai từ khác nhau; lesson toàn từ nhiều âm tiết thì chỉ bỏ bài `tone` |
-| Giao diện | `src/pages/app-flow.test.tsx` | Đủ bốn nút thanh; chưa chọn thì chưa cho kiểm tra; chọn sai thì Mầm nói rõ thanh mấy; **máy không có âm thì hiện chữ Hán và pinyin đúng chỉ xuất hiện đúng một lần** — tức là không lộ đáp án |
+| Giao diện | `src/pages/app-flow.test.tsx` | Đủ bốn nút thanh; chưa chọn thì chưa cho kiểm tra; chọn sai thì Zibi nói rõ thanh mấy; **máy không có âm thì hiện chữ Hán và pinyin đúng chỉ xuất hiện đúng một lần** — tức là không lộ đáp án |
 
 ## 8. Không nằm trong phạm vi
 

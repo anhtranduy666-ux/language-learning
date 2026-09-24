@@ -1,4 +1,4 @@
-# Phương án kỹ thuật — Ghép câu, nghe–viết và Mầm
+# Phương án kỹ thuật — Ghép câu, nghe–viết và Zibi
 
 > Trạng thái: **đã triển khai** (2026-09-24)
 > Liên quan: [product_design.md](../product_design.md) mục 7 (Bài tập), [docs/scene.md](scene.md)
@@ -20,8 +20,8 @@ Hai thứ quan trọng nhất với người mới học tiếng Trung vì thế
 
 | Dạng | Đề bài | Người học làm gì | Chấm thế nào |
 | --- | --- | --- | --- |
-| **Ghép câu** | Mầm đọc nghĩa tiếng Việt của câu ví dụ | Bấm các mảnh chữ Hán theo đúng thứ tự | So chuỗi chữ ghép lại với câu đúng |
-| **Nghe và viết** | Mầm đọc một từ | Gõ lại bằng pinyin | So sau khi bỏ dấu thanh, khoảng trắng, hoa/thường |
+| **Ghép câu** | Zibi đọc nghĩa tiếng Việt của câu ví dụ | Bấm các mảnh chữ Hán theo đúng thứ tự | So chuỗi chữ ghép lại với câu đúng |
+| **Nghe và viết** | Zibi đọc một từ | Gõ lại bằng pinyin | So sau khi bỏ dấu thanh, khoảng trắng, hoa/thường |
 
 Bài học giờ xoay vòng qua năm dạng theo từng từ — trắc nghiệm, pinyin, nghe,
 ghép câu, nghe–viết — rồi khép lại bằng hai bài luyện thanh và một bài ghép cặp.
@@ -78,33 +78,36 @@ liên quan gì tới tiếng Trung. `normalizePinyin()` trong `src/lib/pinyin.ts
 "nǐ hǎo", "ni hao", "NiHao" đều được tính đúng. Ô gõ nói rõ điều này ngay bên
 dưới, để không ai mất công tìm cách gõ dấu.
 
-Lúc chữa bài thì Mầm đưa ra **pinyin có đủ dấu** kèm chữ Hán, để người học vẫn
+Lúc chữa bài thì Zibi đưa ra **pinyin có đủ dấu** kèm chữ Hán, để người học vẫn
 thấy thanh điệu đúng.
 
 ### Máy không phát được âm
 
 Bài nghe chọn đáp án cũ hiện pinyin thay thế khi máy không có âm. Làm y như thế
-ở đây là **lộ luôn đáp án**. Nên Mầm đưa **chữ Hán** ra thay: bài thành "viết
+ở đây là **lộ luôn đáp án**. Nên Zibi đưa **chữ Hán** ra thay: bài thành "viết
 pinyin của chữ này" — vẫn đáng làm, và người học vẫn đi hết được bài.
 
 Bấm Enter trong ô gõ là chấm bài luôn.
 
-## 5. Mầm
+## 5. Zibi
+
+> Tên cũ là **Mầm**, đổi thành **Zibi** ngày 2026-09-24. Các commit trước đó vẫn
+> gọi nhân vật bằng tên cũ.
 
 Nhân vật dẫn đường, xuất hiện ở màn chào, màn từ mới, lúc chấm từng câu và màn
-kết quả. Trong hai dạng bài mới, Mầm là người **ra đề**: đọc nghĩa câu cần ghép,
+kết quả. Trong hai dạng bài mới, Zibi là người **ra đề**: đọc nghĩa câu cần ghép,
 và đọc từ cần viết — đúng vai của nhân vật trong Duolingo.
 
 **Nhân vật tự vẽ, không lấy từ bộ sticker có sẵn.** Yêu cầu ban đầu kèm một bộ
 sticker thương mại để chép theo; dùng lại nhân vật đó trong app là vi phạm bản
-quyền. Mầm là một mầm cây tròn — chiếc lá trên đầu nối nhân vật với khu vườn ở
+quyền. Zibi là một mầm cây tròn — chiếc lá trên đầu nối nhân vật với khu vườn ở
 nền động, và với chính việc học: mới nhú, rồi lớn dần.
 
 - Vẽ bằng SVG như phần nền, nên không thêm file nào vào bản offline.
 - Năm tâm trạng — chào, vui, nghĩ, mừng, tiếc — đổi mắt, miệng và tay, còn thân
   giữ nguyên, để người học nhận ra vẫn là một nhân vật.
 - Nhân vật là hình trang trí, luôn `aria-hidden`. **Lời thoại là chữ thật** trong
-  DOM, nên trình đọc màn hình đọc đúng câu Mầm nói.
+  DOM, nên trình đọc màn hình đọc đúng câu Zibi nói.
 - Nhịp thở và cái lá đung đưa nghe theo lựa chọn nền động và
   `prefers-reduced-motion`.
 
@@ -118,7 +121,7 @@ src/lib/exercises.ts                       Sinh và chấm cả tám dạng bài
 src/components/exercise/SentenceBuilder.tsx
 src/components/exercise/DictationInput.tsx
 src/components/exercise/ToneChoice.tsx
-src/components/Mascot.tsx                  Mầm và bong bóng thoại
+src/components/Mascot.tsx                  Zibi và bong bóng thoại
 src/styles/mascot.css, src/styles/exercise.css
 ```
 
@@ -129,8 +132,8 @@ src/styles/mascot.css, src/styles/exercise.css
 | Tách từ | `src/lib/chinese.test.ts` | Từ dài nhất trước; từ ba chữ; tên riêng Latin; không có từ điển vẫn chạy; **cả 60 câu ví dụ ghép lại ra đúng câu gốc**. |
 | Pinyin | `src/lib/pinyin.test.ts` | Bỏ bốn thanh; ü và v; khoảng trắng, dấu nháy, hoa thường; bỏ trống không bao giờ tính đúng; cả 60 từ gõ không dấu đều khớp. |
 | Sinh và chấm | `src/lib/exercises.test.ts` | Đủ sáu dạng; câu quá ngắn thì thay bằng trắc nghiệm; **mọi bài học đều sinh đủ bài**; mảnh nhiễu không trùng chữ; mảnh trùng chữ có id riêng và bấm cái nào trước cũng đúng. |
-| Giao diện | `src/pages/app-flow.test.tsx` | Mầm đọc đề; bấm mảnh lên dòng và trả về kho; ghép sai thì chỉ ra câu đúng; gõ không dấu được tính đúng; Enter là chấm; máy không có âm thì hiện chữ Hán mà không lộ pinyin. |
-| Mầm | `src/components/Mascot.test.tsx` | Là hình trang trí; mỗi tâm trạng một bộ mặt; lời thoại là chữ thật. |
+| Giao diện | `src/pages/app-flow.test.tsx` | Zibi đọc đề; bấm mảnh lên dòng và trả về kho; ghép sai thì chỉ ra câu đúng; gõ không dấu được tính đúng; Enter là chấm; máy không có âm thì hiện chữ Hán mà không lộ pinyin. |
+| Zibi | `src/components/Mascot.test.tsx` | Là hình trang trí; mỗi tâm trạng một bộ mặt; lời thoại là chữ thật. |
 
 ## 8. Không nằm trong phạm vi
 
