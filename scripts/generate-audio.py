@@ -158,6 +158,54 @@ def synthesize(voice: PiperVoice, tokens: list[str], config: SynthesisConfig):
     return np.asarray(audio, dtype=np.float32), voice.config.sample_rate, spans
 
 
+def silent_point(audio: np.ndarray, rate: int, start: int, end: int, earliest: bool) -> int:
+    """Chỗ lặng thật trong quãng [start, end): khung 20 ms đầu tiên (hoặc cuối cùng)
+    mà năng lượng chỉ cách mức lặng nhất của quãng đó 6 dB.
+
+    Ranh giới mô hình báo có thể lệch vài chục ms so với tiếng thật. Cắt đúng ở
+    mốc đó thì dính theo đầu chữ kế bên — đã xảy ra với 55/60 file từ đầu tiên,
+    nghe như một tiếng "n-" khẽ sau mỗi từ. Tìm chỗ lặng trên chính tín hiệu thì
+    không phụ thuộc mốc đó nữa.
+    """
+    hop, window = int(0.01 * rate), int(0.02 * rate)
+    starts = list(range(max(0, start), max(start + 1, end - window), hop))
+    energies = [10 * np.log10(np.mean(audio[s : s + window] ** 2) + 1e-12) for s in starts]
+    floor = min(energies)
+    quiet = [s for s, e in zip(starts, energies) if e <= floor + 6]
+    chosen = quiet[0] if earliest else quiet[-1]
+    return chosen + window // 2
+
+
+def edge_island(audio: np.ndarray, rate: int) -> bool:
+    """Ở mép clip có một mẩu tiếng ngắn đứng tách riêng không — dấu hiệu đã cắt
+    lấn sang chữ kế bên. Lưới an toàn cho `silent_point`, dùng để loại bản sinh."""
+    hop, window = int(0.01 * rate), int(0.025 * rate)
+    energies = np.array(
+        [10 * np.log10(np.mean(audio[s : s + window] ** 2) + 1e-12) for s in range(0, len(audio) - window, hop)]
+    )
+    if len(energies) == 0:
+        return False
+    loud = energies > energies.max() - 35
+    segments, start = [], None
+    for i, value in enumerate(loud):
+        if value and start is None:
+            start = i
+        if not value and start is not None:
+            segments.append([start, i])
+            start = None
+    if start is not None:
+        segments.append([start, len(loud)])
+    merged: list[list[int]] = []
+    for segment in segments:
+        if merged and segment[0] - merged[-1][1] < 4:
+            merged[-1][1] = segment[1]
+        else:
+            merged.append(segment)
+    if len(merged) < 2:
+        return False
+    return merged[0][1] - merged[0][0] < 10 or merged[-1][1] - merged[-1][0] < 10
+
+
 def render(voice: PiperVoice, clip: dict):
     """Một bản sinh của clip: (audio đã cắt, điểm, kết quả chấm)."""
     kind = clip["kind"]
@@ -173,12 +221,15 @@ def render(voice: PiperVoice, clip: dict):
     results = check_clip(audio, rate, spans, expected)
 
     if kind == "word":
+        # Câu đệm: 我 说 ， [từ] ， 你 说 。 — cắt ở chỗ lặng thật của hai quãng
+        # ngắt, trước chữ 说 và sau chữ 你 thì tuyệt đối không lấn sang.
         first = len(CARRIER_BEFORE)
         last = first + len(clip["tokens"]) - 1
-        pause_after = spans[last + 1]
-        start = spans[first][1] - int(LEAD_SECONDS * rate)
-        end = spans[last][3] + min(pause_after[3] - pause_after[1], int(TAIL_SECONDS * rate))
-        audio = audio[max(0, start) : end]
+        before = spans[first - 2][3]  # hết chữ 说
+        after = spans[last + 2][1]  # bắt đầu chữ 你
+        start = silent_point(audio, rate, before, spans[first][1], earliest=False)
+        end = silent_point(audio, rate, spans[last][2], after, earliest=True)
+        audio = audio[start:end]
     else:
         speech = [span for span in spans if span[0] not in "，。？！"]
         start = speech[0][1] - int(LEAD_SECONDS * rate)
@@ -243,11 +294,15 @@ def main() -> None:
         best = None
         for _ in range(CANDIDATES[clip["kind"]]):
             audio, key, results = render(voice, clip)
+            if edge_island(audio, voice.config.sample_rate):
+                continue
             if best is None or key > best[1]:
                 best = (audio, key, results)
             if all(r.ok for r in results):
                 break
 
+        if best is None:
+            raise SystemExit(f"{clip['path']}: bản nào cũng dính mẩu tiếng ở mép — xem lại silent_point()")
         audio, _, results = best
         target.parent.mkdir(parents=True, exist_ok=True)
         mp3 = to_mp3(audio, voice.config.sample_rate)

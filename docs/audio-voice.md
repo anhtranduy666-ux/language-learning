@@ -72,6 +72,22 @@ Từ đứng cuối câu thì bị giọng trùng xuống ở cuối câu kéo l
 **"我说，__，你说。"**: thêm một chỗ ngắt trước từ để lát cắt rơi vào khoảng lặng,
 không cắt vào đuôi chữ 说.
 
+### Cắt ở chỗ lặng thật, không cắt theo mốc của mô hình
+
+Bản đầu cắt đúng theo ranh giới mô hình báo, cộng thêm tối đa 120 ms đuôi. Ranh
+giới đó lệch vài chục ms so với tiếng thật, và **55/60 file từ** bị dính theo
+một mẩu 20–70 ms đầu chữ 你 phía sau — nghe như một tiếng "n-" khẽ sau mỗi từ.
+Bước chấm thanh không bắt được lỗi này, vì nó chỉ nhìn cao độ bên trong âm tiết.
+
+Giờ `silent_point()` tìm chỗ lặng thật trong quãng ngắt, trên chính tín hiệu:
+khung đầu tiên sau từ (và khung cuối cùng trước từ) mà năng lượng chỉ cách mức
+lặng nhất của quãng đó 6 dB. Mốc của mô hình chỉ còn dùng để khoanh quãng tìm —
+tuyệt đối không lấn qua chữ 说 phía trước hay chữ 你 phía sau.
+
+Thêm một lưới an toàn: `edge_island()` loại mọi bản sinh có một mẩu tiếng ngắn
+đứng tách riêng ở mép clip. Đo lại cả 60 từ và 179 câu sau khi sửa: không còn
+file nào dính.
+
 Câu mẫu thì không cần câu đệm, vì bản thân nó đã là một câu hoàn chỉnh.
 
 ## 4. Sinh vài bản rồi chọn bản đúng thanh
