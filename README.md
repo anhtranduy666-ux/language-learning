@@ -74,6 +74,12 @@ chạy thẳng file TypeScript.
 - **Phát âm**: 60 file audio cho từ và 179 file đọc cả câu mẫu, thu sẵn và đã
   được máy kiểm thanh điệu, chạy được trên mọi máy kể cả khi không cài giọng
   tiếng Trung. Xem mục [Âm thanh](#âm-thanh).
+- **Luyện nói**: đọc to từng từ của bài học vào micro, máy chấm thanh điệu và
+  nhịp ngay trên máy — điểm từng âm tiết, đường giọng của mình đè lên hình thanh
+  mẫu, và đúng một lời khuyên của Zibi. Tiếng nói không rời khỏi máy và không
+  được lưu. Vào từ nút **🎤 Luyện nói** ở màn Từ mới hoặc màn Kết quả. Ngưỡng
+  mới chỉnh trên giọng máy, chưa hiệu chuẩn trên giọng người. Xem
+  [docs/pronunciation-mvp.md](docs/pronunciation-mvp.md).
 - **Cài được lên điện thoại**: thêm vào màn hình chính iPhone hoặc Android,
   chạy toàn màn hình và **dùng được khi mất mạng**, kể cả phần nghe phát âm.
   Xem [docs/pwa.md](docs/pwa.md).
@@ -82,10 +88,10 @@ chạy thẳng file TypeScript.
 
 - Authentication và Supabase (Phase 2–3). Hiện chỉ hỏi tên và lưu ở máy.
 - Spaced repetition cho flashcard. Bản này mới có hai mức "Chưa nhớ" / "Đã nhớ".
-- Chấm phát âm cho người học. Bản thi công đã chốt — miễn phí, chạy trong
-  trình duyệt, không cần tài khoản:
-  [docs/pronunciation-mvp.md](docs/pronunciation-mvp.md). Phần so sánh các
-  hướng ở [docs/pronunciation-scoring.md](docs/pronunciation-scoring.md).
+- Phần còn lại của chấm phát âm: hiệu chuẩn trên giọng người thật và điện thoại
+  thật (mốc M4 ở [docs/pronunciation-mvp.md](docs/pronunciation-mvp.md)), chấm
+  câu mẫu, chấm phụ âm đầu và vần. Phần so sánh các hướng ở
+  [docs/pronunciation-scoring.md](docs/pronunciation-scoring.md).
 - Toàn bộ phần AI ở Phase 8.
 
 ## Âm thanh
@@ -171,6 +177,7 @@ src/
 ├── pages/           Mỗi màn hình một file
 ├── components/scene/  Nền động: khung, khu vườn, bầu trời sao
 ├── components/exercise/  Bài ghép câu, nghe–viết và chọn thanh điệu
+├── components/speaking/  Nút micro, hình đường giọng, kết quả chấm phát âm
 ├── context/
 │   ├── ProgressContext.tsx  Tiến độ người học
 │   ├── SceneContext.tsx     Nền động: đầy đủ / tĩnh / tắt
@@ -193,10 +200,20 @@ src/
 │   ├── scene.ts          Mốc nở của nền động, mức chuyển động
 │   ├── nav.ts            Mục nào của thanh điều hướng đang được chọn
 │   ├── wordMap.ts        Toạ độ 60 từ trên bản đồ chòm sao / luống hoa
-│   └── storage.ts        Đọc/ghi localStorage
-├── styles/          CSS của nền động, bản đồ từ, Zibi, bài tập và bong bóng chọn
+│   ├── storage.ts        Đọc/ghi localStorage
+│   ├── recorder.ts       Chấm phát âm: thu micro ra mẫu thô, tự dừng khi đọc xong
+│   ├── dsp.ts            Hạ mẫu, năng lượng từng khung, vùng có tiếng, WAV
+│   ├── pitch.ts          Đường cao độ (F0) theo khung 10 ms
+│   ├── segment.ts        Cắt bản thu thành đúng số âm tiết của từ
+│   ├── toneScore.ts      Chấm thanh điệu một âm tiết
+│   ├── pronunciation.ts  Cổng chặn, gộp điểm, chọn một lời khuyên
+│   ├── voiceBaseline.ts  Mặt bằng giọng của người học
+│   └── referenceAudio.ts Độ dài phần có tiếng của file mẫu, để so nhịp
+├── styles/          CSS của nền động, bản đồ từ, Zibi, bài tập, bong bóng chọn và luyện nói
 ├── services/supabase.ts  Biến môi trường Supabase
 ├── data/hsk1.ts     Nội dung khoá học
+├── data/pronunciationTips.ts  Lời Zibi nói sau mỗi lần chấm phát âm
+├── test/fixtures/speech/  Bản đọc đúng và cố tình sai thanh, để test bộ chấm
 └── types/           Kiểu dữ liệu dùng chung
 
 supabase/
@@ -209,6 +226,7 @@ scripts/
 ├── generate-audio.py   Sinh audio bằng Piper, tại máy — đường đang dùng
 ├── tone_check.py       Đo cao độ để chọn bản đọc đúng thanh nhất
 ├── dump-clips.ts       Danh sách clip cần sinh, lấy từ src/data
+├── generate-speech-fixtures.py  Sinh bản đọc đúng / sai thanh cho test chấm phát âm
 └── prewarm-audio.ts    Sinh audio qua Azure + Supabase — đường dự phòng
 docs/                      Phương án kỹ thuật cho từng tính năng
 ```
@@ -220,11 +238,12 @@ nên chạy được trong `npm test`, không phải cài Deno chỉ để chạ
 
 ## Kiểm thử
 
-616 test, chia làm ba tầng:
+775 test, chia làm ba tầng:
 
 - **Logic** (`src/lib/*.test.ts`, `supabase/functions/speak/handler.test.ts`) — XP, level, streak, thành tích, sinh và chấm bài tập, chế độ sáng/tối, nền động, bản đồ 60 từ, khoá cache audio, đọc/ghi dữ liệu hỏng.
+  Bộ chấm phát âm được kiểm bằng tín hiệu giả biết trước cao độ, và bằng bản đọc thật của máy — cả đúng lẫn cố tình sai thanh — trong `src/test/fixtures/speech`: bản sai phải bị đánh dấu **đúng ở âm tiết sai**.
 - **Dữ liệu** (`src/data/hsk1.test.ts`) — mọi từ đều có đủ trường, không trùng id, không từ nào lạc khỏi bài học; mỗi câu mẫu có đúng một âm tiết pinyin cho mỗi chữ Hán, và mọi âm tiết là âm tiết tiếng Trung có thật.
-- **Giao diện** (`src/components/*.test.tsx`, `src/pages/app-flow.test.tsx`) — dựng app thật trong bộ nhớ và đi trọn một buổi học, đúng tiêu chí nghiệm thu của Version 2.
+- **Giao diện** (`src/components/*.test.tsx`, `src/pages/app-flow.test.tsx`, `src/pages/speaking-flow.test.tsx`) — dựng app thật trong bộ nhớ và đi trọn một buổi học, đúng tiêu chí nghiệm thu của Version 2; màn luyện nói chạy bộ chấm thật, chỉ thay micro bằng giọng dựng sẵn.
 
 Test chạy trong `StrictMode` giống hệt bản thật, nên những lỗi do hàm cập nhật state không thuần tuý sẽ lộ ra ngay trong suite.
 

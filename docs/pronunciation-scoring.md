@@ -1,6 +1,9 @@
 # Phương án kỹ thuật — Chấm phát âm cho người học
 
-> Trạng thái: **đề xuất, chưa triển khai**
+> Trạng thái: **đã chọn hướng, đã triển khai phần chấm thanh điệu và nhịp cho
+> từ đơn** (2026-09-25) theo [pronunciation-mvp.md](pronunciation-mvp.md) — số đo
+> và chỗ khác thiết kế ở mục 14 của file đó. Tài liệu này giữ lại để biết vì sao
+> các hướng khác bị loại.
 > Ngày: 2026-09-24
 > Liên quan: [product_design.md](../product_design.md) Phase 8, `scripts/tone_check.py`,
 > `src/lib/speechTokens.ts`

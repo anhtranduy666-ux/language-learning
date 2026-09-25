@@ -10,10 +10,10 @@
  * Mọi thứ chạy trên máy người học, không gửi tiếng nói đi đâu. Hàm thuần: nhận
  * `Float32Array`, trả kết quả — test được thẳng, không cần micro.
  *
- * Thiết kế ban đầu còn một phần "độ gần với bản mẫu" bằng MFCC + DTW. Đo trên
- * 60 từ đọc bằng hai giọng khác nhau thì nó chỉ nhận ra đúng từ 5–9/60 lần —
- * gần như đoán mò — nên đã bỏ: điểm của nó chỉ là nhiễu. Số đo ở
- * `docs/pronunciation-mvp.md`.
+ * Thiết kế ban đầu còn một phần "độ gần với bản mẫu" bằng MFCC + DTW. Cho một
+ * giọng khác đọc 60 từ rồi so với 60 file mẫu, file gần nhất chỉ đúng là từ đó
+ * 5–9/60 lần — quá yếu để làm điểm, chỉ cộng nhiễu vào tổng — nên đã bỏ. Số đo
+ * ở mục 14 của `docs/pronunciation-mvp.md`.
  */
 
 import type { AttemptProblem, Rejection } from '../data/pronunciationTips'
