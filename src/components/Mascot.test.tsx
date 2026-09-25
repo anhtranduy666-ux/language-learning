@@ -27,7 +27,7 @@ describe('Mascot', () => {
     expect(new Set(faces).size).toBe(MOODS.length)
   })
 
-  it('tâm trạng nào cũng giữ cái mũi đen, để vẫn nhận ra là một nhân vật', () => {
+  it('tâm trạng nào cũng giữ cái mũi vệt mực, để vẫn nhận ra là một nhân vật', () => {
     for (const mood of MOODS) {
       const { unmount } = render(<Mascot mood={mood} />)
       expect(parts('nose'), mood).toHaveLength(1)
@@ -35,36 +35,34 @@ describe('Mascot', () => {
     }
   })
 
-  it('cười sặc thì nhắm tịt mắt, không còn con ngươi', () => {
-    const { rerender } = render(<Mascot mood="vui" />)
+  it('chào thì mắt chấm và vẫy một tay; cười sặc thì nhắm tịt mắt, giơ cả hai tay', () => {
+    const { rerender } = render(<Mascot mood="chao" />)
     expect(parts('pupil')).toHaveLength(2)
+    expect(parts('hand')).toHaveLength(1)
+    expect(document.querySelector('.mascot .mascot-wave')).not.toBeNull()
 
     rerender(<Mascot mood="mung" />)
     expect(parts('pupil')).toHaveLength(0)
+    expect(parts('hand')).toHaveLength(2)
+    expect(document.querySelector('.mascot .mascot-wave')).toBeNull()
   })
 
-  it('nghi ngờ thì một mắt híp, một mắt trố', () => {
-    render(<Mascot mood="nghi" />)
+  it('mặt đơ có bốn chấm "…." lơ lửng, tâm trạng khác thì không', () => {
+    const { rerender } = render(<Mascot mood="nghi" />)
+    expect(parts('dots')).toHaveLength(1)
+    expect(parts('dots')[0].querySelectorAll('circle')).toHaveLength(4)
 
-    expect(parts('pupil')).toHaveLength(1)
+    rerender(<Mascot mood="vui" />)
+    expect(parts('dots')).toHaveLength(0)
   })
 
-  it('tiếc thì khóc bù lu: có nước mắt chảy và bong bóng mũi', () => {
+  it('tiếc thì gào khóc: nước mắt chảy và hai tay giơ lên trời', () => {
     const { rerender } = render(<Mascot mood="tiec" />)
     expect(parts('tears')).toHaveLength(1)
-    expect(parts('snot')).toHaveLength(1)
+    expect(parts('hand')).toHaveLength(2)
 
     rerender(<Mascot mood="vui" />)
     expect(parts('tears')).toHaveLength(0)
-    expect(parts('snot')).toHaveLength(0)
-  })
-
-  it('chào thì vẫy tay, tâm trạng khác thì không', () => {
-    const { rerender } = render(<Mascot mood="chao" />)
-    expect(document.querySelector('.mascot .mascot-wave')).not.toBeNull()
-
-    rerender(<Mascot mood="nghi" />)
-    expect(document.querySelector('.mascot .mascot-wave')).toBeNull()
   })
 
   it('hai Zibi cùng một trang không giẫm id vùng cắt miệng của nhau', () => {

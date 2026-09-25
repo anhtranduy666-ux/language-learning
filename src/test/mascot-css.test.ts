@@ -60,9 +60,24 @@ function rules(source: string, media = '', counter = { next: 0 }): Rule[] {
   return found
 }
 
-/** Độ nặng của một selector chỉ gồm class, thuộc tính và `*`: đếm class và thuộc tính. */
-function weight(selector: string): number {
-  return (selector.match(/\.[\w-]+|\[[^\]]+\]/g) ?? []).length
+/**
+ * Độ ưu tiên của selector, dạng [class + thuộc tính + pseudo-class, tên thẻ].
+ * File này không dùng id. `*` không tính. `.mascot-dots circle` nặng hơn
+ * `.mascot *` đúng một bậc tên thẻ — đủ để luật tắt thua.
+ */
+function specificity(selector: string): [number, number] {
+  const classLike = /\.[\w-]+|\[[^\]]+\]|:(?!:)[\w-]+(\([^)]*\))?/g
+  const classes = (selector.match(classLike) ?? []).length
+  const rest = selector.replace(classLike, ' ').replace(/::[\w-]+/g, ' ')
+  const types = (rest.match(/[a-z][\w-]*/gi) ?? []).length
+  return [classes, types]
+}
+
+/** So độ ưu tiên: dương là `a` nặng hơn. */
+function compare(a: string, b: string): number {
+  const [ac, at] = specificity(a)
+  const [bc, bt] = specificity(b)
+  return ac - bc || at - bt
 }
 
 /** Selector nhắm chính hình SVG (`.mascot`, `.mascot[...]`) hay một phần bên trong nó. */
@@ -89,12 +104,19 @@ function stoppedBy(stoppers: Selector[], moving: Selector): boolean {
   return stoppers.some(
     (stopper) =>
       targetsSvg(stopper.text) === targetsSvg(moving.text) &&
-      (weight(stopper.text) > weight(moving.text) ||
-        (weight(stopper.text) === weight(moving.text) && stopper.order > moving.order)),
+      (compare(stopper.text, moving.text) > 0 ||
+        (compare(stopper.text, moving.text) === 0 && stopper.order > moving.order)),
   )
 }
 
 describe('chuyển động của Zibi', () => {
+  it('so độ ưu tiên selector như trình duyệt, kể cả tên thẻ và pseudo-class', () => {
+    expect(compare(".mascot[data-mood='mung']", '.mascot')).toBeGreaterThan(0)
+    expect(compare('.mascot[data-mood]', ".mascot[data-mood='mung']")).toBe(0)
+    expect(compare('.mascot-dots circle', '.mascot *')).toBeGreaterThan(0)
+    expect(compare('.mascot-dot:nth-child(2)', '.mascot *')).toBeGreaterThan(0)
+  })
+
   it('đọc được file CSS và thấy các luật chuyển động', () => {
     const texts = MOVING.map((selector) => selector.text)
     expect(texts).toContain('.mascot')
