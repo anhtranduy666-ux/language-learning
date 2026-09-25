@@ -2,9 +2,9 @@
  * Zibi — nhân vật dẫn đường.
  *
  * Nhịp thở nhẹ và cái mầm đung đưa, đủ để nhân vật có vẻ sống chứ không phải
- * một hình dán. Mỗi khuôn mặt thêm một trò nhỏ cho hài: mắt híp nháy "hehe",
- * tay vẫy, tay khua khi cười hay khóc, bốn chấm "…." sáng lần lượt, nước mắt
- * chảy thành dòng.
+ * một hình dán. Mỗi khuôn mặt thêm một trò nhỏ: chớp mắt, lưỡi ngoe nguẩy, tay
+ * vẫy, bốn chấm "…." sáng lần lượt, sao lấp lánh, nước mắt chảy, bong bóng mũi
+ * phập phồng.
  *
  * Chỉ đụng `transform`, `opacity` và nét đứt, và nghe theo đúng lựa chọn nền
  * động: ai đã tắt nền thì cũng không muốn một nhân vật nhún nhảy ở góc màn hình.
@@ -33,9 +33,18 @@
   animation: mascot-sway 2.6s ease-in-out infinite alternate;
 }
 
-/* Mặt cười đểu: mắt híp nhích lên hai cái rồi nghỉ — "hehe". */
-.mascot-hehe {
-  animation: mascot-hehe 3.6s ease-in-out infinite;
+/* Chớp mắt — thỉnh thoảng một cái, như người thật. */
+.mascot-blink {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: mascot-blink 4.2s ease-in-out infinite;
+}
+
+/* Cái lưỡi le ra ngoe nguẩy, xoay quanh chỗ nó thò ra khỏi miệng. */
+.mascot-tongue {
+  transform-box: fill-box;
+  transform-origin: 50% 0;
+  animation: mascot-tongue 1.6s ease-in-out infinite alternate;
 }
 
 /* Vẫy tay chào, xoay quanh vai. */
@@ -45,21 +54,28 @@
   animation: mascot-wave 0.45s ease-in-out infinite alternate;
 }
 
-/* Hai bàn tay giơ lên khua qua khua lại, xoay quanh cổ tay. */
-.mascot-hand {
-  transform-box: fill-box;
-  transform-origin: 50% 100%;
-  animation: mascot-hand 0.3s ease-in-out infinite alternate;
-}
-
-/* Bốn chấm của mặt đơ; độ trễ từng chấm đặt ngay trên phần tử. */
+/* Bốn chấm lúc đang nghĩ; độ trễ từng chấm đặt ngay trên phần tử. */
 .mascot-dot {
   animation: mascot-dot 1.6s ease-in-out infinite;
+}
+
+/* Sao lấp lánh quanh đầu lúc reo mừng; độ trễ đặt trên từng ngôi sao. */
+.mascot-sparkle {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: mascot-sparkle 0.9s ease-in-out infinite alternate;
 }
 
 /* Vệt sáng trôi dọc dòng nước mắt. */
 .mascot-tears {
   animation: mascot-tears 0.8s linear infinite;
+}
+
+/* Bong bóng mũi phồng lên xẹp xuống, dính ở lỗ mũi. */
+.mascot-snot {
+  transform-box: fill-box;
+  transform-origin: 0 0;
+  animation: mascot-snot 1.4s ease-in-out infinite alternate;
 }
 
 /* Đuôi bong bóng thoại, trỏ về phía nhân vật. */
@@ -110,32 +126,29 @@
   }
 }
 
-@keyframes mascot-hehe {
+@keyframes mascot-blink {
   0%,
-  72%,
-  80%,
-  88%,
+  92%,
   100% {
-    transform: translateY(0);
+    transform: scaleY(1);
   }
-  76%,
-  84% {
-    transform: translateY(-1.6px);
+  96% {
+    transform: scaleY(0.1);
+  }
+}
+
+@keyframes mascot-tongue {
+  from {
+    transform: rotate(-6deg);
+  }
+  to {
+    transform: rotate(8deg);
   }
 }
 
 @keyframes mascot-wave {
   from {
     transform: rotate(-8deg);
-  }
-  to {
-    transform: rotate(10deg);
-  }
-}
-
-@keyframes mascot-hand {
-  from {
-    transform: rotate(-10deg);
   }
   to {
     transform: rotate(10deg);
@@ -152,9 +165,29 @@
   }
 }
 
+@keyframes mascot-sparkle {
+  from {
+    transform: scale(0.6);
+    opacity: 0.6;
+  }
+  to {
+    transform: scale(1.15);
+    opacity: 1;
+  }
+}
+
 @keyframes mascot-tears {
   to {
     stroke-dashoffset: -11;
+  }
+}
+
+@keyframes mascot-snot {
+  from {
+    transform: scale(0.55);
+  }
+  to {
+    transform: scale(1.1);
   }
 }
 

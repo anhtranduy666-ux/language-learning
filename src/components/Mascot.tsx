@@ -7,21 +7,17 @@ import { cn } from '../lib/cn'
  */
 export type MascotMood = 'chao' | 'vui' | 'nghi' | 'mung' | 'tiec'
 
-/*
- * Bảng màu lấy từ bộ sticker mẫu: thân xanh xám tô phẳng, nét mực đen, môi màu
- * kem, trong miệng đen, răng trắng, lợi và lưỡi hồng.
- */
-const INK = '#141814'
-const SKIN = '#8ca48a'
-const SHADE = '#7a917a'
-const LIP = '#f2ead6'
-const MOUTH = '#1c1212'
-const GUM = '#e27d88'
-const TONGUE = '#ea7b92'
-const TEAR = '#b4ecf8'
-const TEAR_EDGE = '#58b9d8'
-const BLUSH = '#e8a0a0'
-const TOOTH_GAP = '#a3a8a8'
+const INK = '#2c5e3a'
+const EYE = '#1d2b22'
+const SKIN = '#86cc93'
+const SHADE = '#72b980'
+const MOUTH = '#7a2a3a'
+const TONGUE = '#ff7f9c'
+const TONGUE_LINE = '#d94f73'
+const CHEEK = '#ff9fb4'
+const WATER = '#8fd3ff'
+const SNOT = '#c9eeff'
+const SPARKLE = '#ffd166'
 
 /**
  * Zibi — nhân vật dẫn đường của app.
@@ -30,17 +26,18 @@ const TOOTH_GAP = '#a3a8a8'
  * file nào vào bản offline. Cái mầm trên đầu là chủ ý: nó nối nhân vật với khu
  * vườn ở nền động, và với chính việc học — mới nhú, rồi lớn dần.
  *
- * Nét mặt bám theo bộ sticker hài người dùng chọn: mắt chấm bé tí hoặc híp có
- * nếp nhăn, mũi là vệt mực loang, miệng nhe nguyên hàm răng, cười thì ngửa cổ
- * cười, khóc thì gào to tay giơ lên trời. Mỗi tâm trạng lấy từ một sticker:
+ * Vừa dễ thương vừa buồn cười: phần dễ thương là mắt to long lanh, má hồng,
+ * mũi bé xíu, thân xanh tươi; phần buồn cười nằm ở chỗ cảm xúc nào cũng làm
+ * quá lên — nháy mắt le lưỡi, cười tít mắt giữa một trời lấp lánh, khóc thì
+ * nước mắt thành suối kèm bong bóng mũi. Bản trước chép nét mặt của một bộ
+ * sticker (răng người, mắt híp không con ngươi, mũi vệt mực) và trông ghê ghê,
+ * nên đừng quay lại kiểu đó.
  *
- * - `vui`  — cười nhe răng, lợi hồng, mắt híp đểu, nếp má hai bên.
- * - `chao` — mắt chấm, má hồng, chu môi "ồ", tay xoè vẫy.
- * - `nghi` — mặt đơ: mí sụp, môi dày mím chặt, bốn chấm "…." lơ lửng.
- * - `mung` — ngửa đầu cười sặc, mắt nhắm tít, hai tay giơ.
- * - `tiec` — gào khóc: miệng há hết cỡ, nước mắt chảy thành dòng.
- *
- * Chữa bài sai mà nhân vật khóc lố thì người học bật cười, không thấy bị chê.
+ * - `vui`  — nháy một mắt, miệng ω le lưỡi.
+ * - `chao` — nhướn mày, cười toe, vẫy tay.
+ * - `nghi` — mắt ngước lên một góc, chu môi sang bên, bốn chấm "…." lơ lửng.
+ * - `mung` — mắt tít > <, cười há miệng, hai tay giơ, lấp lánh quanh đầu.
+ * - `tiec` — mắt rơm rớm, nước mắt chảy thành suối, miệng mếu, bong bóng mũi.
  *
  * Nhân vật này là trang trí, nên luôn `aria-hidden`. Lời thoại mới là nội dung
  * thật, và nằm ở `MascotSays`.
@@ -54,8 +51,8 @@ export function Mascot({
   size?: number
   className?: string
 }) {
-  // Mỗi hình một id riêng cho vùng cắt miệng: hai Zibi cùng trang không được giẫm id của nhau.
-  const clipId = `zibi-mouth-${useId().replace(/[^\w-]/g, '')}`
+  // Id riêng cho các vùng cắt: hai Zibi cùng trang không được giẫm id của nhau.
+  const uid = `zibi-${useId().replace(/[^\w-]/g, '')}`
 
   return (
     <svg
@@ -66,245 +63,206 @@ export function Mascot({
       className={cn('mascot', className)}
       data-mood={mood}
     >
+      {mood === 'nghi' && <ThinkingDots />}
+      {mood === 'mung' && <Sparkles />}
+
       {/* Cái mầm trên đầu */}
-      <g className="mascot-sprout">
-        <path d="M60 32c0-9 1-15 3-20" fill="none" stroke={INK} strokeWidth="3" strokeLinecap="round" />
+      <g className="mascot-sprout" data-part="sprout">
+        <path d="M60 32c0-9 1-15 3-20" fill="none" stroke={INK} strokeWidth="3.2" strokeLinecap="round" />
         <path
           d="M63 16c7-6 14-6 17-3-1 5-7 10-14 9-2 0-3-3-3-6Z"
-          fill="#7fbf85"
+          fill="#6cc07a"
           stroke={INK}
           strokeWidth="2"
           strokeLinejoin="round"
         />
         <path
           d="M60 22c-7-4-13-3-15 0 2 4 8 7 13 5 2-1 3-3 2-5Z"
-          fill="#9fd4a2"
+          fill="#9ee0a8"
           stroke={INK}
           strokeWidth="2"
           strokeLinejoin="round"
         />
       </g>
 
-      {mood === 'nghi' && (
-        // Bốn chấm lơ lửng của mặt đơ — sáng lên lần lượt như đang gõ dở.
-        <g className="mascot-dots fill-slate-800 dark:fill-slate-200" data-part="dots">
-          {[8, 15, 22, 29].map((x, index) => (
-            <circle
-              key={x}
-              className="mascot-dot"
-              cx={x}
-              cy="17"
-              r="2.4"
-              style={{ animationDelay: `${index * 0.2}s` }}
-            />
-          ))}
-        </g>
-      )}
-
       <Arms mood={mood} />
 
-      {/* Thân, và mảng tối ở đáy cho có khối */}
+      {/* Hai bàn chân ló ra dưới thân */}
+      <g fill={SHADE} stroke={INK} strokeWidth="2.6">
+        <ellipse cx="46" cy="112.4" rx="6.6" ry="4" />
+        <ellipse cx="74" cy="112.4" rx="6.6" ry="4" />
+      </g>
+
+      {/* Thân, mảng tối ở đáy, và vệt bóng trên đầu cho tròn trịa */}
       <path
         d="M60 30c26 0 44 18 44 43 0 25-19 40-44 40S16 98 16 73c0-25 18-43 44-43Z"
         fill={SKIN}
         stroke={INK}
         strokeWidth="3.2"
       />
-      <path d="M22 88c7 14 22 21 38 21s31-7 38-21c-9 10-23 15-38 15s-29-5-38-15Z" fill={SHADE} />
+      <path d="M22 89c7 13 21 20 38 20s31-7 38-20c-9 9-23 14-38 14s-29-5-38-14Z" fill={SHADE} />
+      <path d="M42 38c-9 4-15 11-18 20" fill="none" stroke="#ffffff" strokeWidth="5" strokeLinecap="round" opacity=".45" />
 
-      {mood === 'chao' && (
-        <g fill={BLUSH} opacity=".7">
-          <ellipse cx="33" cy="65" rx="6" ry="3.8" />
-          <ellipse cx="87" cy="65" rx="6" ry="3.8" />
-        </g>
-      )}
-
-      {mood === 'tiec' && <Tears />}
-
-      {/* Cười sặc thì ngửa cả mặt ra sau. */}
-      <g transform={mood === 'mung' ? 'rotate(-9 60 72)' : undefined}>
-        <Eyes mood={mood} />
-        <Nose y={NOSE_Y[mood]} />
-        <g transform={MOUTH_DROP[mood] ? `translate(0 ${MOUTH_DROP[mood]})` : undefined}>
-          <Mouth mood={mood} clipId={clipId} />
-        </g>
+      {/* Má hồng */}
+      <g fill={CHEEK} opacity=".6">
+        <ellipse cx="33.6" cy="74.6" rx="6.4" ry="4" />
+        <ellipse cx="86.4" cy="74.6" rx="6.4" ry="4" />
       </g>
 
-      {/* Chân */}
-      <path d="M47 112v5M73 112v5" stroke={INK} strokeWidth="5.4" strokeLinecap="round" />
+      {mood === 'tiec' && <Tears />}
+      <Eyes mood={mood} uid={uid} />
+      <path data-part="nose" d="M57.4 68.8q2.6-1.8 5.2 0-.5 2.8-2.6 3.2-2.1-.4-2.6-3.2Z" fill={EYE} />
+      <Mouth mood={mood} clipId={`${uid}-mouth`} />
     </svg>
   )
 }
 
-/** Gào khóc hay cười sặc thì mặt dúm lại: mũi nhích lên, miệng tụt xuống. */
-const NOSE_Y: Record<MascotMood, number> = { vui: 63, chao: 63, nghi: 63, mung: 60.6, tiec: 58.6 }
-const MOUTH_DROP: Record<MascotMood, number> = { vui: 0, chao: 0, nghi: 0, mung: 3, tiec: 4 }
-
-/** Một nét mực. */
-function Line({ d, width = 2.6, color = INK }: { d: string; width?: number; color?: string }) {
+/** Một nét vẽ. */
+function Line({ d, width = 2.8, color = INK }: { d: string; width?: number; color?: string }) {
   return <path d={d} fill="none" stroke={color} strokeWidth={width} strokeLinecap="round" strokeLinejoin="round" />
 }
 
-/** Tay kiểu sticker: mảnh như sợi mì, viền mực hai bên. */
+/** Tay tròn như ngón tay găng: nét màu thân, viền đậm hai bên. */
 function Limb({ d }: { d: string }) {
   return (
     <>
-      <path d={d} fill="none" stroke={INK} strokeWidth="8.6" strokeLinecap="round" strokeLinejoin="round" />
-      <path d={d} fill="none" stroke={SKIN} strokeWidth="4.4" strokeLinecap="round" strokeLinejoin="round" />
+      <path d={d} fill="none" stroke={INK} strokeWidth="11" strokeLinecap="round" />
+      <path d={d} fill="none" stroke={SKIN} strokeWidth="6.4" strokeLinecap="round" />
     </>
   )
 }
 
-/** Bốn ngón tay của bàn tay đang xoè, vẽ hướng lên: [x1, y1, x2, y2]. */
-const FINGERS: Array<[number, number, number, number]> = [
-  [-4.6, -1, -7.4, -6.6],
-  [-1.8, -2.2, -2.6, -9.4],
-  [1.2, -2.2, 2, -9.6],
-  [3.8, -1.2, 6.4, -7.6],
-]
+const ARM_DOWN_LEFT = 'M24 82C16 84 12 90 11 96'
+const ARM_DOWN_RIGHT = 'M96 82c8 2 12 8 13 14'
+const ARM_UP_LEFT = 'M24 76C15 70 11 60 12 52'
+const ARM_UP_RIGHT = 'M96 76c9-6 13-16 12-24'
 
-/**
- * Bàn tay xoè bốn ngón, vẽ hướng lên rồi xoay theo cánh tay. Lớp ngoài để CSS
- * lắc tay — CSS `transform` đặt thẳng lên lớp trong thì mất luôn phép xoay.
- */
-function Hand({ x, y, angle, className }: { x: number; y: number; angle: number; className?: string }) {
-  const fingers = (color: string, width: number) =>
-    FINGERS.map(([x1, y1, x2, y2]) => (
-      <path key={x1} d={`M${x1} ${y1}L${x2} ${y2}`} stroke={color} strokeWidth={width} strokeLinecap="round" />
-    ))
-
+/** Hai tay, vẽ sau lưng thân. */
+function Arms({ mood }: { mood: MascotMood }) {
+  if (mood === 'chao') {
+    return (
+      <>
+        <g className="mascot-wave">
+          <Limb d={ARM_UP_LEFT} />
+        </g>
+        <Limb d={ARM_DOWN_RIGHT} />
+      </>
+    )
+  }
   return (
-    <g className={className} data-part="hand">
-      <g transform={`translate(${x} ${y}) rotate(${angle})`}>
-        {fingers(INK, 4.4)}
-        <ellipse cx="0" cy="0.6" rx="5" ry="4.2" fill={SKIN} stroke={INK} strokeWidth="2.2" />
-        {fingers(SKIN, 2)}
-      </g>
+    <>
+      <Limb d={mood === 'mung' ? ARM_UP_LEFT : ARM_DOWN_LEFT} />
+      <Limb d={mood === 'mung' ? ARM_UP_RIGHT : ARM_DOWN_RIGHT} />
+    </>
+  )
+}
+
+/** Mắt đen láy với hai đốm sáng — chỗ dễ thương nhất của cả khuôn mặt. */
+function ShinyEye({ cx, cy }: { cx: number; cy: number }) {
+  return (
+    <g data-part="eye">
+      <ellipse cx={cx} cy={cy} rx="6.4" ry="7.6" fill={EYE} />
+      <circle cx={cx + 2.2} cy={cy - 2.6} r="2.4" fill="#ffffff" />
+      <circle cx={cx - 2} cy={cy + 2.7} r="1.1" fill="#ffffff" />
     </g>
   )
 }
 
-const ARM_DOWN_LEFT = 'M22 84C15 88 12 94 12 99'
-const ARM_DOWN_RIGHT = 'M98 84C105 88 108 94 108 99'
-
-/** Hai tay, vẽ sau lưng thân. */
-function Arms({ mood }: { mood: MascotMood }) {
-  switch (mood) {
-    case 'chao':
-      return (
-        <>
-          <g className="mascot-wave">
-            <Limb d="M22 78C14 72 11 62 12 52" />
-            <Hand x={12} y={50} angle={-8} />
-          </g>
-          <Limb d={ARM_DOWN_RIGHT} />
-        </>
-      )
-    case 'mung':
-      return (
-        <>
-          <Limb d="M22 76C14 68 10 58 12 46" />
-          <Hand x={12} y={44} angle={-14} className="mascot-hand" />
-          <Limb d="M98 76C106 68 110 58 108 46" />
-          <Hand x={108} y={44} angle={14} className="mascot-hand" />
-        </>
-      )
-    case 'tiec':
-      // Giơ cả hai tay lên trời mà gào.
-      return (
-        <>
-          <Limb d="M22 74C12 66 8 52 12 40" />
-          <Hand x={12} y={38} angle={-4} className="mascot-hand" />
-          <Limb d="M98 74C108 66 112 52 108 40" />
-          <Hand x={108} y={38} angle={4} className="mascot-hand" />
-        </>
-      )
-    default:
-      return (
-        <>
-          <Limb d={ARM_DOWN_LEFT} />
-          <Limb d={ARM_DOWN_RIGHT} />
-        </>
-      )
-  }
+/** Mắt ngấn nước: nửa dưới long lanh xanh, đốm sáng to hơn. */
+function TearyEye({ cx, cy, clipId }: { cx: number; cy: number; clipId: string }) {
+  return (
+    <g data-part="eye">
+      <clipPath id={clipId}>
+        <ellipse cx={cx} cy={cy} rx="7.4" ry="8.6" />
+      </clipPath>
+      <ellipse cx={cx} cy={cy} rx="7.4" ry="8.6" fill={EYE} />
+      <path
+        clipPath={`url(#${clipId})`}
+        d={`M${cx - 7.4} ${cy + 2}q3.7-2 7.4 0t7.4 0V${cy + 8.6}H${cx - 7.4}Z`}
+        fill={WATER}
+        opacity=".85"
+      />
+      <circle cx={cx + 2.6} cy={cy - 3.2} r="3" fill="#ffffff" />
+      <circle cx={cx - 2.8} cy={cy - 0.6} r="1.3" fill="#ffffff" />
+    </g>
+  )
 }
 
-function Eyes({ mood }: { mood: MascotMood }) {
+/** Mắt trắng, con ngươi ngước lên một góc — đang nghĩ. */
+function LookUpEye({ cx }: { cx: number }) {
+  return (
+    <g data-part="eye">
+      <ellipse cx={cx} cy="63" rx="6.6" ry="7.6" fill="#ffffff" stroke={EYE} strokeWidth="2.2" />
+      <circle cx={cx - 2.2} cy="59.6" r="3" fill={EYE} />
+      <circle cx={cx - 1.2} cy="58.6" r="1" fill="#ffffff" />
+    </g>
+  )
+}
+
+function Eyes({ mood, uid }: { mood: MascotMood; uid: string }) {
   switch (mood) {
     case 'chao':
-      // Mắt chấm bé tí, lông mày mảnh.
       return (
         <g>
-          {[42, 78].map((x) => (
-            <g key={x}>
-              <circle data-part="pupil" cx={x} cy="54" r="2.5" fill={INK} />
-              <Line d={`M${x - 3.4} 47.6q3.4-1.6 6.8 0`} width={1.6} />
-            </g>
-          ))}
+          <Line d="M38.4 52q6-4.4 12-.6" width={2.6} color={EYE} />
+          <Line d="M69.6 51.4q6-3.8 12 .6" width={2.6} color={EYE} />
+          <g className="mascot-blink">
+            <ShinyEye cx={45} cy={63} />
+            <ShinyEye cx={75} cy={63} />
+          </g>
         </g>
       )
     case 'nghi':
-      // Mặt đơ: mí sụp nặng trịch, con ngươi ló nửa, bọng mắt. Đuôi mắt trễ ra ngoài.
+      // Một bên mày nhướn cao, một bên hơi chau.
       return (
         <g>
-          {[
-            { x: 42, lid: 'M35 53.8q7-1.6 14-.4', brow: 'M36 47.4q6-1.2 12-.6' },
-            { x: 78, lid: 'M71 53.4q7-1.6 14 .4', brow: 'M72 46.8q6-1.2 12 .6' },
-          ].map(({ x, lid, brow }) => (
-            <g key={x}>
-              <path data-part="pupil" d={`M${x - 3} 53.2a3 2.8 0 0 0 6 0Z`} fill={INK} />
-              <Line d={lid} />
-              <Line d={`M${x - 5} 58.2q5 2 10 0`} width={1.4} />
-              <Line d={brow} width={1.6} />
-            </g>
-          ))}
+          <Line d="M36 49.6q6-5 12-1.4" width={2.6} color={EYE} />
+          <Line d="M71 54q6-1.6 11 .6" width={2.6} color={EYE} />
+          <g className="mascot-blink">
+            <LookUpEye cx={45} />
+            <LookUpEye cx={75} />
+          </g>
         </g>
       )
     case 'mung':
-      // Cười ngặt nghẽo: mắt nhắm tịt ^ ^, đuôi mắt nhăn tít.
+      // Cười tít mắt > <.
       return (
         <g>
-          <Line d="M36 55q6-6 12 0" />
-          <Line d="M34.5 52l-3.4-1.8M34.5 56.4l-3.6.6" width={1.5} />
-          <Line d="M72 55q6-6 12 0" />
-          <Line d="M85.5 52l3.4-1.8M85.5 56.4l3.6.6" width={1.5} />
+          <Line d="M38 58.4l8.4 5-8.4 5" width={3.4} color={EYE} />
+          <Line d="M82 58.4l-8.4 5 8.4 5" width={3.4} color={EYE} />
         </g>
       )
     case 'tiec':
-      // Gào khóc: mắt nhắm nghiền > <, trán nhăn.
+      // Mày chau, mắt rơm rớm.
       return (
         <g>
-          <Line d="M34 51l9 4-9 4" />
-          <Line d="M86 51l-9 4 9 4" />
-          <Line d="M49 44q3-2 6 0M65 44q3-2 6 0" width={1.4} />
+          <Line d="M37 51.6q5-4.6 11-5.4" width={2.6} color={EYE} />
+          <Line d="M83 51.6q-5-4.6-11-5.4" width={2.6} color={EYE} />
+          <TearyEye cx={45} cy={63} clipId={`${uid}-eye-left`} />
+          <TearyEye cx={75} cy={63} clipId={`${uid}-eye-right`} />
         </g>
       )
     default:
-      // Mắt híp nhìn đểu: một khe mảnh, nếp mí phía trên, đuôi mắt có nếp.
+      // Nháy một mắt.
       return (
-        <g className="mascot-hehe">
-          {[36, 74].map((x) => (
-            <g key={x}>
-              <path d={`M${x} 53.4q6-4.2 12 0q-6 2.8-12 0Z`} fill={INK} />
-              <Line d={`M${x + 1} 49q5-2.4 10 0`} width={1.6} />
-              <Line d={x < 60 ? `M${x - 1.6} 53.4l-2.4 1.2` : `M${x + 13.6} 53.4l2.4 1.2`} width={1.4} />
-            </g>
-          ))}
+        <g>
+          <ShinyEye cx={45} cy={63} />
+          <Line d="M69 65q6-6.6 12 0" width={3.2} color={EYE} />
         </g>
       )
   }
 }
 
-/** Hai dòng nước mắt chảy từ khoé mắt xuống tận chân. */
-const TEAR_STREAMS = ['M37 59C33 71 33 88 36 106', 'M83 59C87 71 87 88 84 106']
+/** Nước mắt chảy thành suối từ khoé mắt xuống, bắn vài giọt ở cuối. */
+const TEAR_STREAMS = ['M41.6 71C39.6 80 40.6 92 38.6 103', 'M78.4 71C80.4 80 79.4 92 81.4 103']
 
 function Tears() {
   return (
     <g data-part="tears">
       {TEAR_STREAMS.map((d) => (
         <g key={d}>
-          <Line d={d} width={5} color={TEAR_EDGE} />
-          <Line d={d} width={3} color={TEAR} />
+          <Line d={d} width={7.2} />
+          <Line d={d} width={5} color={WATER} />
           {/* Vệt sáng trôi xuống cho ra dòng nước đang chảy. */}
           <path
             className="mascot-tears"
@@ -314,142 +272,132 @@ function Tears() {
             strokeWidth="1.4"
             strokeLinecap="round"
             strokeDasharray="2 9"
-            opacity=".8"
+            opacity=".85"
           />
         </g>
       ))}
+      <g fill={WATER} stroke={INK} strokeWidth="1.2">
+        <circle cx="33.6" cy="104" r="2" />
+        <circle cx="86.4" cy="104" r="2" />
+        <circle cx="30.4" cy="99" r="1.4" />
+        <circle cx="89.6" cy="99" r="1.4" />
+      </g>
     </g>
   )
 }
 
-/** Vị trí các cục của vệt mực làm mũi, quanh tâm mũi: [dx, dy, rx, ry]. */
-const NOSE_BLOBS: Array<[number, number, number, number]> = [
-  [0, 0.2, 6.4, 5.2],
-  [-5, -2.8, 2.7, 2.5],
-  [5, -3.2, 2.9, 2.6],
-  [6.6, 1.6, 2, 1.9],
-  [0.8, 5.2, 2.3, 2.1],
-  [-5.8, 2.6, 1.9, 1.8],
-]
-
-/** Cái mũi: vệt mực đen loang — nét nhận diện của bộ sticker, tâm trạng nào cũng giữ. */
-function Nose({ y }: { y: number }) {
-  return (
-    <g data-part="nose" fill={INK}>
-      {NOSE_BLOBS.map(([dx, dy, rx, ry]) => (
-        <ellipse key={`${dx} ${dy}`} cx={60 + dx} cy={y + dy} rx={rx} ry={ry} />
-      ))}
-    </g>
-  )
-}
-
-/**
- * Miệng há: môi kem viền mực, lòng miệng đen, rồi răng, lợi, lưỡi cắt gọn theo
- * lòng miệng.
- */
+/** Miệng há: lòng miệng đỏ sẫm, lưỡi hồng cắt gọn theo viền, rồi kẻ viền đè lên. */
 function OpenMouth({
   clipId,
-  lips,
-  opening,
-  children,
+  outline,
+  tongue,
 }: {
   clipId: string
-  lips: string
-  opening: string
-  children: React.ReactNode
+  outline: string
+  tongue: { cx: number; cy: number; rx: number; ry: number }
 }) {
   return (
     <g>
       <clipPath id={clipId}>
-        <path d={opening} />
+        <path d={outline} />
       </clipPath>
-      <path d={lips} fill={LIP} stroke={INK} strokeWidth="2.4" strokeLinejoin="round" />
-      <path d={opening} fill={MOUTH} />
-      <g clipPath={`url(#${clipId})`}>{children}</g>
-      <path d={opening} fill="none" stroke={INK} strokeWidth="1.6" />
+      <path d={outline} fill={MOUTH} />
+      <ellipse clipPath={`url(#${clipId})`} {...tongue} fill={TONGUE} />
+      <path d={outline} fill="none" stroke={INK} strokeWidth="2.6" strokeLinejoin="round" />
     </g>
   )
 }
 
-/** Mép trên hàm răng của nụ cười nhe răng, theo đường cong của miệng. */
-const grinTop = (x: number) => 73.4 + 4.9 * (1 - ((x - 60) / 33) ** 2)
-const GRIN_GAPS = [38, 45.4, 52.8, 60, 67.2, 74.6, 82].map((x) => `M${x} ${grinTop(x).toFixed(1)}v9`).join('')
-
 function Mouth({ mood, clipId }: { mood: MascotMood; clipId: string }) {
   switch (mood) {
     case 'chao':
-      // Chu môi "ồ".
       return (
-        <g>
-          <ellipse cx="60" cy="79" rx="7.4" ry="6" fill={LIP} stroke={INK} strokeWidth="2.2" />
-          <ellipse cx="60" cy="79.2" rx="3.4" ry="2.2" fill={MOUTH} />
-        </g>
-      )
-    case 'nghi':
-      // Môi dày mím chặt, không buồn nói.
-      return (
-        <g>
-          <path
-            d="M44 79C48.6 75 55 75.4 60 77.4C65 75.4 71.4 75 76 79C70 81 50 81 44 79Z"
-            fill={LIP}
-            stroke={INK}
-            strokeWidth="2.2"
-            strokeLinejoin="round"
-          />
-          <path
-            d="M44 79C50 87.4 70 87.4 76 79C70 81 50 81 44 79Z"
-            fill={LIP}
-            stroke={INK}
-            strokeWidth="2.2"
-            strokeLinejoin="round"
-          />
-          <Line d="M52 90.6q8 2 16 0" width={1.4} />
-        </g>
+        <OpenMouth
+          clipId={clipId}
+          outline="M50 74C51 87 69 87 70 74C63 76.4 57 76.4 50 74Z"
+          tongue={{ cx: 60, cy: 84.6, rx: 6.4, ry: 4.4 }}
+        />
       )
     case 'mung':
-      // Há miệng cười: răng trên, lưỡi hồng.
       return (
         <OpenMouth
           clipId={clipId}
-          lips="M38 70C43 64.6 77 64.6 82 70C84 88 73 100 60 100C47 100 36 88 38 70Z"
-          opening="M42.6 72C47 68.4 73 68.4 77.4 72C78.6 86 70 95.6 60 95.6C50 95.6 41.4 86 42.6 72Z"
-        >
-          <path d="M38 66H82V76.6C72 79.4 48 79.4 38 76.6Z" fill="#ffffff" />
-          <ellipse cx="60" cy="94" rx="12.6" ry="8" fill={TONGUE} />
-          <Line d="M60 88.6v5" width={1.2} color="#b34d66" />
-        </OpenMouth>
+          outline="M45 73C45 94 75 94 75 73C67 76 53 76 45 73Z"
+          tongue={{ cx: 60, cy: 88.4, rx: 9, ry: 6 }}
+        />
       )
+    case 'nghi':
+      // Chu môi lệch sang một bên: "hừm?".
+      return <ellipse cx="66" cy="79" rx="2.8" ry="2.4" fill={MOUTH} stroke={INK} strokeWidth="2.2" />
     case 'tiec':
-      // Gào hết cỡ: lộ cả răng trên lẫn răng dưới.
-      return (
-        <OpenMouth
-          clipId={clipId}
-          lips="M40 68C45 61 75 61 80 68C84.6 84 80 105 60 107C40 105 35.4 84 40 68Z"
-          opening="M44.4 70C48.6 65.6 71.4 65.6 75.6 70C79 84 75 101.6 60 103C45 101.6 41 84 44.4 70Z"
-        >
-          <path d="M40 62H80V75C70 77.6 50 77.6 40 75Z" fill="#ffffff" />
-          <Line d="M50 70.6v5M56.6 70.6v5M63.4 70.6v5M70 70.6v5" width={1} color={TOOTH_GAP} />
-          <path d="M40 108V97.6C50 95 70 95 80 97.6V108Z" fill="#ffffff" />
-        </OpenMouth>
-      )
-    default:
-      // Nhe nguyên hàm răng trắng, viền lợi hồng, môi dưới màu kem, nếp má hai bên.
+      // Miệng mếu run run, và cái bong bóng mũi phập phồng.
       return (
         <g>
-          <OpenMouth
-            clipId={clipId}
-            lips="M27 68C31 96 89 96 93 68C79 74.5 41 74.5 27 68Z"
-            opening="M32 71C37.4 91 82.6 91 88 71C75 76.6 45 76.6 32 71Z"
-          >
-            <path d="M27 69C42 75.6 78 75.6 93 69V74.8C78 81.4 42 81.4 27 74.8Z" fill={GUM} />
-            <path d="M27 73.4C42 80 78 80 93 73.4V84.4C78 91 42 91 27 84.4Z" fill="#ffffff" />
-            <Line d={GRIN_GAPS} width={0.9} color={TOOTH_GAP} />
-          </OpenMouth>
-          <Line d="M24 61c-3.6 5.4-3.8 12-.4 17M96 61c3.6 5.4 3.8 12 .4 17" width={1.8} />
-          <Line d="M43 99.6c10 4.6 24 4.6 34 0" width={1.6} />
+          <Line d="M51 83q2.25-2.6 4.5 0t4.5 0 4.5 0 4.5 0" width={2.6} />
+          <g className="mascot-snot" data-part="snot">
+            <circle cx="65.4" cy="75.6" r="4.2" fill={SNOT} opacity=".9" stroke={INK} strokeWidth="1.2" />
+            <circle cx="64.2" cy="74.4" r="1.2" fill="#ffffff" />
+          </g>
+        </g>
+      )
+    default:
+      // Miệng ω, le cái lưỡi ra một bên.
+      return (
+        <g>
+          <g className="mascot-tongue" data-part="tongue">
+            <path d="M60.6 76.2C60.6 85.4 69.4 85.4 69.4 76.8Z" fill={TONGUE} stroke={INK} strokeWidth="2" />
+            <Line d="M65 78v3.6" width={1.2} color={TONGUE_LINE} />
+          </g>
+          <Line d="M52 74.6q4 4.6 8 0q4 4.6 8 0" />
         </g>
       )
   }
+}
+
+/** Bốn chấm lơ lửng khi đang nghĩ — sáng lên lần lượt như đang gõ dở. */
+function ThinkingDots() {
+  return (
+    <g className="fill-slate-700 dark:fill-slate-200" data-part="dots">
+      {[8, 15, 22, 29].map((x, index) => (
+        <circle
+          key={x}
+          className="mascot-dot"
+          cx={x}
+          cy="17"
+          r="2.4"
+          style={{ animationDelay: `${index * 0.2}s` }}
+        />
+      ))}
+    </g>
+  )
+}
+
+/** Ngôi sao bốn cánh. */
+function star(cx: number, cy: number, r: number): string {
+  return `M${cx} ${cy - r}Q${cx} ${cy} ${cx + r} ${cy}Q${cx} ${cy} ${cx} ${cy + r}Q${cx} ${cy} ${cx - r} ${cy}Q${cx} ${cy} ${cx} ${cy - r}Z`
+}
+
+/** Ba ngôi sao lấp lánh quanh đầu: [cx, cy, bán kính]. */
+const SPARKLES: Array<[number, number, number]> = [
+  [24, 34, 5.4],
+  [99, 30, 4.4],
+  [106, 46, 3],
+]
+
+/** Lấp lánh quanh đầu lúc reo mừng. */
+function Sparkles() {
+  return (
+    <g data-part="sparkles" fill={SPARKLE} stroke={INK} strokeWidth="1.2" strokeLinejoin="round">
+      {SPARKLES.map(([cx, cy, r], index) => (
+        <path
+          key={index}
+          className="mascot-sparkle"
+          d={star(cx, cy, r)}
+          style={{ animationDelay: `${index * 0.25}s` }}
+        />
+      ))}
+    </g>
+  )
 }
 
 /**

@@ -54,9 +54,9 @@ chạy thẳng file TypeScript.
   phương án khác hẳn nhau về phụ âm và vần, nên mắt loại trừ được mà tai không
   cần làm gì. Xem [docs/tones.md](docs/tones.md).
 - **Zibi**: nhân vật dẫn đường tự vẽ bằng SVG — chào, ra đề, khen khi đúng, chữa
-  bài khi sai. Nét mặt bám theo một bộ sticker hài: mũi vệt mực, cười nhe nguyên
-  hàm răng lợi hồng, chu môi "ồ" vẫy tay, mặt đơ "….", ngửa cổ cười sặc, gào
-  khóc hai tay giơ lên trời.
+  bài khi sai. Vừa dễ thương vừa buồn cười: mắt to long lanh, má hồng, nháy
+  mắt le lưỡi, ngước mắt "….", cười tít giữa một trời lấp lánh, khóc nước mắt
+  thành suối kèm bong bóng mũi.
 - **Bong bóng chọn**: thanh điều hướng là viên thuốc kính mờ nổi, mục đang chọn
   nằm trong bong bóng trượt nảy sang mục mới; các bộ chọn ở màn Cá nhân dùng
   chung kiểu đó. Xem [docs/bubble.md](docs/bubble.md).
