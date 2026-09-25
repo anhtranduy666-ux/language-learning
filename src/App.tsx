@@ -13,6 +13,7 @@ import { Profile } from './pages/Profile'
 import { ProgressPage } from './pages/ProgressPage'
 import { Result } from './pages/Result'
 import { Speaking } from './pages/Speaking'
+import { Translate } from './pages/Translate'
 
 /**
  * Bản đồ màn hình theo mục 4 của bản thiết kế.
@@ -29,6 +30,7 @@ export function App() {
             <Route element={<AppShell />}>
               <Route path="/" element={<Home />} />
               <Route path="/learn" element={<Learn />} />
+              <Route path="/translate" element={<Translate />} />
               <Route path="/progress" element={<ProgressPage />} />
               <Route path="/profile" element={<Profile />} />
             </Route>

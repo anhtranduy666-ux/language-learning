@@ -6,12 +6,13 @@ const nav = () => screen.getByRole('navigation', { name: 'Điều hướng chín
 const link = (name: string) => within(nav()).getByRole('link', { name })
 
 describe('BottomNav', () => {
-  it('có đủ bốn mục, mỗi mục có tên dù trên màn hình chỉ có icon', () => {
+  it('có đủ năm mục theo đúng thứ tự, mỗi mục có tên dù trên màn hình chỉ có icon', () => {
     renderApp('/', ONBOARDED)
 
-    for (const name of ['Trang chủ', 'Học', 'Tiến độ', 'Cá nhân']) {
-      expect(link(name)).toBeInTheDocument()
-    }
+    const names = within(nav())
+      .getAllByRole('link')
+      .map((item) => item.getAttribute('aria-label'))
+    expect(names).toEqual(['Trang chủ', 'Học', 'Dịch', 'Tiến độ', 'Cá nhân'])
   })
 
   it('mục đang đứng được đánh dấu cho trình đọc màn hình', () => {
@@ -24,7 +25,7 @@ describe('BottomNav', () => {
   it('bong bóng đứng đúng dưới mục đang chọn', () => {
     renderApp('/progress', ONBOARDED)
 
-    expect(nav()).toHaveAttribute('data-active-index', '2')
+    expect(nav()).toHaveAttribute('data-active-index', '3')
   })
 
   it('bấm sang mục khác thì bong bóng trượt theo', async () => {
@@ -33,7 +34,7 @@ describe('BottomNav', () => {
 
     await user.click(link('Cá nhân'))
 
-    expect(nav()).toHaveAttribute('data-active-index', '3')
+    expect(nav()).toHaveAttribute('data-active-index', '4')
     expect(screen.getByRole('heading', { name: 'Cá nhân' })).toBeInTheDocument()
   })
 

@@ -92,6 +92,7 @@ Các màn hình chính:
 ### Mobile Navigation
 - Home
 - Learn
+- Translate — gõ tiếng Việt, ra tiếng Trung và nghe đọc (xem `docs/translate.md`)
 - Progress
 - Profile
 

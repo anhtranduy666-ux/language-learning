@@ -82,6 +82,10 @@ chạy thẳng file TypeScript.
   được lưu. Vào từ nút **🎤 Luyện nói** ở màn Từ mới hoặc màn Kết quả. Ngưỡng
   mới chỉnh trên giọng máy, chưa hiệu chuẩn trên giọng người. Xem
   [docs/pronunciation-mvp.md](docs/pronunciation-mvp.md).
+- **Dịch**: mục giữa thanh điều hướng. Gõ tiếng Việt, ra chữ Hán kèm pinyin, rồi
+  Zibi đọc to lên — bấm loa để nghe lại. Từ và câu có trong bài học được tra
+  ngay trên máy, kèm giọng đọc thu sẵn; còn lại hỏi Google Dịch. Xem
+  [docs/translate.md](docs/translate.md).
 - **Cài được lên điện thoại**: thêm vào màn hình chính iPhone hoặc Android,
   chạy toàn màn hình và **dùng được khi mất mạng**, kể cả phần nghe phát âm.
   Xem [docs/pwa.md](docs/pwa.md).
@@ -205,6 +209,7 @@ src/
 │   ├── nav.ts            Mục nào của thanh điều hướng đang được chọn
 │   ├── wordMap.ts        Toạ độ 60 từ trên bản đồ chòm sao / luống hoa
 │   ├── storage.ts        Đọc/ghi localStorage
+│   ├── translate.ts      Dịch Việt → Trung: tra khoá học trước, rồi Google Dịch
 │   ├── recorder.ts       Chấm phát âm: thu micro ra mẫu thô, tự dừng khi đọc xong
 │   ├── dsp.ts            Hạ mẫu, năng lượng từng khung, vùng có tiếng, WAV
 │   ├── pitch.ts          Đường cao độ (F0) theo khung 10 ms
@@ -242,12 +247,12 @@ nên chạy được trong `npm test`, không phải cài Deno chỉ để chạ
 
 ## Kiểm thử
 
-775 test, chia làm ba tầng:
+813 test, chia làm ba tầng:
 
 - **Logic** (`src/lib/*.test.ts`, `supabase/functions/speak/handler.test.ts`) — XP, level, streak, thành tích, sinh và chấm bài tập, chế độ sáng/tối, nền động, bản đồ 60 từ, khoá cache audio, đọc/ghi dữ liệu hỏng.
   Bộ chấm phát âm được kiểm bằng tín hiệu giả biết trước cao độ, và bằng bản đọc thật của máy — cả đúng lẫn cố tình sai thanh — trong `src/test/fixtures/speech`: bản sai phải bị đánh dấu **đúng ở âm tiết sai**.
 - **Dữ liệu** (`src/data/hsk1.test.ts`) — mọi từ đều có đủ trường, không trùng id, không từ nào lạc khỏi bài học; mỗi câu mẫu có đúng một âm tiết pinyin cho mỗi chữ Hán, và mọi âm tiết là âm tiết tiếng Trung có thật.
-- **Giao diện** (`src/components/*.test.tsx`, `src/pages/app-flow.test.tsx`, `src/pages/speaking-flow.test.tsx`) — dựng app thật trong bộ nhớ và đi trọn một buổi học, đúng tiêu chí nghiệm thu của Version 2; màn luyện nói chạy bộ chấm thật, chỉ thay micro bằng giọng dựng sẵn.
+- **Giao diện** (`src/components/*.test.tsx`, `src/pages/app-flow.test.tsx`, `src/pages/speaking-flow.test.tsx`, `src/pages/translate-flow.test.tsx`) — dựng app thật trong bộ nhớ và đi trọn một buổi học, đúng tiêu chí nghiệm thu của Version 2; màn luyện nói chạy bộ chấm thật, chỉ thay micro bằng giọng dựng sẵn; màn Dịch chạy thật, chỉ thay mạng bằng câu trả lời dựng sẵn của Google.
 
 Test chạy trong `StrictMode` giống hệt bản thật, nên những lỗi do hàm cập nhật state không thuần tuý sẽ lộ ra ngay trong suite.
 
