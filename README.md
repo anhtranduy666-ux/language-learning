@@ -92,6 +92,8 @@ chạy thẳng file TypeScript.
   thật (mốc M4 ở [docs/pronunciation-mvp.md](docs/pronunciation-mvp.md)), chấm
   câu mẫu, chấm phụ âm đầu và vần. Phần so sánh các hướng ở
   [docs/pronunciation-scoring.md](docs/pronunciation-scoring.md).
+- Hội thoại với Zibi: nói chuyện theo kịch bản, đọc câu đáp và được chấm phát
+  âm. Đã có phương án kỹ thuật: [docs/dialogue.md](docs/dialogue.md).
 - Toàn bộ phần AI ở Phase 8.
 
 ## Âm thanh
