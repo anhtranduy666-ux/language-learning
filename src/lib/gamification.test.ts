@@ -24,6 +24,7 @@ describe('XP_REWARDS', () => {
       flashcard: 5,
       correctAnswer: 10,
       lessonComplete: 30,
+      speaking: 5,
       dailyGoal: 50,
     })
   })

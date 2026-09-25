@@ -9,6 +9,12 @@ export const XP_REWARDS = {
   correctAnswer: 10,
   /** Hoàn thành trọn vẹn một lesson. */
   lessonComplete: 30,
+  /**
+   * Đọc một từ ở màn Luyện nói — một lần cho mỗi từ mỗi lượt vào màn. Thưởng
+   * việc **có luyện**, không thưởng theo điểm: bộ chấm còn nhiễu vài điểm, đừng
+   * để nó làm trọng tài phát XP.
+   */
+  speaking: 5,
   /** Thưởng thêm khi chạm mục tiêu trong ngày. */
   dailyGoal: 50,
 } as const

@@ -130,7 +130,7 @@ async function buildSentence(user: UserEvent, pieces: readonly string[]) {
 describe('Màn hình chào', () => {
   it('người chưa khai tên bị đưa về màn hình chào', () => {
     renderApp('/')
-    expect(screen.getByRole('heading', { name: /Học tiếng Trung từ con số 0/ })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Học tiếng Trung' })).toBeInTheDocument()
   })
 
   it('chưa nhập tên thì chưa cho bắt đầu', () => {
@@ -588,7 +588,7 @@ describe('Cá nhân', () => {
     await user.click(screen.getByRole('button', { name: 'Xoá tiến độ học' }))
     await user.click(screen.getByRole('button', { name: 'Xoá hết' }))
 
-    expect(screen.getByRole('heading', { name: /Học tiếng Trung từ con số 0/ })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Học tiếng Trung' })).toBeInTheDocument()
   })
 })
 
@@ -631,7 +631,7 @@ describe('Chế độ sáng/tối', () => {
     await user.click(screen.getByRole('button', { name: 'Xoá tiến độ học' }))
     await user.click(screen.getByRole('button', { name: 'Xoá hết' }))
 
-    expect(screen.getByRole('heading', { name: /Học tiếng Trung từ con số 0/ })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Học tiếng Trung' })).toBeInTheDocument()
     expect(theme()).toBe('dark')
   })
 })
@@ -674,7 +674,7 @@ describe('Nền động', () => {
     await user.click(screen.getByRole('button', { name: 'Xoá tiến độ học' }))
     await user.click(screen.getByRole('button', { name: 'Xoá hết' }))
 
-    expect(screen.getByRole('heading', { name: /Học tiếng Trung từ con số 0/ })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Học tiếng Trung' })).toBeInTheDocument()
     expect(document.documentElement.getAttribute('data-scene')).toBe('off')
   })
 })

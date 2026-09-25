@@ -121,6 +121,11 @@ export function Result() {
             </Button>
           </Link>
         )}
+        <Link to={`/lesson/${lessonId}/speaking`}>
+          <Button variant="secondary" size="lg" fullWidth>
+            <span aria-hidden="true">🎤</span> Luyện nói các từ vừa học
+          </Button>
+        </Link>
         <Link to="/">
           <Button variant="secondary" size="lg" fullWidth>
             Về trang chủ

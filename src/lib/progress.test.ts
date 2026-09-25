@@ -6,6 +6,7 @@ import {
   createProgress,
   isOnboarded,
   recordCorrectAnswer,
+  recordSpeakingPractice,
   recordWordReview,
   setDailyGoal,
   setName,
@@ -154,6 +155,14 @@ describe('recordCorrectAnswer', () => {
   it('cộng 10 XP cho mỗi câu đúng', () => {
     const progress = recordCorrectAnswer(createProgress(), TODAY)
     expect(progress.xp).toBe(XP_REWARDS.correctAnswer)
+  })
+})
+
+describe('recordSpeakingPractice', () => {
+  it('cộng XP cho việc có luyện nói, không phụ thuộc điểm', () => {
+    const progress = recordSpeakingPractice(createProgress(), TODAY)
+    expect(progress.xp).toBe(XP_REWARDS.speaking)
+    expect(progress.xpToday).toBe(XP_REWARDS.speaking)
   })
 })
 

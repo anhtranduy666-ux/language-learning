@@ -1,0 +1,114 @@
+[
+  {
+    "id": "nihao",
+    "pinyin": "nǐ hǎo",
+    "referenceSeconds": 0.54,
+    "correct": "nihao.correct-low.wav",
+    "wrong": [
+      {
+        "file": "nihao.wrong-ni4-low.wav",
+        "read": "ni4 hao3",
+        "syllable": 0
+      }
+    ]
+  },
+  {
+    "id": "xiexie",
+    "pinyin": "xiè xie",
+    "referenceSeconds": 0.55,
+    "correct": "xiexie.correct-high.wav",
+    "wrong": [
+      {
+        "file": "xiexie.wrong-xie1-high.wav",
+        "read": "xie1 xie5",
+        "syllable": 0
+      }
+    ]
+  },
+  {
+    "id": "shi",
+    "pinyin": "shì",
+    "referenceSeconds": 0.33,
+    "correct": "shi.correct-low.wav",
+    "wrong": [
+      {
+        "file": "shi.wrong-shi1-low.wav",
+        "read": "shi1",
+        "syllable": 0
+      }
+    ]
+  },
+  {
+    "id": "ta-nam",
+    "pinyin": "tā",
+    "referenceSeconds": 0.3,
+    "correct": "ta-nam.correct-high.wav",
+    "wrong": [
+      {
+        "file": "ta-nam.wrong-ta4-high.wav",
+        "read": "ta4",
+        "syllable": 0
+      }
+    ]
+  },
+  {
+    "id": "ren",
+    "pinyin": "rén",
+    "referenceSeconds": 0.29,
+    "correct": "ren.correct-low.wav",
+    "wrong": [
+      {
+        "file": "ren.wrong-ren4-low.wav",
+        "read": "ren4",
+        "syllable": 0
+      }
+    ]
+  },
+  {
+    "id": "hao",
+    "pinyin": "hǎo",
+    "referenceSeconds": 0.35,
+    "correct": "hao.correct-high.wav",
+    "wrong": [
+      {
+        "file": "hao.wrong-hao2-high.wav",
+        "read": "hao2",
+        "syllable": 0
+      }
+    ]
+  },
+  {
+    "id": "laoshi",
+    "pinyin": "lǎo shī",
+    "referenceSeconds": 0.56,
+    "correct": "laoshi.correct-low.wav",
+    "wrong": [
+      {
+        "file": "laoshi.wrong-shi4-low.wav",
+        "read": "lao3 shi4",
+        "syllable": 1
+      }
+    ]
+  },
+  {
+    "id": "mama",
+    "pinyin": "mā ma",
+    "referenceSeconds": 0.49,
+    "correct": "mama.correct-high.wav",
+    "wrong": []
+  },
+  {
+    "id": "shangwu",
+    "pinyin": "shàng wǔ",
+    "referenceSeconds": 0.65,
+    "correct": "shangwu.correct-low.wav",
+    "wrong": []
+  },
+  {
+    "id": "bukeqi",
+    "pinyin": "bú kè qi",
+    "referenceSeconds": 0.66,
+    "correct": "bukeqi.correct-high.wav",
+    "wrong": []
+  }
+]

@@ -59,11 +59,19 @@ export function Lesson() {
       </div>
 
       <div className="sticky bottom-0 -mx-4 mt-6 bg-slate-50/95 px-4 dark:bg-slate-950/95 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur">
-        <Link to={`/lesson/${lesson.id}/flashcards`}>
-          <Button size="lg" fullWidth>
-            Luyện flashcard
-          </Button>
-        </Link>
+        <div className="grid grid-cols-[auto_1fr] gap-3">
+          {/* Luyện nói là bước tuỳ chọn: đọc to từng từ, máy chấm thanh điệu. */}
+          <Link to={`/lesson/${lesson.id}/speaking`}>
+            <Button variant="secondary" size="lg">
+              <span aria-hidden="true">🎤</span> Luyện nói
+            </Button>
+          </Link>
+          <Link to={`/lesson/${lesson.id}/flashcards`}>
+            <Button size="lg" fullWidth>
+              Luyện flashcard
+            </Button>
+          </Link>
+        </div>
       </div>
     </>
   )

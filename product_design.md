@@ -207,6 +207,7 @@ Chưa cần:
 - Trả lời đúng: +10 XP
 - Hoàn thành lesson: +30 XP
 - Hoàn thành daily goal: +50 XP
+- Luyện nói một từ: +5 XP — thưởng việc có luyện, không theo điểm (xem `docs/pronunciation-mvp.md`)
 
 ### Level
 XP tích lũy → Level.

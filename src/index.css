@@ -4,6 +4,7 @@
 @import './styles/mascot.css';
 @import './styles/exercise.css';
 @import './styles/bubble.css';
+@import './styles/speaking.css';
 
 /* Chế độ tối do người học chọn, không bám cứng vào `prefers-color-scheme`.
    Thuộc tính này được đặt trên thẻ `html` — xem `src/lib/theme.ts`. */

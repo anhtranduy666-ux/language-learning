@@ -83,6 +83,11 @@ export function recordCorrectAnswer(progress: UserProgress, today: string): User
   return awardXp(progress, XP_REWARDS.correctAnswer, today)
 }
 
+/** Ghi nhận một từ đã được đọc to ở màn Luyện nói, bất kể điểm bao nhiêu. */
+export function recordSpeakingPractice(progress: UserProgress, today: string): UserProgress {
+  return awardXp(progress, XP_REWARDS.speaking, today)
+}
+
 /**
  * Đánh dấu hoàn thành một lesson.
  * Học lại một bài đã xong vẫn được cộng XP, nhưng không bị đếm trùng trong danh sách.

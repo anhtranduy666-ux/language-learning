@@ -12,6 +12,7 @@ import { Lesson } from './pages/Lesson'
 import { Profile } from './pages/Profile'
 import { ProgressPage } from './pages/ProgressPage'
 import { Result } from './pages/Result'
+import { Speaking } from './pages/Speaking'
 
 /**
  * Bản đồ màn hình theo mục 4 của bản thiết kế.
@@ -37,6 +38,7 @@ export function App() {
               <Route path="/lesson/:lessonId/flashcards" element={<Flashcards />} />
               <Route path="/lesson/:lessonId/exercise" element={<ExercisePage />} />
               <Route path="/lesson/:lessonId/result" element={<Result />} />
+              <Route path="/lesson/:lessonId/speaking" element={<Speaking />} />
             </Route>
 
             <Route path="*" element={<Navigate to="/" replace />} />

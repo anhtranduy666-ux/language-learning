@@ -1,0 +1,51 @@
+/**
+ * Màn Luyện nói — những chi tiết Tailwind diễn đạt vụng.
+ */
+
+/*
+ * Nút micro. Vòng sáng phía sau nở ra theo âm lượng đang thu, để người học
+ * thấy máy đang nghe mình — biến `--level` do React đặt, từ 0 tới 1.
+ */
+.mic-button {
+  --level: 0;
+  position: relative;
+  isolation: isolate;
+}
+
+.mic-ring {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: 9999px;
+  background: currentColor;
+  opacity: 0.18;
+  transform: scale(calc(1 + var(--level) * 0.55));
+  transition: transform 90ms linear;
+}
+
+/* Đang thu mà người học chưa nói: vòng sáng thở nhẹ, để biết máy chưa treo. */
+.mic-button[data-state='recording'] .mic-ring {
+  animation: mic-breathe 1.6s ease-in-out infinite;
+}
+
+@keyframes mic-breathe {
+  50% {
+    opacity: 0.3;
+  }
+}
+
+/* Kết quả hiện ra: trồi lên nhẹ, cùng nhịp với phần hiện cả câu ở bài ghép câu. */
+.speaking-result {
+  animation: sentence-reveal 320ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mic-ring {
+    transition: none;
+  }
+
+  .mic-button[data-state='recording'] .mic-ring,
+  .speaking-result {
+    animation: none;
+  }
+}

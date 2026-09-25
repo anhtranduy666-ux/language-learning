@@ -7,6 +7,7 @@ import {
   completeLesson,
   createProgress,
   recordCorrectAnswer,
+  recordSpeakingPractice,
   recordWordReview,
   setDailyGoal,
   setName,
@@ -22,6 +23,8 @@ export interface ProgressContextValue {
   clearNewAchievements: () => void
   reviewWord: (wordId: string, known: boolean) => void
   answerCorrect: () => void
+  /** Người học vừa đọc to một từ ở màn Luyện nói. */
+  practiceSpeaking: () => void
   finishLesson: (lessonId: string) => void
   updateName: (name: string) => void
   updateDailyGoal: (goal: number) => void
@@ -73,6 +76,7 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
       clearNewAchievements: () => setNewAchievements([]),
       reviewWord: (wordId, known) => apply((p) => recordWordReview(p, wordId, known, today)),
       answerCorrect: () => apply((p) => recordCorrectAnswer(p, today)),
+      practiceSpeaking: () => apply((p) => recordSpeakingPractice(p, today)),
       finishLesson: (lessonId) => apply((p) => completeLesson(p, lessonId, today)),
       updateName: (name) => apply((p) => setName(p, name)),
       updateDailyGoal: (goal) => apply((p) => setDailyGoal(p, goal)),

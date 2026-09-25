@@ -23,7 +23,7 @@ export function Landing() {
     <div className="flex min-h-dvh flex-col justify-between bg-gradient-to-b from-brand-50 to-slate-50 dark:from-brand-500/10 dark:to-slate-950 px-6 py-10">
       <div className="mx-auto w-full max-w-md">
         <p className="font-hanzi text-6xl">你好</p>
-        <h1 className="mt-6 text-3xl font-bold text-slate-900 dark:text-slate-100">Học tiếng Trung từ con số 0</h1>
+        <h1 className="mt-6 text-3xl font-bold text-slate-900 dark:text-slate-100">Học tiếng Trung</h1>
         <p className="mt-3 text-slate-600 dark:text-slate-400">
           Mỗi ngày một chút: từ vựng, pinyin, phát âm và bài tập ngắn. Không cần biết gì trước.
         </p>
