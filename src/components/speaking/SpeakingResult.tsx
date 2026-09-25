@@ -1,6 +1,7 @@
 import { PRAISE, REJECTIONS, TIPS, bandLabel, sandhiNote, type AttemptProblem } from '../../data/pronunciationTips'
 import { cn } from '../../lib/cn'
 import type { Attempt, SyllableResult } from '../../lib/pronunciation'
+import { PlayIcon } from '../icons/UiIcons'
 import { MascotSays } from '../Mascot'
 import { PitchSketch } from './PitchSketch'
 
@@ -109,9 +110,9 @@ export function SpeakingResult({ attempt, onReplay }: SpeakingResultProps) {
           <button
             type="button"
             onClick={onReplay}
-            className="rounded-full px-4 py-2 text-sm font-semibold text-brand-600 ring-1 ring-brand-200 transition hover:bg-brand-50 dark:text-brand-300 dark:ring-brand-500/40 dark:hover:bg-brand-500/10"
+            className="inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold text-brand-600 ring-1 ring-brand-200 transition hover:bg-brand-50 dark:text-brand-300 dark:ring-brand-500/40 dark:hover:bg-brand-500/10"
           >
-            ▶ Nghe lại giọng mình
+            <PlayIcon size={14} /> Nghe lại giọng mình
           </button>
         </div>
       )}

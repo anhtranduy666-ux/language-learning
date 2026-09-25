@@ -183,12 +183,18 @@ export interface WordProgress {
   lastReviewed: string
 }
 
+/**
+ * Tên icon của một thành tích, trong bộ icon vẽ tay ở
+ * `src/components/icons/GameIcons.tsx` — app không dùng emoji.
+ */
+export type AchievementIconName = 'target' | 'sprout' | 'books' | 'trophy' | 'streak' | 'xp' | 'shine' | 'medal'
+
 /** Thành tích đã mở khoá. */
 export interface Achievement {
   id: string
   title: string
   description: string
-  icon: string
+  icon: AchievementIconName
 }
 
 /** Toàn bộ tiến độ của người học. Đây là dữ liệu được lưu lại giữa các phiên. */

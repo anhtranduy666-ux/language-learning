@@ -3,6 +3,7 @@ import { Link, Navigate, useParams } from 'react-router-dom'
 import { AudioButton } from '../components/AudioButton'
 import { ExampleSentences } from '../components/ExampleSentences'
 import { FocusHeader } from '../components/FocusHeader'
+import { MicIcon } from '../components/icons/UiIcons'
 import { MascotSays } from '../components/Mascot'
 import { Button } from '../components/ui/Button'
 import { ALL_LESSONS, wordsOfLesson } from '../data/hsk1'
@@ -63,7 +64,7 @@ export function Lesson() {
           {/* Luyện nói là bước tuỳ chọn: đọc to từng từ, máy chấm thanh điệu. */}
           <Link to={`/lesson/${lesson.id}/speaking`}>
             <Button variant="secondary" size="lg">
-              <span aria-hidden="true">🎤</span> Luyện nói
+              <MicIcon size={20} /> Luyện nói
             </Button>
           </Link>
           <Link to={`/lesson/${lesson.id}/flashcards`}>

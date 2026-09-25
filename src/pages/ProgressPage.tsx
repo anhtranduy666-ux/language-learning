@@ -1,3 +1,5 @@
+import type { ReactNode } from 'react'
+import { AchievementIcon, LessonsIcon, LockIcon, StreakIcon, WordsIcon, XpIcon } from '../components/icons/GameIcons'
 import { StatBar } from '../components/StatBar'
 import { WordMap } from '../components/WordMap'
 import { ProgressBar } from '../components/ui/ProgressBar'
@@ -40,11 +42,11 @@ export function ProgressPage() {
 
       {/* Các chỉ số */}
       <section className="grid grid-cols-2 gap-3">
-        <MetricCard icon="🔥" value={streak} label="ngày streak" />
-        <MetricCard icon="⭐" value={progress.xp} label="tổng XP" />
-        <MetricCard icon="📚" value={learnedWordCount(progress)} label="từ đã nhớ" />
+        <MetricCard icon={<StreakIcon size={32} />} value={streak} label="ngày streak" />
+        <MetricCard icon={<XpIcon size={32} />} value={progress.xp} label="tổng XP" />
+        <MetricCard icon={<WordsIcon size={32} />} value={learnedWordCount(progress)} label="từ đã nhớ" />
         <MetricCard
-          icon="📖"
+          icon={<LessonsIcon size={32} />}
           value={`${progress.completedLessonIds.length}/${TOTAL_LESSONS}`}
           label="bài đã xong"
         />
@@ -104,9 +106,9 @@ export function ProgressPage() {
                     : 'bg-white opacity-50 ring-slate-100 dark:bg-slate-900 dark:ring-slate-800',
                 )}
               >
-                <p aria-hidden="true" className="text-2xl">
-                  {isUnlocked ? achievement.icon : '🔒'}
-                </p>
+                <span className="flex justify-center">
+                  {isUnlocked ? <AchievementIcon name={achievement.icon} size={36} /> : <LockIcon size={36} />}
+                </span>
                 <p className="mt-1 text-xs font-semibold text-slate-800 dark:text-slate-200">{achievement.title}</p>
                 <span className="sr-only">
                   {isUnlocked ? 'Đã mở khoá' : 'Chưa mở khoá'}: {achievement.description}
@@ -125,7 +127,8 @@ function MetricCard({
   value,
   label,
 }: {
-  icon: string
+  /** Icon vẽ tay, tự `aria-hidden`. */
+  icon: ReactNode
   value: number | string
   label: string
 }) {
@@ -135,9 +138,7 @@ function MetricCard({
       aria-label={label}
       className="surface rounded-2xl p-4"
     >
-      <p aria-hidden="true" className="text-2xl">
-        {icon}
-      </p>
+      {icon}
       <p className="mt-1 text-2xl font-bold text-slate-900 dark:text-slate-100">{value}</p>
       <p className="text-sm text-slate-500 dark:text-slate-400">{label}</p>
     </div>

@@ -1,5 +1,7 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import { Link, Navigate, useLocation, useParams } from 'react-router-dom'
+import { AchievementIcon, StreakIcon } from '../components/icons/GameIcons'
+import { MicIcon } from '../components/icons/UiIcons'
 import { Mascot } from '../components/Mascot'
 import { Button } from '../components/ui/Button'
 import { ProgressBar } from '../components/ui/ProgressBar'
@@ -78,7 +80,15 @@ export function Result() {
         <dl className="mt-5 grid grid-cols-3 gap-3 text-center">
           <Stat label="XP nhận được" value={`+${state.xpEarned}`} />
           <Stat label="Tổng XP" value={progress.xp} />
-          <Stat label="Streak" value={`${streak} 🔥`} />
+          <Stat
+            label="Streak"
+            value={
+              <span className="inline-flex items-center gap-1">
+                {streak}
+                <StreakIcon size={20} />
+              </span>
+            }
+          />
         </dl>
       </div>
 
@@ -94,9 +104,7 @@ export function Result() {
           <ul className="mt-3 space-y-2">
             {unlocked.map((achievement) => (
               <li key={achievement.id} className="flex items-center gap-3">
-                <span aria-hidden="true" className="text-2xl">
-                  {achievement.icon}
-                </span>
+                <AchievementIcon name={achievement.icon} size={36} className="shrink-0" />
                 <span>
                   <span className="block font-semibold text-slate-900 dark:text-slate-100">{achievement.title}</span>
                   <span className="block text-sm text-slate-600 dark:text-slate-400">{achievement.description}</span>
@@ -123,7 +131,7 @@ export function Result() {
         )}
         <Link to={`/lesson/${lessonId}/speaking`}>
           <Button variant="secondary" size="lg" fullWidth>
-            <span aria-hidden="true">🎤</span> Luyện nói các từ vừa học
+            <MicIcon size={20} /> Luyện nói các từ vừa học
           </Button>
         </Link>
         <Link to="/">
@@ -136,7 +144,7 @@ export function Result() {
   )
 }
 
-function Stat({ label, value }: { label: string; value: string | number }) {
+function Stat({ label, value }: { label: string; value: ReactNode }) {
   return (
     <div>
       <dt className="text-xs text-slate-500 dark:text-slate-400">{label}</dt>

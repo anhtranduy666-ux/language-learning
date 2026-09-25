@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { CardsIcon, CheckIcon } from '../components/icons/UiIcons'
 import { StatBar } from '../components/StatBar'
 import { ProgressBar } from '../components/ui/ProgressBar'
 import { HSK1 } from '../data/hsk1'
@@ -63,7 +64,7 @@ export function Learn() {
                           : 'bg-slate-100 text-slate-400 dark:bg-slate-800 dark:text-slate-500',
                       )}
                     >
-                      {isDone ? '✓' : '📇'}
+                      {isDone ? <CheckIcon size={20} /> : <CardsIcon size={20} />}
                     </span>
                     <span className="min-w-0 flex-1">
                       <span className="block truncate font-semibold text-slate-900 dark:text-slate-100">

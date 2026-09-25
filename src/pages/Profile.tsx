@@ -1,5 +1,13 @@
 import { useState } from 'react'
-import { BubbleSwitch } from '../components/ui/BubbleSwitch'
+import {
+  AutoThemeIcon,
+  ButterflyIcon,
+  MoonIcon,
+  OffIcon,
+  StillSceneIcon,
+  SunIcon,
+} from '../components/icons/UiIcons'
+import { BubbleSwitch, type BubbleOption } from '../components/ui/BubbleSwitch'
 import { Button } from '../components/ui/Button'
 import { useProgress } from '../context/ProgressContext'
 import { useScene } from '../context/SceneContext'
@@ -15,16 +23,16 @@ const GOAL_OPTIONS = [
   { value: 100, label: 'Nghiêm túc', hint: '100 XP · khoảng 10 phút mỗi ngày' },
 ]
 
-const THEME_OPTIONS: Array<{ value: ThemeChoice; label: string; icon: string }> = [
-  { value: 'light', label: 'Sáng', icon: '☀️' },
-  { value: 'dark', label: 'Tối', icon: '🌙' },
-  { value: 'system', label: 'Theo máy', icon: '🌓' },
+const THEME_OPTIONS: Array<BubbleOption<ThemeChoice>> = [
+  { value: 'light', label: 'Sáng', icon: <SunIcon size={18} /> },
+  { value: 'dark', label: 'Tối', icon: <MoonIcon size={18} /> },
+  { value: 'system', label: 'Theo máy', icon: <AutoThemeIcon size={18} /> },
 ]
 
-const SCENE_OPTIONS: Array<{ value: SceneChoice; label: string; icon: string }> = [
-  { value: 'full', label: 'Đầy đủ', icon: '🦋' },
-  { value: 'still', label: 'Tĩnh', icon: '🏞️' },
-  { value: 'off', label: 'Tắt', icon: '🚫' },
+const SCENE_OPTIONS: Array<BubbleOption<SceneChoice>> = [
+  { value: 'full', label: 'Đầy đủ', icon: <ButterflyIcon size={18} /> },
+  { value: 'still', label: 'Tĩnh', icon: <StillSceneIcon size={18} /> },
+  { value: 'off', label: 'Tắt', icon: <OffIcon size={18} /> },
 ]
 
 /** Màn hình Profile: tên hiển thị, mục tiêu hằng ngày, giao diện và tuỳ chọn xoá dữ liệu. */

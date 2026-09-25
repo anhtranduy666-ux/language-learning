@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Navigate, useNavigate } from 'react-router-dom'
+import { StreakIcon, TargetIcon, WordsIcon } from '../components/icons/GameIcons'
 import { MascotSays } from '../components/Mascot'
 import { Button } from '../components/ui/Button'
 import { useProgress } from '../context/ProgressContext'
@@ -34,13 +35,13 @@ export function Landing() {
 
         <ul className="mt-6 space-y-3 text-slate-700 dark:text-slate-300">
           <li className="flex items-center gap-3">
-            <span aria-hidden="true">📇</span> 60 từ HSK 1 kèm phát âm
+            <WordsIcon size={26} /> 60 từ HSK 1 kèm phát âm
           </li>
           <li className="flex items-center gap-3">
-            <span aria-hidden="true">🎯</span> Bài tập ngắn, làm xong trong 5 phút
+            <TargetIcon size={26} /> Bài tập ngắn, làm xong trong 5 phút
           </li>
           <li className="flex items-center gap-3">
-            <span aria-hidden="true">🔥</span> XP và streak để giữ thói quen
+            <StreakIcon size={26} /> XP và streak để giữ thói quen
           </li>
         </ul>
       </div>

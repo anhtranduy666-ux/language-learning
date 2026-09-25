@@ -1,4 +1,4 @@
-import type { CSSProperties } from 'react'
+import type { CSSProperties, ReactNode } from 'react'
 import { cn } from '../../lib/cn'
 
 /** Giá trị của một lựa chọn: chuỗi như 'dark', hoặc số như mục tiêu 50 XP. */
@@ -7,8 +7,8 @@ type OptionValue = string | number
 export interface BubbleOption<T extends OptionValue> {
   value: T
   label: string
-  /** Emoji đứng trước nhãn. Chỉ để trang trí, trình đọc màn hình bỏ qua. */
-  icon?: string
+  /** Icon vẽ tay đứng trước nhãn. Chỉ để trang trí, trình đọc màn hình bỏ qua. */
+  icon?: ReactNode
 }
 
 interface BubbleSwitchProps<T extends OptionValue> {
@@ -61,7 +61,7 @@ export function BubbleSwitch<T extends OptionValue>({
             )}
           >
             {option.icon && (
-              <span aria-hidden="true" className="bubble-switch-icon text-base leading-none">
+              <span aria-hidden="true" className="bubble-switch-icon flex leading-none">
                 {option.icon}
               </span>
             )}

@@ -89,15 +89,15 @@ export function learnedWordCount(progress: UserProgress): number {
 
 /** Danh sách thành tích có thể mở khoá. */
 export const ACHIEVEMENTS: Achievement[] = [
-  { id: 'first-lesson', title: 'First Lesson', description: 'Hoàn thành bài học đầu tiên', icon: '🎯' },
-  { id: 'words-10', title: '10 Words', description: 'Nhớ được 10 từ vựng', icon: '🌱' },
-  { id: 'words-50', title: '50 Words', description: 'Nhớ được 50 từ vựng', icon: '📚' },
-  { id: 'words-100', title: '100 Words', description: 'Nhớ được 100 từ vựng', icon: '🏆' },
-  { id: 'streak-3', title: '3 Day Streak', description: 'Học đều 3 ngày liên tiếp', icon: '🔥' },
-  { id: 'streak-7', title: '7 Day Streak', description: 'Học đều 7 ngày liên tiếp', icon: '🔥' },
-  { id: 'xp-500', title: '500 XP', description: 'Tích luỹ 500 XP', icon: '⭐' },
-  { id: 'xp-1000', title: '1,000 XP', description: 'Tích luỹ 1.000 XP', icon: '🌟' },
-  { id: 'unit-master', title: 'Unit Master', description: 'Hoàn thành 5 bài học', icon: '🥇' },
+  { id: 'first-lesson', title: 'First Lesson', description: 'Hoàn thành bài học đầu tiên', icon: 'target' },
+  { id: 'words-10', title: '10 Words', description: 'Nhớ được 10 từ vựng', icon: 'sprout' },
+  { id: 'words-50', title: '50 Words', description: 'Nhớ được 50 từ vựng', icon: 'books' },
+  { id: 'words-100', title: '100 Words', description: 'Nhớ được 100 từ vựng', icon: 'trophy' },
+  { id: 'streak-3', title: '3 Day Streak', description: 'Học đều 3 ngày liên tiếp', icon: 'streak' },
+  { id: 'streak-7', title: '7 Day Streak', description: 'Học đều 7 ngày liên tiếp', icon: 'streak' },
+  { id: 'xp-500', title: '500 XP', description: 'Tích luỹ 500 XP', icon: 'xp' },
+  { id: 'xp-1000', title: '1,000 XP', description: 'Tích luỹ 1.000 XP', icon: 'shine' },
+  { id: 'unit-master', title: 'Unit Master', description: 'Hoàn thành 5 bài học', icon: 'medal' },
 ]
 
 /** Điều kiện mở khoá của từng thành tích. */

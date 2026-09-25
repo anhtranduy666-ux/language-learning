@@ -186,6 +186,7 @@ src/
 ├── components/scene/  Nền động: khung, khu vườn, bầu trời sao
 ├── components/exercise/  Bài ghép câu, nghe–viết và chọn thanh điệu
 ├── components/speaking/  Nút micro, hình đường giọng, kết quả chấm phát âm
+├── components/icons/     Bộ icon vẽ tay: icon màu cho chỉ số và thành tích, icon nét cho nút bấm — app không dùng emoji
 ├── context/
 │   ├── ProgressContext.tsx  Tiến độ người học
 │   ├── SceneContext.tsx     Nền động: đầy đủ / tĩnh / tắt
@@ -247,7 +248,7 @@ nên chạy được trong `npm test`, không phải cài Deno chỉ để chạ
 
 ## Kiểm thử
 
-813 test, chia làm ba tầng:
+819 test, chia làm ba tầng:
 
 - **Logic** (`src/lib/*.test.ts`, `supabase/functions/speak/handler.test.ts`) — XP, level, streak, thành tích, sinh và chấm bài tập, chế độ sáng/tối, nền động, bản đồ 60 từ, khoá cache audio, đọc/ghi dữ liệu hỏng.
   Bộ chấm phát âm được kiểm bằng tín hiệu giả biết trước cao độ, và bằng bản đọc thật của máy — cả đúng lẫn cố tình sai thanh — trong `src/test/fixtures/speech`: bản sai phải bị đánh dấu **đúng ở âm tiết sai**.

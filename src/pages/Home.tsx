@@ -1,4 +1,6 @@
+import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
+import { CourseIcon, LessonsIcon, StreakIcon, WordsIcon } from '../components/icons/GameIcons'
 import { StatBar } from '../components/StatBar'
 import { Button } from '../components/ui/Button'
 import { ProgressBar } from '../components/ui/ProgressBar'
@@ -44,11 +46,18 @@ export function Home() {
           className="mt-3"
         />
         <p className="mt-3 text-sm text-slate-600 dark:text-slate-400">
-          {goalMet
-            ? streak > 0
-              ? `Xong rồi! Streak của bạn đang là ${streak} ngày. 🔥`
-              : 'Xong mục tiêu hôm nay rồi. Tuyệt vời!'
-            : `Còn ${progress.dailyGoal - progress.xpToday} XP nữa là đạt mục tiêu.`}
+          {goalMet ? (
+            streak > 0 ? (
+              <>
+                Xong rồi! Streak của bạn đang là {streak} ngày.{' '}
+                <StreakIcon size={18} className="inline-block align-[-3px]" />
+              </>
+            ) : (
+              'Xong mục tiêu hôm nay rồi. Tuyệt vời!'
+            )
+          ) : (
+            `Còn ${progress.dailyGoal - progress.xpToday} XP nữa là đạt mục tiêu.`
+          )}
         </p>
       </section>
 
@@ -69,10 +78,10 @@ export function Home() {
 
       {/* Tổng quan nhanh */}
       <section className="grid grid-cols-3 gap-3">
-        <SummaryCard icon="📚" value={learnedWordCount(progress)} label="từ đã nhớ" />
-        <SummaryCard icon="📖" value={progress.completedLessonIds.length} label="bài đã xong" />
+        <SummaryCard icon={<WordsIcon size={34} />} value={learnedWordCount(progress)} label="từ đã nhớ" />
+        <SummaryCard icon={<LessonsIcon size={34} />} value={progress.completedLessonIds.length} label="bài đã xong" />
         <SummaryCard
-          icon="🎓"
+          icon={<CourseIcon size={34} />}
           value={`${courseCompletion(progress.completedLessonIds)}%`}
           label="khoá HSK 1"
         />
@@ -93,15 +102,14 @@ function SummaryCard({
   value,
   label,
 }: {
-  icon: string
+  /** Icon vẽ tay, tự `aria-hidden`. */
+  icon: ReactNode
   value: number | string
   label: string
 }) {
   return (
     <div className="surface rounded-2xl p-3 text-center">
-      <p aria-hidden="true" className="text-xl">
-        {icon}
-      </p>
+      <span className="flex justify-center">{icon}</span>
       <p className="mt-1 text-xl font-bold text-slate-900 dark:text-slate-100">{value}</p>
       <p className="text-xs text-slate-500 dark:text-slate-400">{label}</p>
     </div>

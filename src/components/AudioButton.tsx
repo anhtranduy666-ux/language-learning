@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useAudioStatus } from '../hooks/useAudioStatus'
 import { cn } from '../lib/cn'
 import { playWord, type PlayStage } from '../lib/speech'
+import { SpeakerIcon, SpeakerOffIcon, SpinnerIcon } from './icons/UiIcons'
 
 interface AudioButtonProps {
   /** Chuỗi tiếng Trung cần đọc. */
@@ -17,10 +18,13 @@ interface AudioButtonProps {
 }
 
 const SIZES = {
-  sm: 'h-9 w-9 text-base',
-  md: 'h-12 w-12 text-xl',
-  lg: 'h-16 w-16 text-3xl',
+  sm: 'h-9 w-9',
+  md: 'h-12 w-12',
+  lg: 'h-16 w-16',
 }
+
+/** Cỡ icon theo cỡ nút. */
+const ICON_SIZES = { sm: 18, md: 24, lg: 30 }
 
 /** Lời nhắc khi máy không phát âm được, kèm cách khắc phục. */
 const HINTS = {
@@ -30,11 +34,6 @@ const HINTS = {
   error: 'Không phát được âm thanh lần này. Thử bấm lại nhé.',
 }
 
-/** Biểu tượng theo chặng. Tải file từ mạng có thể mất vài giây. */
-const STAGE_ICONS: Record<PlayStage, string> = {
-  loading: '⏳',
-  speaking: '🔊',
-}
 
 type Hint = keyof typeof HINTS | null
 
@@ -95,7 +94,14 @@ export function AudioButton({
           className,
         )}
       >
-        <span aria-hidden="true">{stage ? STAGE_ICONS[stage] : available ? '🔊' : '🔇'}</span>
+        {/* Tải file từ mạng có thể mất vài giây: lúc đó hiện vòng quay thay cho cái loa. */}
+        {stage === 'loading' ? (
+          <SpinnerIcon size={ICON_SIZES[size]} />
+        ) : available ? (
+          <SpeakerIcon size={ICON_SIZES[size]} />
+        ) : (
+          <SpeakerOffIcon size={ICON_SIZES[size]} />
+        )}
       </button>
 
       {hint ? (

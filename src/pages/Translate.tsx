@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { AudioButton } from '../components/AudioButton'
+import { BookIcon } from '../components/icons/UiIcons'
 import { MascotSays } from '../components/Mascot'
 import { Button } from '../components/ui/Button'
 import { cn } from '../lib/cn'
@@ -164,7 +165,8 @@ function TranslationCard({ result }: { result: Translation }) {
       <p className="mt-4 text-sm text-slate-500 dark:text-slate-400">
         {result.source === 'course' ? (
           <>
-            <span aria-hidden="true">📘</span> Có trong bài học: “{result.courseMeaning}”
+            <BookIcon size={16} className="mr-1 inline-block align-[-3px]" />
+            Có trong bài học: “{result.courseMeaning}”
           </>
         ) : (
           'Dịch bởi Google Dịch'
