@@ -146,7 +146,7 @@ function playFile(url: string): Promise<PlayResult> {
   })
 }
 
-function playVoice(text: string, voice: SpeechSynthesisVoice): Promise<PlayResult> {
+function playVoice(text: string, voice: SpeechSynthesisVoice, rate = 0.85): Promise<PlayResult> {
   const speech = synth()
   if (!speech) return Promise.resolve('unsupported')
 
@@ -166,8 +166,8 @@ function playVoice(text: string, voice: SpeechSynthesisVoice): Promise<PlayResul
       const utterance = new SpeechSynthesisUtterance(text)
       utterance.voice = voice
       utterance.lang = voice.lang
-      // Chậm hơn bình thường một chút để người mới nghe kịp từng âm tiết.
-      utterance.rate = 0.85
+      // Tiếng Trung đọc chậm hơn bình thường một chút để người mới nghe kịp từng âm tiết.
+      utterance.rate = rate
       utterance.onend = () => finish('played')
       utterance.onerror = () => finish('error')
 
@@ -235,4 +235,35 @@ export async function playWord(input: {
   }
 
   return synth() ? 'no-chinese-voice' : 'unsupported'
+}
+
+/** Giọng tiếng Việt của máy, hoặc null nếu máy không có. */
+export function findVietnameseVoice(): SpeechSynthesisVoice | null {
+  const speech = synth()
+  if (!speech) return null
+  return (
+    speech.getVoices().find((voice) => {
+      const lang = voice.lang.toLowerCase().replace('_', '-')
+      return lang === 'vi' || lang.startsWith('vi-')
+    }) ?? null
+  )
+}
+
+/** Kết quả đọc một câu tiếng Việt. */
+export type VietnameseResult = 'played' | 'no-voice' | 'unsupported' | 'error'
+
+/**
+ * Đọc một câu tiếng Việt — bản dịch ở chiều Trung → Việt của màn Dịch.
+ *
+ * Tiếng Việt không có file thu sẵn nào, nên chỉ có giọng của máy. iPhone có sẵn
+ * giọng tiếng Việt, Android thường cũng có; máy không có thì trả `no-voice` để
+ * giao diện nói rõ, không im lặng.
+ */
+export async function speakVietnamese(text: string): Promise<VietnameseResult> {
+  stopPlayback()
+  if (!synth()) return 'unsupported'
+  const voice = findVietnameseVoice()
+  if (!voice) return 'no-voice'
+  const result = await playVoice(text, voice, 1)
+  return result === 'played' ? 'played' : 'error'
 }

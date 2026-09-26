@@ -56,6 +56,10 @@ export default defineConfig({
     globals: true,
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],
+    // Test giao diện dựng cả app trong jsdom, thường xong dưới 1,5 giây. Máy bận
+    // (nhiều phiên cùng chạy test) có lúc chậm gấp bốn, vượt mốc 5 giây mặc định
+    // và hỏng oan. 15 giây vẫn đủ ngắn để bắt được test treo thật.
+    testTimeout: 15_000,
     include: ['src/**/*.{test,spec}.{ts,tsx}', 'supabase/functions/**/*.test.ts'],
   },
 })

@@ -72,6 +72,16 @@ export function MicIcon(props: IconProps) {
   )
 }
 
+/** Hai mũi tên ngược chiều — đổi chiều dịch. */
+export function SwapIcon(props: IconProps) {
+  return (
+    <Frame {...props}>
+      <path d="M4 8.4h14.4M14.6 4.6l3.8 3.8-3.8 3.8" />
+      <path d="M20 15.6H5.6M9.4 11.8l-3.8 3.8 3.8 3.8" />
+    </Frame>
+  )
+}
+
 export function PlayIcon(props: IconProps) {
   return (
     <Frame {...props}>
